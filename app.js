@@ -50,8 +50,6 @@ function initElements() {
   // 登入表單
   elements.loginForm = document.getElementById('loginForm');
   elements.storeIdInput = document.getElementById('storeId');
-  elements.passwordInput = document.getElementById('password');
-  elements.btnTogglePw = document.getElementById('btnTogglePw');
   elements.btnLogin = document.getElementById('btnLogin');
   elements.errorMessage = document.getElementById('errorMessage');
 
@@ -83,18 +81,6 @@ function initElements() {
 function initEventListeners() {
   // 登入表單
   elements.loginForm.addEventListener('submit', handleLogin);
-  elements.btnTogglePw.addEventListener('click', togglePasswordVisibility);
-
-  // 密碼可見性即時切換
-  elements.btnTogglePw.addEventListener('mousedown', () => {
-    elements.passwordInput.type = 'text';
-  });
-  elements.btnTogglePw.addEventListener('mouseup', () => {
-    elements.passwordInput.type = 'password';
-  });
-  elements.btnTogglePw.addEventListener('mouseleave', () => {
-    elements.passwordInput.type = 'password';
-  });
 
   // 登出
   elements.btnLogout.addEventListener('click', () => showModal(elements.logoutModal));
@@ -149,11 +135,10 @@ function handleLogin(e) {
   e.preventDefault();
   
   const storeId = elements.storeIdInput.value.trim().toUpperCase();
-  const password = elements.passwordInput.value;
 
   // 驗證
-  if (!storeId || !password) {
-    showError('請填寫 Store ID 和密碼');
+  if (!storeId) {
+    showError('請填寫 Store ID');
     return;
   }
 
@@ -164,17 +149,11 @@ function handleLogin(e) {
     return;
   }
 
-  // 密碼長度驗證
-  if (password.length < 8) {
-    showError('密碼最少需要 8 個字元');
-    return;
-  }
-
   // 顯示 loading
   setLoginLoading(true);
   hideError();
 
-  // 模擬登入驗證（實際應該調用後端 API）
+  // 模擬登入驗證
   setTimeout(() => {
     // 登入成功
     state.isLoggedIn = true;
