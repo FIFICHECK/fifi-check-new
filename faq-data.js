@@ -11,7 +11,7 @@ const FAQ_DATA = {
     questions: [
       {
         q: "如何登入商戶後台？",
-        a: `要登入 HKTVmall 商戶後台，請前往 MMS (Merchant Management System)：\nhttps://mms.shoalter.com/mms/\n\n1. 輸入您的 HKTV 帳戶電郵\n2. 輸入密碼\n3. 輸入 Store ID\n4. 點擊登入\n\n如果您忘記密碼，請聯絡商戶服務團隊或您的 RM。`
+        a: `要登入 HKTVmall 商戶後台，請前往 MMS (Merchant Management System)：\nhttps://mms.shoalter.com/mms/\n\n1. 輸入您的 HKTV 帳戶電郵\n2. 輸入密碼\n3. 輸入 Store ID\n4. 點擊登入\n\n如果您忘記密碼，請聯絡 FIFI 查服務團隊或您的 RM。`
       },
       {
         q: "如何設定雙重驗證（2FA）？",
@@ -181,9 +181,19 @@ const FAQ_DATA = {
         q: "如何聯絡我的 RM？",
         a: `聯絡您的商戶關係經理（RM）：\n\n📧 電郵方式：\n• 登入 MMS 查看您的 RM 聯絡資料\n• 在「帳戶資訊」中可以找到 RM 電郵\n\n📱 直接聯絡：\n• 如 RM 有提供即時通訊方式（如 WhatsApp）\n• 辦公時間內回覆較快\n\n💡 建議：\n• 準備好您的 Store ID 和具體問題\n• 非緊急事項可以發電郵\n• 緊急事項可以直接致電 RM`
       },
-      {
+{
         q: "商戶服務團隊聯絡方式？",
-        a: `聯絡 HKTVmall 商戶服務團隊：\n\n📧 電郵：\n• merchant@hktv.com.hk\n\n📞 電話：\n• 2153 9999（商戶專線）\n\n⏰ 辦公時間：\n• 星期一至五：9:00 - 18:00\n• 星期六：9:00 - 13:00\n• 星期日及公眾假期：休息\n\n💬 在線支援：\n• MMS 後台右下角的在線客服\n\n📍 地址：\n• HKTVmall 商戶支援中心\n（詳情可在後台查看）`
+        a: `聯絡 FIFI 查服務團隊：
+
+📱 WhatsApp：
+• 3998 8139
+
+📞 或致電您/妳既 RM
+
+💡 建議：
+• 有任何問題歡迎隨時聯絡
+• 我哋樂意幫助您解決疑問`
+      },
       },
       {
         q: "有商戶培訓課程嗎？",
