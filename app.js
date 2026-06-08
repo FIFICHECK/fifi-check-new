@@ -78,35 +78,38 @@ function initElements() {
 // ================================================
 
 function initEventListeners() {
+  // Helper to safely add event listener
+  const safeAddEvent = (el, event, handler) => {
+    if (el) el.addEventListener(event, handler);
+  };
+
   // 登入表單
-  elements.loginForm.addEventListener('submit', handleLogin);
+  safeAddEvent(elements.loginForm, 'submit', handleLogin);
 
   // 登出
-  elements.btnLogout.addEventListener('click', () => showModal(elements.logoutModal));
-  elements.btnCancelLogout.addEventListener('click', () => hideModal(elements.logoutModal));
-  elements.btnConfirmLogout.addEventListener('click', handleLogout);
+  safeAddEvent(elements.btnLogout, 'click', () => showModal(elements.logoutModal));
+  safeAddEvent(elements.btnCancelLogout, 'click', () => hideModal(elements.logoutModal));
+  safeAddEvent(elements.btnConfirmLogout, 'click', handleLogout);
 
-  // API Key Modal
-  elements.btnSkipApiKey.addEventListener('click', () => {
-    hideModal(elements.apiKeyModal);
-    showChatView();
-  });
-  elements.btnSaveApiKey.addEventListener('click', handleSaveApiKey);
+  // API Key Modal (removed - no longer needed)
+  // Elements kept for compatibility but not used
 
   // Chat 輸入
-  elements.chatInput.addEventListener('input', handleChatInput);
-  elements.chatInput.addEventListener('keydown', handleChatKeydown);
-  elements.btnSend.addEventListener('click', sendMessage);
+  safeAddEvent(elements.chatInput, 'input', handleChatInput);
+  safeAddEvent(elements.chatInput, 'keydown', handleChatKeydown);
+  safeAddEvent(elements.btnSend, 'click', sendMessage);
 
   // 預設問題
-  elements.presetChips.querySelectorAll('.preset-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const question = chip.dataset.question;
-      elements.chatInput.value = question;
-      handleChatInput();
-      sendMessage();
+  if (elements.presetChips) {
+    elements.presetChips.querySelectorAll('.preset-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const question = chip.dataset.question;
+        elements.chatInput.value = question;
+        handleChatInput();
+        sendMessage();
+      });
     });
-  });
+  }
 }
 
 // ================================================
