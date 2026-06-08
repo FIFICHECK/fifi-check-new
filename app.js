@@ -157,10 +157,10 @@ function handleLogin(e) {
     return;
   }
 
-  // Store ID 格式驗證
-  const storeIdPattern = /^H\d{7}$/;
+  // Store ID 格式驗證 (H/B/P/C + 7位數字)
+  const storeIdPattern = /^[HBPChbpc]\d{7}$/;
   if (!storeIdPattern.test(storeId)) {
-    showError('Store ID 格式不正確（應為 H + 7位數字，如 H3626001）');
+    showError('Store ID 格式不正確（應為 H/B/P/C + 7位數字，如 H3626001）');
     return;
   }
 
