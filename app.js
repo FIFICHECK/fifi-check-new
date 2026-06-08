@@ -49,7 +49,6 @@ function initElements() {
 
   // 登入表單
   elements.loginForm = document.getElementById('loginForm');
-  elements.emailInput = document.getElementById('email');
   elements.storeIdInput = document.getElementById('storeId');
   elements.passwordInput = document.getElementById('password');
   elements.btnTogglePw = document.getElementById('btnTogglePw');
@@ -149,13 +148,12 @@ function checkAuthStatus() {
 function handleLogin(e) {
   e.preventDefault();
   
-  const email = elements.emailInput.value.trim();
   const storeId = elements.storeIdInput.value.trim().toUpperCase();
   const password = elements.passwordInput.value;
 
   // 驗證
-  if (!email || !storeId || !password) {
-    showError('請填寫所有欄位');
+  if (!storeId || !password) {
+    showError('請填寫 Store ID 和密碼');
     return;
   }
 
@@ -178,20 +176,9 @@ function handleLogin(e) {
 
   // 模擬登入驗證（實際應該調用後端 API）
   setTimeout(() => {
-    // 簡單的客戶端驗證（示範用）
-    // 實際應用需要向您的伺服器驗證
-    const isValidEmail = email.includes('@') && email.includes('.');
-    
-    if (!isValidEmail) {
-      showError('電郵格式不正確');
-      setLoginLoading(false);
-      return;
-    }
-
     // 登入成功
     state.isLoggedIn = true;
     state.user = {
-      email: email,
       storeId: storeId,
       loginTime: new Date().toISOString()
     };
