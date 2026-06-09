@@ -292,25 +292,93 @@ async function sendMessage() {
 
   // 加入用戶消息
   addMessage('user', message);
-  
+
   // 顯示 typing 狀態
   showTyping(true);
 
   try {
-    // 同時獲取 FAQ 匹配和 Hermes 分析
-    const [faqMatches, hermesAnalysis] = await Promise.all([
-      Promise.resolve(searchFAQ(message)),
-      state.hermesMode ? getHermesAnalysis(message) : Promise.resolve(null)
-    ]);
-
-    // 顯示助理回覆
-    await showAssistantResponse(message, faqMatches, hermesAnalysis);
+    // 檢查係唔係日常寒暄
+    const greetingResponse = checkCasualGreeting(message);
+    if (greetingResponse) {
+      await new Promise(r => setTimeout(r, 600)); // 等0.6秒似真人在諗
+      addHermesPanel(greetingResponse);
+    } else {
+      // 正常 FAQ + Hermes 分析
+      const [faqMatches, hermesAnalysis] = await Promise.all([
+        Promise.resolve(searchFAQ(message)),
+        state.hermesMode ? getHermesAnalysis(message) : Promise.resolve(null)
+      ]);
+      await showAssistantResponse(message, faqMatches, hermesAnalysis);
+    }
   } catch (error) {
     console.error('Error:', error);
-    addMessage('assistant', `抱歉，發生錯誤：${error.message}\n\n請稍後再試。`);
+    addMessage('assistant', `唉～衰咗衰咗... ${error.message}\n\n等我冷靜下先 😅`);
   } finally {
     showTyping(false);
   }
+}
+
+// ================================================
+// 日常寒暄檢測
+// ================================================
+
+function checkCasualGreeting(message) {
+  const msg = message.toLowerCase().trim();
+  const greetings = [
+    '/', '你好', 'hello', 'hi', '嗨', '早晨', '午安', '晚安',
+    '你叫咩名', '你係邊個', '你係咩', '你係誰', '你係人定鬼',
+    '做緊咩', '做咩', '忙咩', '最近點', '你好嗎', '點呀',
+    '喂', 'hello呀', 'hi呀', '你好呀', '早晨呀'
+  ];
+
+  // 簡單關鍵字匹配
+  const isGreeting = greetings.some(g => msg === g || msg === g + '？' || msg === g + '?');
+
+  if (!isGreeting) return null;
+
+  const casualResponses = [
+    {
+      answer: `👋 你好！我係 **FIFI** 查，你嘅 HKTVmall 商戶小幫手！`,
+      extendedAdvice: `知道你有好多嘢要搞，頭都大埋啦... 不過唔洗驚！我實幫到你架！\n\n有咩想問就尽管開口啦 ^^`,
+      relatedCategory: '關於 FIFI',
+      confidence: 1.0
+    },
+    {
+      answer: `唉～我喺度等你問嘢咋！ 😄`,
+      extendedAdvice: `我係 **FIFI 查**，專幫 HKTVmall 商戶解決疑難雜症！\n\n知道你頭痕緊，我一定幫到你掛～ 有咩就出聲啦！`,
+      relatedCategory: '關於 FIFI',
+      confidence: 1.0
+    },
+    {
+      answer: `喂！你好！我是 **FIFI** 嚟嘅～  :P`,
+      extendedAdvice: `聽講你好頭痛嚟嘅？唔洗咁緊張！我幫過好多商戶解決問題嘅經驗✨\n\n你慢慢話我知有咩困難，我實幫到你架！`,
+      relatedCategory: '關於 FIFI',
+      confidence: 1.0
+    }
+  ];
+
+  // 隨機揀一個回覆
+  const response = casualResponses[Math.floor(Math.random() * casualResponses.length)];
+  const confidence = response.confidence;
+  const confidenceClass = 'confidence-high';
+
+  return `
+    <div class="hermes-analysis">
+      <div class="hermes-analysis-header">
+        <span>🧠</span>
+        <strong>FIFI 查</strong>
+        <span class="confidence-badge ${confidenceClass}">線上閒聊中 ^^</span>
+      </div>
+      <div class="hermes-section">
+        <div class="hermes-section-label">💬</div>
+        <div class="hermes-section-content">${response.answer}</div>
+      </div>
+      <div class="hermes-section">
+        <div class="hermes-section-label">🤝</div>
+        <div class="hermes-section-content">${response.extendedAdvice}</div>
+      </div>
+    </div>
+  `;
 }
 
 // ================================================
