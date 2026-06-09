@@ -490,28 +490,19 @@ function saveToMasterRecord(storeId, question, answer) {
 }
 
 function showConversationHistory() {
-  const modal = elements.historyModal;
   const content = document.getElementById('historyContent');
   if (!content) return;
 
-  const master = getMasterRecord();
-  const storeIds = Object.keys(master);
+  // 只顯示當前 Store ID 的記錄
+  const history = state.conversationHistory || [];
 
-  if (storeIds.length === 0) {
+  if (history.length === 0) {
     content.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:40px;">暫時未有對話記錄</p>';
     return;
   }
 
-  let html = '<div class="history-tabs">';
-  storeIds.forEach((id, i) => {
-    html += `<button class="history-tab ${i === 0 ? 'active' : ''}" onclick="showStoreHistory('${id}')">${id}</button>`;
-  });
-  html += '</div>';
-  html += '<div class="history-list" id="historyListContent">';
-
-  // 顯示第一個 Store ID 的記錄
-  const firstId = storeIds[0];
-  master[firstId].slice().reverse().forEach((item, i) => {
+  let html = '<div class="history-list">';
+  history.slice().reverse().forEach((item, i) => {
     const time = new Date(item.timestamp).toLocaleString('zh-HK', {
       year: 'numeric', month: 'numeric', day: 'numeric',
       hour: '2-digit', minute: '2-digit'
@@ -525,10 +516,6 @@ function showConversationHistory() {
     `;
   });
   html += '</div>';
-
-  // 總記錄數
-  const totalRecords = storeIds.reduce((sum, id) => sum + master[id].length, 0);
-  html += `<div class="history-footer">總共 ${totalRecords} 條記錄，${storeIds.length} 個 Store ID</div>`;
 
   content.innerHTML = html;
 }
