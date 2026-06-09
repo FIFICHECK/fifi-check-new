@@ -6,8 +6,8 @@
 let state = {
   isLoggedIn: false,
   user: null,
-  apiKey: null,
-  apiProvider: 'openai',
+  apiKey: '',
+  apiProvider: 'openrouter',
   messages: [],
   isTyping: false,
   hermesMode: true  // Hermes 分析模式開關
@@ -23,6 +23,10 @@ const API_CONFIG = {
     model: 'gpt-4o'
   },
   deepseek: {
+  openrouter: {
+    endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+    model: 'mistralai/mistral-7b-instruct'
+  }
     endpoint: 'https://api.deepseek.com/v1/chat/completions',
     model: 'deepseek-chat'
   }
@@ -44,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initElements();
   initEventListeners();
   checkAuthStatus();
+  checkApiKeyStatus();
 });
 
 function initElements() {
@@ -110,6 +115,21 @@ function initEventListeners() {
 
   // Hermes 開關
   safeAddEvent(elements.hermesBadge, 'click', toggleHermesMode);
+  // API Key Modal
+  safeAddEvent(elements.btnSkipApiKey, 'click', () => {
+    hideModal(elements.apiKeyModal);
+    localStorage.setItem('fifi_apikey_set', 'true');
+  });
+  safeAddEvent(elements.btnSaveApiKey, 'click', () => {
+    const key = elements.apiKeyInput.value.trim();
+    if (key) {
+      state.apiKey = key;
+      localStorage.setItem('fifi_apikey', key);
+      hideModal(elements.apiKeyModal);
+      localStorage.setItem('fifi_apikey_set', 'true');
+      showNotification('✅ API Key 已設定');
+    }
+  });
 }
 
 function checkAuthStatus() {
@@ -118,6 +138,15 @@ function checkAuthStatus() {
     state.user = JSON.parse(savedUser);
     state.isLoggedIn = true;
     showChatView();
+  }
+}
+
+function checkApiKeyStatus() {
+  const savedKey = localStorage.getItem('fifi_apikey');
+  if (savedKey) {
+    state.apiKey = savedKey;
+  } else {
+    setTimeout(() => showModal(elements.apiKeyModal), 500);
   }
 }
 
