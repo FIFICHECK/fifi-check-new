@@ -6,128 +6,139 @@
   <title>FIFI CHECK 🐾 — HKTVmall 商戶 AI 助理</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>">
 </head>
 <body>
-  <!-- Header -->
-  <header class="header" id="header">
-    <div class="header-content">
-      <div class="logo">
-        <span class="logo-icon">🐾</span>
-        <span class="logo-text">FIFI CHECK</span>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header" id="header">
+      <h1>🐾 FIFI CHECK</h1>
+      <div class="header-info">
+        <span class="hermes-badge active" id="hermesBadge" title="Hermes 分析：開啟">
+          <span>🧠</span>
+          <span>Hermes</span>
+        </span>
+        <span class="store-badge" id="storeBadge" style="display:none;"></span>
+        <button class="btn-logout" id="btnLogout" style="display:none;">登出</button>
       </div>
-      <div class="user-info" id="userInfo" style="display: none;">
-        <span class="store-badge" id="storeBadge"></span>
-        <span class="last-login" id="lastLogin"></span>
-        <button class="btn-logout" id="btnLogout">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          登出
-        </button>
-      </div>
-    </div>
-  </header>
+    </header>
 
-  <!-- Main Content -->
-  <main class="main-content" id="mainContent">
     <!-- Login View -->
     <div class="login-view" id="loginView">
       <div class="login-card">
-        <div class="login-header">
-          <div class="login-logo">🐾</div>
-          <h1>FIFI CHECK</h1>
-          <p class="login-subtitle">HKTVmall 商戶 AI 助理</p>
-          <p class="login-desc">24小時即時回覆您嘅商戶查詢</p>
-        </div>
-
-        <form class="login-form" id="loginForm">
-          <div class="error-message" id="errorMessage" style="display: none;"></div>
-
-          <button type="submit" class="btn-login" id="btnLogin">
-            <span class="btn-text">登入</span>
-            <span class="btn-loader" style="display: none;">
-              <svg class="spinner" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="31.4 31.4" stroke-linecap="round"/></svg>
-            </span>
-          </button>
+        <h2>🐾 FIFI CHECK</h2>
+        <p class="subtitle">HKTVmall 商戶 AI 助理</p>
+        <p class="login-desc">24小時即時回覆您嘅商戶查詢</p>
+        
+        <form id="loginForm">
+          <div class="error-message" id="errorMessage"></div>
+          <div class="form-group">
+            <label>用戶名</label>
+            <input type="text" id="username" placeholder="輸入用戶名" autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label>密碼</label>
+            <input type="password" id="password" placeholder="輸入密碼" autocomplete="current-password">
+          </div>
+          <button type="submit" class="btn btn-primary" id="btnLogin">登入</button>
         </form>
-
+        
         <div class="login-footer">
-          <p>登入即表示您同意我們的<a href="#">服務條款</a>和<a href="#">私隱政策</a></p>
+          <p>📖 資料來源：<a href="https://sites.google.com/view/hktv-merc-faq/" target="_blank">HKTV 商戶支援</a></p>
         </div>
       </div>
     </div>
 
     <!-- Chat View -->
-    <div class="chat-view" id="chatView" style="display: none;">
-      <div class="chat-container">
-        <!-- Welcome Screen -->
-        <div class="welcome-screen" id="welcomeScreen">
-          <div class="welcome-icon">🐾</div>
-          <h2>您好！歡迎使用 FIFI CHECK</h2>
-          <p>我是您的 HKTVmall 商戶 AI 助理，可以幫您解答關於：</p>
-          <ul class="welcome-features">
-            <li>📦 產品上架與庫存管理</li>
-            <li>📋 訂單處理與物流</li>
-            <li>🎁 優惠活動設定</li>
-            <li>💰 佣金與結算</li>
-            <li>📞 聯絡客戶服務</li>
-          </ul>
-          <p class="welcome-hint">試試點擊下面嘅快捷問題，或者直接輸入您嘅問題：</p>
-          <div class="preset-chips" id="presetChips">
-            <button class="preset-chip" data-question="如何上架新產品？">如何上架新產品？</button>
-            <button class="preset-chip" data-question="訂單處理要幾耐？">訂單處理要幾耐？</button>
-            <button class="preset-chip" data-question="如何設定優惠活動？">如何設定優惠活動？</button>
-            <button class="preset-chip" data-question="如何聯絡我的 RM？">如何聯絡我的 RM？</button>
-            <button class="preset-chip" data-question="佣金率是多少？">佣金率是多少？</button>
-            <button class="preset-chip" data-question="如何處理退貨？">如何處理退貨？</button>
-          </div>
+    <div class="chat-view" id="chatView">
+      <!-- Chat Header -->
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <h3>🐾 FIFI CHECK — HKTVmall 商戶 AI 助理</h3>
+          <p class="last-login" id="lastLogin"></p>
         </div>
+        <button class="btn-logout" id="btnLogoutTop">登出</button>
+      </div>
 
-        <!-- Messages Container -->
-        <div class="messages-container" id="messagesContainer" style="display: none;"></div>
-
-        <!-- Typing Indicator -->
-        <div class="typing-indicator" id="typingIndicator" style="display: none;">
-          <div class="typing-avatar">🐾</div>
-          <div class="typing-dots">
-            <span></span><span></span><span></span>
-          </div>
-          <span class="typing-text">FIFI 思考緊...</span>
+      <!-- Welcome Screen -->
+      <div class="welcome-screen" id="welcomeScreen">
+        <h2>您好！歡迎使用 FIFI CHECK</h2>
+        <p>我是您的 HKTVmall 商戶 AI 助理，可以幫您解答關於：</p>
+        <ul class="welcome-features">
+          <li>📦 產品上架與庫存管理</li>
+          <li>📋 訂單處理與物流</li>
+          <li>🎁 推廣活動設定</li>
+          <li>💰 佣金與結算</li>
+          <li>📞 聯絡與支援</li>
+        </ul>
+        <p class="welcome-hint">點擊下面快捷問題，或直接輸入您嘅問題：</p>
+        <div class="preset-chips" id="presetChips">
+          <button class="preset-chip" onclick="askPreset('如何上架新產品？')">如何上架新產品？</button>
+          <button class="preset-chip" onclick="askPreset('佣金率是多少？')">佣金率是多少？</button>
+          <button class="preset-chip" onclick="askPreset('如何處理訂單發貨？')">如何處理訂單發貨？</button>
+          <button class="preset-chip" onclick="askPreset('如何設定優惠活動？')">如何設定優惠活動？</button>
+          <button class="preset-chip" onclick="askPreset('如何聯絡我的 RM？')">如何聯絡我的 RM？</button>
+          <button class="preset-chip" onclick="askPreset('退款政策是怎樣的？')">退款政策是怎樣的？</button>
         </div>
+      </div>
+
+      <!-- Messages Container -->
+      <div class="messages-container" id="messagesContainer"></div>
+
+      <!-- Typing Indicator -->
+      <div class="typing-indicator" id="typingIndicator">
+        <div class="typing-avatar">🐾</div>
+        <div class="typing-dots">
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+        </div>
+        <span>FIFI 思考緊...</span>
       </div>
 
       <!-- Chat Input -->
       <div class="chat-input-container">
-        <div class="chat-input-wrapper">
-          <textarea
-            id="chatInput"
-            placeholder="輸入您嘅問題... (Enter 發送，Shift+Enter 換行)"
-            rows="1"
-          ></textarea>
-          <button class="btn-send" id="btnSend" disabled>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-          </button>
-        </div>
-        <p class="chat-footer">FIFI CHECK AI 助理 • 24小時為您服務</p>
+        <textarea 
+          class="chat-input" 
+          id="chatInput" 
+          placeholder="輸入您的問題... (輸入「help」查看幫助)"
+          rows="1"
+        ></textarea>
+        <button class="btn-send" id="btnSend" disabled>➤</button>
       </div>
     </div>
-  </main>
 
-  <!-- Logout Confirmation Modal -->
-  <div class="modal-overlay" id="logoutModal" style="display: none;">
-    <div class="modal">
-      <div class="modal-icon">🐾</div>
-      <h3>確定要登出嗎？</h3>
-      <p>登出後需要重新輸入帳戶資料</p>
-      <div class="modal-actions">
-        <button class="btn-modal-cancel" id="btnCancelLogout">取消</button>
-        <button class="btn-modal-confirm" id="btnConfirmLogout">確定登出</button>
+    <!-- Logout Modal -->
+    <div class="modal" id="logoutModal">
+      <div class="modal-content">
+        <h3>確認登出？</h3>
+        <p>您確定要登出 FIFI CHECK 嗎？</p>
+        <div class="modal-buttons">
+          <button class="btn btn-secondary" id="btnCancelLogout">取消</button>
+          <button class="btn btn-primary" id="btnConfirmLogout">確認登出</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Key Modal (Optional) -->
+    <div class="modal" id="apiKeyModal">
+      <div class="modal-content">
+        <h3>設定 API Key</h3>
+        <p>輸入您的 OpenAI API Key 以啟用更高級的分析功能（可選）</p>
+        <input type="password" id="apiKeyInput" placeholder="sk-..." style="width:100%;padding:12px;margin:15px 0;border:1px solid #333;border-radius:8px;background:#1e2832;color:#e7e7e7;">
+        <div class="modal-buttons">
+          <button class="btn btn-secondary" id="btnSkipApiKey">跳過</button>
+          <button class="btn btn-primary" id="btnSaveApiKey">儲存</button>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- FAQ Data -->
   <script src="faq-data.js"></script>
+  <!-- Main App -->
   <script src="app.js"></script>
 </body>
 </html>
