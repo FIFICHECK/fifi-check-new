@@ -1,5 +1,5 @@
 // ================================================
-// FIFI CHECK — Main Application (Hermes Enhanced)
+// Jerry GP Dashboard — Main Application (Hermes Enhanced)
 // HKTVmall 商戶 AI 助理 + Hermes 分析引擎
 // ================================================
 
@@ -151,29 +151,31 @@ function checkApiKeyStatus() {
 function handleLogin(e) {
   e.preventDefault();
   
-  const username = document.getElementById('username')?.value || 
-                  document.querySelector('input[type="text"]')?.value ||
-                  document.querySelector('input[name="username"]')?.value;
-  const password = document.getElementById('password')?.value ||
-                   document.querySelector('input[type="password"]')?.value;
+  const storeId = document.getElementById('username')?.value?.trim() ||
+                  document.querySelector('input[type="text"]')?.value?.trim();
 
-  if (!username || !password) {
-    showError('請輸入用戶名和密碼');
+  if (!storeId) {
+    showError('請輸入 Store ID');
+    return;
+  }
+
+  // 驗證 Store ID 格式 (H/B/C/P + 數字)
+  const storeIdPattern = /^[HBCPhbcp]\d{6,8}$/;
+  if (!storeIdPattern.test(storeId)) {
+    showError('Store ID 格式不正確 (例: H1234567)');
     return;
   }
 
   setLoginLoading(true);
   
-  // 模擬登入延遲
   setTimeout(() => {
-    if (username && password) {
-      state.isLoggedIn = true;
-      state.user = { username, loginTime: new Date() };
-      localStorage.setItem('fifi_user', JSON.stringify(state.user));
-      showChatView();
-    } else {
-      showError('用戶名或密碼錯誤');
-    }
+    state.isLoggedIn = true;
+    state.user = { username: storeId.toUpperCase(), loginTime: new Date() };
+    localStorage.setItem('fifi_user', JSON.stringify(state.user));
+    showChatView();
+    setLoginLoading(false);
+  }, 300);
+}
     setLoginLoading(false);
   }, 500);
 }
@@ -457,7 +459,7 @@ function getDefaultHermesResponse(question) {
   }
   return {
     answer: '抱歉，我未能找到完全匹配的分析結果。',
-    extendedAdvice: '建議聯絡您的 RM 或 FIFI CHECK 商戶服務團隊獲取詳細協助。',
+    extendedAdvice: '建議聯絡您的 RM 或 Jerry GP Dashboard 商戶服務團隊獲取詳細協助。',
     relatedCategory: '聯絡與支援',
     warning: '',
     confidence: 0.2
@@ -555,7 +557,7 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
     const bestMatch = faqMatches[0];
     responseText = `📌 ${bestMatch.q}\n\n${bestMatch.a}\n\n---\n📖 資料來源：https://sites.google.com/view/hktv-merc-faq/`;
   } else {
-    responseText = `感謝您嘅提問！\n\n目前我未能找到完全匹配嘅答案。\n\n建議您：\n1. 嘗試使用其他關鍵字搜尋\n2. 聯絡您的 RM 查詢\n3. 聯絡 FIFI CHECK 商戶服務團隊的 RM\n\n📖 資料來源：https://sites.google.com/view/hktv-merc-faq/`;
+    responseText = `感謝您嘅提問！\n\n目前我未能找到完全匹配嘅答案。\n\n建議您：\n1. 嘗試使用其他關鍵字搜尋\n2. 聯絡您的 RM 查詢\n3. 聯絡 Jerry GP Dashboard 商戶服務團隊的 RM\n\n📖 資料來源：https://sites.google.com/view/hktv-merc-faq/`;
   }
 
   // 加入助理消息
