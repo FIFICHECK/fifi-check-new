@@ -15,20 +15,18 @@ let state = {
 
 // DOM 元素緩存
 let elements = {};
-
-// 端點配置
 const API_CONFIG = {
   openai: {
     endpoint: 'https://api.openai.com/v1/chat/completions',
     model: 'gpt-4o'
   },
   deepseek: {
+    endpoint: 'https://api.deepseek.com/v1/chat/completions',
+    model: 'deepseek-chat'
+  },
   openrouter: {
     endpoint: 'https://openrouter.ai/api/v1/chat/completions',
     model: 'mistralai/mistral-7b-instruct'
-  }
-    endpoint: 'https://api.deepseek.com/v1/chat/completions',
-    model: 'deepseek-chat'
   }
 };
 
