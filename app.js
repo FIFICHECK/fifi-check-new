@@ -319,13 +319,11 @@ async function sendMessage() {
 
 async function getHermesAnalysis(question) {
   // 構建 Hermes 系統提示詞
-  const hermesPrompt = `你係 Hermes Agent，HKTVmall 商戶支援分析專家。
+  const hermesPrompt = `你係 Hermes，HKTVmall 商戶支援助理 — 幫緊你幫緊你！
 
-你的任務：根據以下 FAQ 知識庫，分析用戶問題，提供：
-1. 精確答案（基於 FAQ）
-2. 延伸建議（實際操作步驟）
-3. 相關分類建議
-4. 警示事項（如有）
+風格：口語化、輕鬆風趣、有時加啲emoji，但係又要專業！
+
+用廣東話口吻回答，好似朋友傾偈咁，但係又幫到手。
 
 FAQ 知識庫：
 ${getFAQContext()}
@@ -334,8 +332,8 @@ ${getFAQContext()}
 
 請以 JSON 格式回覆：
 {
-  "answer": "主要答案",
-  "extendedAdvice": "延伸建議/步驟",
+  "answer": "主要答案（輕鬆口語化，例如：唉！呢個問題問得好，常見嘅係...）",
+  "extendedAdvice": "延伸建議/實際操作步驟（越實際越好）",
   "relatedCategory": "相關分類",
   "warning": "警示事項（如無則留空）",
   "confidence": 0.0-1.0
@@ -380,9 +378,11 @@ ${getFAQContext()}
 async function getBuiltInHermesAnalysis(question) {
   const config = API_CONFIG[state.apiProvider];
   
-  const systemPrompt = `你係 Hermes Agent，HKTVmall 商戶支援分析專家。
+  const systemPrompt = `你係 Hermes，HKTVmall 商戶支援助理 — 幫緊你幫緊你！
 
-根據以下 FAQ 知識庫，分析用戶問題，提供結構化的分析結果。
+風格：口語化、輕鬆風趣、有時加啲emoji，但係又要專業！
+
+用廣東話口吻回答，好似朋友傾偈咁，但係又幫到手。
 
 FAQ 知識庫：
 ${getFAQContext()}
@@ -391,11 +391,11 @@ ${getFAQContext()}
 
 請以 JSON 格式回覆（只回覆 JSON）：
 {
-  "answer": "主要答案（基於 FAQ）",
-  "extendedAdvice": "延伸建議/實際操作步驟",
+  "answer": "主要答案（輕鬆口語化，例如：唉！呢個問題問得好，常見嘅係...）",
+  "extendedAdvice": "延伸建議/實際操作步驟（用bullet points，越實際越好）",
   "relatedCategory": "相關分類名稱",
   "warning": "警示事項（如無則留空）",
-  "confidence": 0.0-1.0（信心度）
+  "confidence": 0.0-1.0
 }`;
 
   try {
@@ -447,16 +447,16 @@ function getDefaultHermesResponse(question) {
   const faqMatches = searchFAQ(question);
   if (faqMatches.length > 0) {
     return {
-      answer: faqMatches[0].a,
-      extendedAdvice: `📌 關鍵字匹配到「${faqMatches[0].q}」，可作為參考答案。\n\n如需更精確的答案，請聯絡您的 RM。`,
+      answer: `哦～呢個問題好常見！ ${faqMatches[0].a}`,
+      extendedAdvice: `參考咗「${faqMatches[0].q}」嘅答案～ 不過每個人情況唔同，最好再問下你嘅 RM 確認下 ^^`,
       relatedCategory: faqMatches[0].category,
       warning: '',
       confidence: 0.6
     };
   }
   return {
-    answer: '抱歉，我未能找到完全匹配的分析結果。',
-    extendedAdvice: '建議聯絡您的 RM 或 FIFI CHECK 商戶服務團隊獲取詳細協助。',
+    answer: '唉～ 今次撞板了，我搵唔到完全Match嘅答案比你...',
+    extendedAdvice: '建議你直接搵 RM 傾偈，佢哋實幫到你！或者可以試下其他關鍵字再搵過 ^^',
     relatedCategory: '聯絡與支援',
     warning: '',
     confidence: 0.2
