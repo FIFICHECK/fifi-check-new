@@ -65,6 +65,7 @@ function initElements() {
 
   // 登出
   elements.btnLogout = document.getElementById('btnLogout');
+  elements.btnLogoutTop = document.getElementById('btnLogoutTop');
   elements.logoutModal = document.getElementById('logoutModal');
   elements.btnCancelLogout = document.getElementById('btnCancelLogout');
   elements.btnConfirmLogout = document.getElementById('btnConfirmLogout');
@@ -103,6 +104,7 @@ function initEventListeners() {
 
   // 登出
   safeAddEvent(elements.btnLogout, 'click', () => showModal(elements.logoutModal));
+  safeAddEvent(elements.btnLogoutTop, 'click', () => showModal(elements.logoutModal));
   safeAddEvent(elements.btnCancelLogout, 'click', () => hideModal(elements.logoutModal));
   safeAddEvent(elements.btnConfirmLogout, 'click', handleLogout);
 
@@ -284,6 +286,10 @@ async function sendMessage() {
   // 清空輸入框
   elements.chatInput.value = '';
   handleChatInput();
+
+  // 確保輸入框可見
+  elements.chatInput?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  elements.chatInput?.focus();
 
   // 隱藏歡迎畫面
   if (elements.welcomeScreen) {
