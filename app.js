@@ -1,5 +1,5 @@
 // ================================================
-// Jerry GP Dashboard — Main Application (Hermes Enhanced)
+// FIFI CHECK — Main Application (Hermes Enhanced)
 // HKTVmall 商戶 AI 助理 + Hermes 分析引擎
 // ================================================
 
@@ -459,7 +459,7 @@ function getDefaultHermesResponse(question) {
   }
   return {
     answer: '抱歉，我未能找到完全匹配的分析結果。',
-    extendedAdvice: '建議聯絡您的 RM 或 Jerry GP Dashboard 商戶服務團隊獲取詳細協助。',
+    extendedAdvice: '建議聯絡您的 RM 或 FIFI CHECK 商戶服務團隊獲取詳細協助。',
     relatedCategory: '聯絡與支援',
     warning: '',
     confidence: 0.2
@@ -557,7 +557,7 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
     const bestMatch = faqMatches[0];
     responseText = `📌 ${bestMatch.q}\n\n${bestMatch.a}\n\n---\n📖 資料來源：https://sites.google.com/view/hktv-merc-faq/`;
   } else {
-    responseText = `感謝您嘅提問！\n\n目前我未能找到完全匹配嘅答案。\n\n建議您：\n1. 嘗試使用其他關鍵字搜尋\n2. 聯絡您的 RM 查詢\n3. 聯絡 Jerry GP Dashboard 商戶服務團隊的 RM\n\n📖 資料來源：https://sites.google.com/view/hktv-merc-faq/`;
+    responseText = `感謝您嘅提問！\n\n目前我未能找到完全匹配嘅答案。\n\n建議您：\n1. 嘗試使用其他關鍵字搜尋\n2. 聯絡您的 RM 查詢\n3. 聯絡 FIFI CHECK 商戶服務團隊的 RM\n\n📖 資料來源：https://sites.google.com/view/hktv-merc-faq/`;
   }
 
   // 加入助理消息
