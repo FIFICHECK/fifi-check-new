@@ -478,91 +478,59 @@ function getFAQContext() {
 // ================================================
 
 async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
-  let responseText = '';
-  let hermesHtml = '';
-
-  // 如果有 Hermes 分析結果
+  // 只顯示 Hermes 分析，不顯示 FAQ 原文
   if (hermesAnalysis && hermesAnalysis.answer) {
     const confidence = hermesAnalysis.confidence || 0.5;
-    const confidenceColor = confidence >= 0.7 ? '#2ecc71' : confidence >= 0.4 ? '#f39c12' : '#e74c3c';
+    const confidenceClass = confidence >= 0.7 ? 'confidence-high' : confidence >= 0.4 ? 'confidence-medium' : 'confidence-low';
+    const confidenceText = confidence >= 0.7 ? '高' : confidence >= 0.4 ? '中' : '低';
     
-    hermesHtml = `
-      <div class="hermes-analysis" style="
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 12px;
-        padding: 16px;
-        margin-top: 12px;
-        color: #fff;
-      ">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-          <span style="font-size: 18px;">🧠</span>
+    let hermesHtml = `
+      <div class="hermes-analysis">
+        <div class="hermes-analysis-header">
+          <span>🧠</span>
           <strong>Hermes 分析</strong>
-          <span style="
-            background: ${confidenceColor};
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            margin-left: auto;
-          ">信心度 ${Math.round(confidence * 100)}%</span>
+          <span class="confidence-badge ${confidenceClass}">${confidenceText} — ${Math.round(confidence * 100)}%</span>
         </div>
         
-        <div style="margin-bottom: 10px;">
-          <strong style="display: block; margin-bottom: 4px;">📝 答案：</strong>
-          <span>${hermesAnalysis.answer}</span>
+        <div class="hermes-section">
+          <div class="hermes-section-label">📝 答案</div>
+          <div class="hermes-section-content">${escapeHtml(hermesAnalysis.answer)}</div>
         </div>
-        
-        ${hermesAnalysis.extendedAdvice ? `
-        <div style="margin-bottom: 10px;">
-          <strong style="display: block; margin-bottom: 4px;">💡 延伸建議：</strong>
-          <span style="opacity: 0.9;">${hermesAnalysis.extendedAdvice}</span>
-        </div>
-        ` : ''}
-        
-        ${hermesAnalysis.relatedCategory ? `
-        <div style="margin-bottom: 10px;">
-          <strong style="display: block; margin-bottom: 4px;">📂 相關分類：</strong>
-          <span>${hermesAnalysis.relatedCategory}</span>
-        </div>
-        ` : ''}
-        
-        ${hermesAnalysis.warning ? `
-        <div style="
-          background: rgba(231, 76, 60, 0.3);
-          padding: 8px 12px;
-          border-radius: 8px;
-          margin-top: 10px;
-        ">
-          <strong>⚠️ 警示：</strong> ${hermesAnalysis.warning}
-        </div>
-        ` : ''}
-        
-        <div style="
-          margin-top: 10px;
-          padding-top: 10px;
-          border-top: 1px solid rgba(255,255,255,0.2);
-          font-size: 11px;
-          opacity: 0.7;
-        ">
-          📖 資料來源：https://sites.google.com/view/hktv-merc-faq/
-        </div>
-      </div>
     `;
-  }
-
-  // 生成 FAQ 回覆文字
-  if (faqMatches.length > 0) {
-    const bestMatch = faqMatches[0];
-    responseText = `📌 ${bestMatch.q}\n\n${bestMatch.a}\n\n---\n📖 資料來源：https://sites.google.com/view/hktv-merc-faq/`;
-  } else {
-    responseText = `感謝您嘅提問！\n\n目前我未能找到完全匹配嘅答案。\n\n建議您：\n1. 嘗試使用其他關鍵字搜尋\n2. 聯絡您的 RM 查詢\n3. 聯絡 FIFI CHECK 商戶服務團隊的 RM\n\n📖 資料來源：https://sites.google.com/view/hktv-merc-faq/`;
-  }
-
-  // 加入助理消息
-  addMessage('assistant', responseText);
-  
-  // 加入 Hermes 分析面板
-  if (hermesHtml) {
+    
+    if (hermesAnalysis.extendedAdvice) {
+      hermesHtml += `
+        <div class="hermes-section">
+          <div class="hermes-section-label">💡 延伸建議</div>
+          <div class="hermes-section-content">${escapeHtml(hermesAnalysis.extendedAdvice)}</div>
+        </div>
+      `;
+    }
+    
+    if (hermesAnalysis.relatedCategory) {
+      hermesHtml += `
+        <div class="hermes-section">
+          <div class="hermes-section-label">📂 相關分類</div>
+          <div class="hermes-section-content">${escapeHtml(hermesAnalysis.relatedCategory)}</div>
+        </div>
+      `;
+    }
+    
+    if (hermesAnalysis.warning) {
+      hermesHtml += `
+        <div class="hermes-warning">⚠️ ${escapeHtml(hermesAnalysis.warning)}</div>
+      `;
+    }
+    
+    hermesHtml += `
+      <div class="hermes-source">📖 資料來源：https://sites.google.com/view/hktv-merc-faq/</div>
+    </div>
+    `;
+    
     addHermesPanel(hermesHtml);
+  } else {
+    // 如果沒有 Hermes 分析，顯示簡短提示
+    addMessage('assistant', '抱歉，Hermes 分析暫時無法使用。請稍後再試或聯絡您的 RM。');
   }
 }
 
