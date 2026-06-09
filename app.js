@@ -391,6 +391,9 @@ async function sendMessage() {
         a: hermesAnalysis?.answer || '抱歉，Hermes 分析暫時無法使用。',
         timestamp: Date.now()
       });
+
+      // 保存到 master 記錄（所有 Store ID 的所有問題）
+      saveToMasterRecord(state.user.username, message, hermesAnalysis?.answer || '');
     }
   } catch (error) {
     console.error('Error:', error);
@@ -458,6 +461,146 @@ function showConversationHistory() {
   html += '</div>';
 
   content.innerHTML = html;
+}
+
+// ================================================
+// Master Record - 所有問題的完整記錄
+// ================================================
+
+function getMasterRecord() {
+  try {
+    const stored = localStorage.getItem('fifi_master_record');
+    return stored ? JSON.parse(stored) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveToMasterRecord(storeId, question, answer) {
+  const master = getMasterRecord();
+  if (!master[storeId]) {
+    master[storeId] = [];
+  }
+  master[storeId].push({
+    q: question,
+    a: answer,
+    timestamp: Date.now()
+  });
+  localStorage.setItem('fifi_master_record', JSON.stringify(master));
+}
+
+function showConversationHistory() {
+  const modal = elements.historyModal;
+  const content = document.getElementById('historyContent');
+  if (!content) return;
+
+  const master = getMasterRecord();
+  const storeIds = Object.keys(master);
+
+  if (storeIds.length === 0) {
+    content.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:40px;">暫時未有對話記錄</p>';
+    return;
+  }
+
+  let html = '<div class="history-tabs">';
+  storeIds.forEach((id, i) => {
+    html += `<button class="history-tab ${i === 0 ? 'active' : ''}" onclick="showStoreHistory('${id}')">${id}</button>`;
+  });
+  html += '</div>';
+  html += '<div class="history-list" id="historyListContent">';
+
+  // 顯示第一個 Store ID 的記錄
+  const firstId = storeIds[0];
+  master[firstId].slice().reverse().forEach((item, i) => {
+    const time = new Date(item.timestamp).toLocaleString('zh-HK', {
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+    html += `
+      <div class="history-item">
+        <div class="history-q">❓ ${escapeHtml(item.q)}</div>
+        <div class="history-a">💬 ${escapeHtml(item.a)}</div>
+        <div class="history-time">🕐 ${time}</div>
+      </div>
+    `;
+  });
+  html += '</div>';
+
+  // 總記錄數
+  const totalRecords = storeIds.reduce((sum, id) => sum + master[id].length, 0);
+  html += `<div class="history-footer">總共 ${totalRecords} 條記錄，${storeIds.length} 個 Store ID</div>`;
+
+  content.innerHTML = html;
+}
+
+function showStoreHistory(storeId) {
+  const master = getMasterRecord();
+  const content = document.getElementById('historyListContent');
+  if (!content || !master[storeId]) return;
+
+  // 更新 tab 狀態
+  document.querySelectorAll('.history-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.textContent === storeId);
+  });
+
+  let html = '';
+  master[storeId].slice().reverse().forEach((item, i) => {
+    const time = new Date(item.timestamp).toLocaleString('zh-HK', {
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+    html += `
+      <div class="history-item">
+        <div class="history-q">❓ ${escapeHtml(item.q)}</div>
+        <div class="history-a">💬 ${escapeHtml(item.a)}</div>
+        <div class="history-time">🕐 ${time}</div>
+      </div>
+    `;
+  });
+  content.innerHTML = html;
+}
+
+// ================================================
+// 匯出 Excel (CSV 格式)
+// ================================================
+
+function exportToExcel() {
+  const master = getMasterRecord();
+  const storeIds = Object.keys(master);
+
+  if (storeIds.length === 0) {
+    showNotification('暫無記錄可以匯出');
+    return;
+  }
+
+  // CSV header
+  let csv = '\uFEFF'; // BOM for UTF-8
+  csv += 'Store ID,時間,問題,答案\n';
+
+  storeIds.forEach(storeId => {
+    master[storeId].forEach(item => {
+      const time = new Date(item.timestamp).toLocaleString('zh-HK', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+      // Escape quotes and wrap in quotes
+      const q = `"${item.q.replace(/"/g, '""')}"`;
+      const a = `"${item.a.replace(/"/g, '""')}"`;
+      csv += `${storeId},${time},${q},${a}\n`;
+    });
+  });
+
+  // Create download
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const date = new Date().toISOString().slice(0, 10);
+  link.href = url;
+  link.download = `FIFI_CHECK_記錄_${date}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+
+  showNotification('📥 匯出成功！');
 }
 
 // ================================================

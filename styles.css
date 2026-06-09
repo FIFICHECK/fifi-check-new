@@ -875,3 +875,46 @@ html, body {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+/* ================================================
+   History Tabs
+   ================================================ */
+
+.history-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.history-tab {
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.8em;
+  transition: all 0.2s;
+}
+
+.history-tab:hover {
+  background: var(--border);
+}
+
+.history-tab.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.history-footer {
+  text-align: center;
+  padding: 12px;
+  font-size: 0.75em;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  margin-top: 10px;
+}
