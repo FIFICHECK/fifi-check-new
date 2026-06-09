@@ -742,3 +742,136 @@ html, body {
     padding: 30px 24px;
   }
 }
+
+/* ================================================
+   Store ID Suggestions
+   ================================================ */
+
+.store-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px;
+  background: var(--bg-warm);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.store-suggestion-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.8em;
+  transition: all 0.2s;
+}
+
+.store-suggestion-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* ================================================
+   Chat Header Actions
+   ================================================ */
+
+.chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-history {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.75em;
+  transition: all 0.2s;
+}
+
+.btn-history:hover {
+  background: var(--bg-warm);
+  color: var(--text-primary);
+}
+
+/* ================================================
+   History Modal
+   ================================================ */
+
+.history-modal-content {
+  max-width: 500px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-content {
+  max-height: 400px;
+  overflow-y: auto;
+  margin: 15px 0;
+  padding: 10px 0;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.history-item {
+  background: var(--bg-warm);
+  border-radius: var(--radius);
+  padding: 14px;
+  border: 1px solid var(--border);
+}
+
+.history-q {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  font-size: 0.9em;
+}
+
+.history-a {
+  color: var(--text-secondary);
+  font-size: 0.85em;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.history-time {
+  font-size: 0.7em;
+  color: var(--text-muted);
+}
+
+/* ================================================
+   Notification
+   ================================================ */
+
+.notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--primary);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 0.85em;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 2000;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.notification.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

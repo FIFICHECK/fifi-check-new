@@ -1,5 +1,5 @@
 // ================================================
-// FIFI CHECK — Main Application (Hermes Enhanced)
+// FIFI CHECK — Main Application (Enhanced)
 // HKTVmall 商戶 AI 助理 + Hermes 分析引擎
 // ================================================
 
@@ -10,7 +10,8 @@ let state = {
   apiProvider: 'openrouter',
   messages: [],
   isTyping: false,
-  hermesMode: true  // Hermes 分析模式開關
+  hermesMode: true,
+  conversationHistory: []  // 對話歷史
 };
 
 // DOM 元素緩存
@@ -30,13 +31,67 @@ const API_CONFIG = {
   }
 };
 
-// Hermes/GAS 配置 — 請替換為你的 GAS Web App URL
 const GAS_CONFIG = {
-  // 當你没有設定 GAS URL 時，使用內置 LLM 分析
   useBuiltInLLM: true,
-  gasWebAppUrl: '',  // 例如: 'https://script.google.com/macros/s/XXX/exec'
-  hermesWebhook: ''   // Discord webhook URL for Hermes (可選)
+  gasWebAppUrl: '',
+  hermesWebhook: ''
 };
+
+// ================================================
+// Store ID 歷史記錄
+// ================================================
+
+function getStoredStoreIds() {
+  try {
+    const stored = localStorage.getItem('fifi_store_history');
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveStoreId(storeId) {
+  const history = getStoredStoreIds();
+  const upperId = storeId.toUpperCase();
+  // 移除已存在的
+  const filtered = history.filter(id => id !== upperId);
+  // 加入最新
+  filtered.unshift(upperId);
+  // 最多保存5個
+  const limited = filtered.slice(0, 5);
+  localStorage.setItem('fifi_store_history', JSON.stringify(limited));
+}
+
+function showStoreIdSuggestions() {
+  const history = getStoredStoreIds();
+  if (history.length === 0) return;
+
+  // 創建建議下拉選單
+  let suggestionsHtml = '<div class="store-suggestions" id="storeSuggestions">';
+  history.forEach(id => {
+    suggestionsHtml += `<button class="store-suggestion-btn" onclick="useStoreId('${id}')">${id}</button>`;
+  });
+  suggestionsHtml += '</div>';
+
+  // 插入到輸入框後
+  const usernameInput = document.getElementById('username');
+  if (usernameInput) {
+    // 移除舊的
+    const old = document.getElementById('storeSuggestions');
+    if (old) old.remove();
+    usernameInput.insertAdjacentHTML('afterend', suggestionsHtml);
+  }
+}
+
+function useStoreId(storeId) {
+  const input = document.getElementById('username');
+  if (input) {
+    input.value = storeId;
+    // 移除建議
+    const suggestions = document.getElementById('storeSuggestions');
+    if (suggestions) suggestions.remove();
+  }
+}
 
 // ================================================
 // 初始化
@@ -47,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initEventListeners();
   checkAuthStatus();
   checkApiKeyStatus();
+  showStoreIdSuggestions();
 });
 
 function initElements() {
@@ -83,10 +139,12 @@ function initElements() {
   elements.chatInput = document.getElementById('chatInput');
   elements.btnSend = document.getElementById('btnSend');
   elements.presetChips = document.getElementById('presetChips');
-  
-  // Hermes 增強面板
   elements.hermesPanel = document.getElementById('hermesPanel');
   elements.hermesBadge = document.getElementById('hermesBadge');
+
+  // 歷史記錄按鈕
+  elements.btnHistory = document.getElementById('btnHistory');
+  elements.historyModal = document.getElementById('historyModal');
 }
 
 // ================================================
@@ -94,7 +152,6 @@ function initElements() {
 // ================================================
 
 function initEventListeners() {
-  // Helper to safely add event listener
   const safeAddEvent = (el, event, handler) => {
     if (el) el.addEventListener(event, handler);
   };
@@ -102,11 +159,21 @@ function initEventListeners() {
   // 登入表單
   safeAddEvent(elements.loginForm, 'submit', handleLogin);
 
+  // Store ID 輸入監聽 - 顯示建議
+  safeAddEvent(document.getElementById('username'), 'focus', showStoreIdSuggestions);
+
   // 登出
   safeAddEvent(elements.btnLogout, 'click', () => showModal(elements.logoutModal));
   safeAddEvent(elements.btnLogoutTop, 'click', () => showModal(elements.logoutModal));
   safeAddEvent(elements.btnCancelLogout, 'click', () => hideModal(elements.logoutModal));
   safeAddEvent(elements.btnConfirmLogout, 'click', handleLogout);
+
+  // 歷史記錄
+  safeAddEvent(elements.btnHistory, 'click', () => {
+    showConversationHistory();
+    showModal(elements.historyModal);
+  });
+  safeAddEvent(document.getElementById('btnCloseHistory'), 'click', () => hideModal(elements.historyModal));
 
   // Chat 輸入
   safeAddEvent(elements.chatInput, 'input', handleChatInput);
@@ -115,6 +182,7 @@ function initEventListeners() {
 
   // Hermes 開關
   safeAddEvent(elements.hermesBadge, 'click', toggleHermesMode);
+
   // API Key Modal
   safeAddEvent(elements.btnSkipApiKey, 'click', () => {
     hideModal(elements.apiKeyModal);
@@ -138,6 +206,7 @@ function checkAuthStatus() {
     state.user = JSON.parse(savedUser);
     state.isLoggedIn = true;
     showChatView();
+    loadConversationHistory();
   }
 }
 
@@ -152,7 +221,7 @@ function checkApiKeyStatus() {
 
 function handleLogin(e) {
   e.preventDefault();
-  
+
   const storeId = document.getElementById('username')?.value?.trim() ||
                   document.querySelector('input[type="text"]')?.value?.trim();
 
@@ -161,7 +230,6 @@ function handleLogin(e) {
     return;
   }
 
-  // 驗證 Store ID 格式 (H/B/C/P + 數字)
   const storeIdPattern = /^[HBCPhbcp]\d{6,8}$/;
   if (!storeIdPattern.test(storeId)) {
     showError('Store ID 格式不正確 (例: H1234567)');
@@ -169,23 +237,33 @@ function handleLogin(e) {
   }
 
   setLoginLoading(true);
-  
+
   setTimeout(() => {
+    const upperId = storeId.toUpperCase();
     state.isLoggedIn = true;
-    state.user = { username: storeId.toUpperCase(), loginTime: new Date() };
+    state.user = { username: upperId, loginTime: new Date() };
     localStorage.setItem('fifi_user', JSON.stringify(state.user));
+
+    // 保存 Store ID 到歷史
+    saveStoreId(upperId);
+
     showChatView();
     setLoginLoading(false);
   }, 300);
 }
 
 function handleLogout() {
+  // 保存對話歷史
+  saveConversationHistory();
+
   state.isLoggedIn = false;
   state.user = null;
   state.messages = [];
+  state.conversationHistory = [];
   localStorage.removeItem('fifi_user');
   showLoginView();
   hideModal(elements.logoutModal);
+  showStoreIdSuggestions();
 }
 
 function showLoginView() {
@@ -283,38 +361,36 @@ async function sendMessage() {
   const message = elements.chatInput.value.trim();
   if (!message) return;
 
-  // 清空輸入框
   elements.chatInput.value = '';
   handleChatInput();
-
-  // 確保輸入框可見
   elements.chatInput?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   elements.chatInput?.focus();
 
-  // 隱藏歡迎畫面
   if (elements.welcomeScreen) {
     elements.welcomeScreen.style.display = 'none';
   }
 
-  // 加入用戶消息
   addMessage('user', message);
-
-  // 顯示 typing 狀態
   showTyping(true);
 
   try {
-    // 檢查係唔係日常寒暄
     const greetingResponse = checkCasualGreeting(message);
     if (greetingResponse) {
-      await new Promise(r => setTimeout(r, 600)); // 等0.6秒似真人在諗
+      await new Promise(r => setTimeout(r, 600));
       addHermesPanel(greetingResponse);
     } else {
-      // 正常 FAQ + Hermes 分析
       const [faqMatches, hermesAnalysis] = await Promise.all([
         Promise.resolve(searchFAQ(message)),
         state.hermesMode ? getHermesAnalysis(message) : Promise.resolve(null)
       ]);
       await showAssistantResponse(message, faqMatches, hermesAnalysis);
+
+      // 加入對話歷史
+      state.conversationHistory.push({
+        q: message,
+        a: hermesAnalysis?.answer || '抱歉，Hermes 分析暫時無法使用。',
+        timestamp: Date.now()
+      });
     }
   } catch (error) {
     console.error('Error:', error);
@@ -325,66 +401,63 @@ async function sendMessage() {
 }
 
 // ================================================
-// 日常寒暄檢測
+// 對話歷史保存/讀取
 // ================================================
 
-function checkCasualGreeting(message) {
-  const msg = message.toLowerCase().trim();
-  const greetings = [
-    '/', '你好', 'hello', 'hi', '嗨', '早晨', '午安', '晚安',
-    '你叫咩名', '你係邊個', '你係咩', '你係誰', '你係人定鬼',
-    '做緊咩', '做咩', '忙咩', '最近點', '你好嗎', '點呀',
-    '喂', 'hello呀', 'hi呀', '你好呀', '早晨呀'
-  ];
+function saveConversationHistory() {
+  if (state.conversationHistory.length === 0) return;
+  if (!state.user) return;
 
-  // 簡單關鍵字匹配
-  const isGreeting = greetings.some(g => msg === g || msg === g + '？' || msg === g + '?');
+  const key = `fifi_history_${state.user.username}`;
+  const data = {
+    storeId: state.user.username,
+    conversations: state.conversationHistory,
+    lastUpdated: Date.now()
+  };
+  localStorage.setItem(key, JSON.stringify(data));
+}
 
-  if (!isGreeting) return null;
+function loadConversationHistory() {
+  if (!state.user) return;
 
-  const casualResponses = [
-    {
-      answer: `👋 你好！我係 **FIFI** 查，你嘅 HKTVmall 商戶小幫手！`,
-      extendedAdvice: `知道你有好多嘢要搞，頭都大埋啦... 不過唔洗驚！我實幫到你架！\n\n有咩想問就尽管開口啦 ^^`,
-      relatedCategory: '關於 FIFI',
-      confidence: 1.0
-    },
-    {
-      answer: `唉～我喺度等你問嘢咋！ 😄`,
-      extendedAdvice: `我係 **FIFI 查**，專幫 HKTVmall 商戶解決疑難雜症！\n\n知道你頭痕緊，我一定幫到你掛～ 有咩就出聲啦！`,
-      relatedCategory: '關於 FIFI',
-      confidence: 1.0
-    },
-    {
-      answer: `喂！你好！我是 **FIFI** 嚟嘅～  :P`,
-      extendedAdvice: `聽講你好頭痛嚟嘅？唔洗咁緊張！我幫過好多商戶解決問題嘅經驗✨\n\n你慢慢話我知有咩困難，我實幫到你架！`,
-      relatedCategory: '關於 FIFI',
-      confidence: 1.0
+  const key = `fifi_history_${state.user.username}`;
+  const stored = localStorage.getItem(key);
+  if (stored) {
+    try {
+      const data = JSON.parse(stored);
+      state.conversationHistory = data.conversations || [];
+    } catch {
+      state.conversationHistory = [];
     }
-  ];
+  }
+}
 
-  // 隨機揀一個回覆
-  const response = casualResponses[Math.floor(Math.random() * casualResponses.length)];
-  const confidence = response.confidence;
-  const confidenceClass = 'confidence-high';
+function showConversationHistory() {
+  const modal = elements.historyModal;
+  const content = document.getElementById('historyContent');
+  if (!content) return;
 
-  return `
-    <div class="hermes-analysis">
-      <div class="hermes-analysis-header">
-        <span>🧠</span>
-        <strong>FIFI 查</strong>
-        <span class="confidence-badge ${confidenceClass}">線上閒聊中 ^^</span>
+  if (state.conversationHistory.length === 0) {
+    content.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:40px;">暫時未有對話記錄</p>';
+    return;
+  }
+
+  let html = '<div class="history-list">';
+  state.conversationHistory.slice().reverse().forEach((item, i) => {
+    const time = new Date(item.timestamp).toLocaleString('zh-HK', {
+      month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+    html += `
+      <div class="history-item">
+        <div class="history-q">${escapeHtml(item.q)}</div>
+        <div class="history-a">${escapeHtml(item.a)}</div>
+        <div class="history-time">${time}</div>
       </div>
-      <div class="hermes-section">
-        <div class="hermes-section-label">💬</div>
-        <div class="hermes-section-content">${response.answer}</div>
-      </div>
-      <div class="hermes-section">
-        <div class="hermes-section-label">🤝</div>
-        <div class="hermes-section-content">${response.extendedAdvice}</div>
-      </div>
-    </div>
-  `;
+    `;
+  });
+  html += '</div>';
+
+  content.innerHTML = html;
 }
 
 // ================================================
@@ -392,12 +465,16 @@ function checkCasualGreeting(message) {
 // ================================================
 
 async function getHermesAnalysis(question) {
-  // 構建 Hermes 系統提示詞
+  // 加入對話上下文
+  const conversationContext = state.conversationHistory.length > 0
+    ? `\n\n之前的對話記錄（用於理解上下文）：\n${state.conversationHistory.slice(-3).map(h => `問：${h.q}\n答：${h.a}`).join('\n')}`
+    : '';
+
   const hermesPrompt = `你係 Hermes，HKTVmall 商戶支援助理 — 幫緊你幫緊你！
 
 風格：口語化、輕鬆風趣、有時加啲emoji，但係又要專業！
 
-用廣東話口吻回答，好似朋友傾偈咁，但係又幫到手。
+用廣東話口吻回答，好似朋友傾偈咁，但係又幫到手。${conversationContext}
 
 FAQ 知識庫：
 ${getFAQContext()}
@@ -406,8 +483,8 @@ ${getFAQContext()}
 
 請以 JSON 格式回覆：
 {
-  "answer": "主要答案（輕鬆口語化，例如：唉！呢個問題問得好，常見嘅係...）",
-  "extendedAdvice": "延伸建議/實際操作步驟（越實際越好）",
+  "answer": "主要答案（輕鬆口語化）",
+  "extendedAdvice": "延伸建議/實際操作步驟",
   "relatedCategory": "相關分類",
   "warning": "警示事項（如無則留空）",
   "confidence": 0.0-1.0
@@ -416,47 +493,43 @@ ${getFAQContext()}
 只回覆 JSON，不要其他文字。`;
 
   try {
-    // 嘗試使用 GAS Web App
     if (GAS_CONFIG.gasWebAppUrl) {
       const response = await fetch(GAS_CONFIG.gasWebAppUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          action: 'hermesAnalysis', 
+        body: JSON.stringify({
+          action: 'hermesAnalysis',
           question: question,
           faqContext: getFAQContext()
         }),
         signal: AbortSignal.timeout(25000)
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         if (data.answer) return data;
       }
     }
-    
-    // Fallback: 使用內置 LLM 分析
+
     if (GAS_CONFIG.useBuiltInLLM && state.apiKey) {
-      return await getBuiltInHermesAnalysis(question);
+      return await getBuiltInHermesAnalysis(question, conversationContext);
     }
-    
-    // 無法分析時返回預設
+
     return getDefaultHermesResponse(question);
-    
   } catch (error) {
     console.log('Hermes analysis fallback:', error.message);
     return getDefaultHermesResponse(question);
   }
 }
 
-async function getBuiltInHermesAnalysis(question) {
+async function getBuiltInHermesAnalysis(question, conversationContext = '') {
   const config = API_CONFIG[state.apiProvider];
-  
+
   const systemPrompt = `你係 Hermes，HKTVmall 商戶支援助理 — 幫緊你幫緊你！
 
 風格：口語化、輕鬆風趣、有時加啲emoji，但係又要專業！
 
-用廣東話口吻回答，好似朋友傾偈咁，但係又幫到手。
+用廣東話口吻回答，好似朋友傾偈咁，但係又幫到手。${conversationContext}
 
 FAQ 知識庫：
 ${getFAQContext()}
@@ -492,17 +565,14 @@ ${getFAQContext()}
     });
 
     if (!response.ok) throw new Error('LLM API error');
-    
+
     const data = await response.json();
     const content = data.choices[0].message.content.trim();
-    
-    // 嘗試解析 JSON
+
     try {
-      // 移除可能有的 markdown code block
       const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
       return JSON.parse(jsonStr);
     } catch {
-      // 無法解析時返回文字
       return {
         answer: content,
         extendedAdvice: '',
@@ -542,7 +612,7 @@ function getDefaultHermesResponse(question) {
 // ================================================
 
 function getFAQContext() {
-  return ALL_FAQ.map(item => 
+  return ALL_FAQ.map(item =>
     `[${item.category}] ${item.q}\n${item.a}`
   ).join('\n\n');
 }
@@ -552,12 +622,11 @@ function getFAQContext() {
 // ================================================
 
 async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
-  // 只顯示 Hermes 分析，不顯示 FAQ 原文
   if (hermesAnalysis && hermesAnalysis.answer) {
     const confidence = hermesAnalysis.confidence || 0.5;
     const confidenceClass = confidence >= 0.7 ? 'confidence-high' : confidence >= 0.4 ? 'confidence-medium' : 'confidence-low';
     const confidenceText = confidence >= 0.7 ? '高' : confidence >= 0.4 ? '中' : '低';
-    
+
     let hermesHtml = `
       <div class="hermes-analysis">
         <div class="hermes-analysis-header">
@@ -565,13 +634,13 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
           <strong>Hermes 分析</strong>
           <span class="confidence-badge ${confidenceClass}">${confidenceText} — ${Math.round(confidence * 100)}%</span>
         </div>
-        
+
         <div class="hermes-section">
           <div class="hermes-section-label">📝 答案</div>
           <div class="hermes-section-content">${escapeHtml(hermesAnalysis.answer)}</div>
         </div>
     `;
-    
+
     if (hermesAnalysis.extendedAdvice) {
       hermesHtml += `
         <div class="hermes-section">
@@ -580,7 +649,7 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
         </div>
       `;
     }
-    
+
     if (hermesAnalysis.relatedCategory) {
       hermesHtml += `
         <div class="hermes-section">
@@ -589,21 +658,20 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
         </div>
       `;
     }
-    
+
     if (hermesAnalysis.warning) {
       hermesHtml += `
         <div class="hermes-warning">⚠️ ${escapeHtml(hermesAnalysis.warning)}</div>
       `;
     }
-    
+
     hermesHtml += `
       <div class="hermes-source">📖 資料來源：https://sites.google.com/view/hktv-merc-faq/</div>
     </div>
     `;
-    
+
     addHermesPanel(hermesHtml);
   } else {
-    // 如果沒有 Hermes 分析，顯示簡短提示
     addMessage('assistant', '抱歉，Hermes 分析暫時無法使用。請稍後再試或聯絡您的 RM。');
   }
 }
@@ -612,7 +680,7 @@ function addHermesPanel(html) {
   const container = document.createElement('div');
   container.className = 'hermes-panel-container';
   container.innerHTML = html;
-  
+
   if (elements.messagesContainer) {
     elements.messagesContainer.appendChild(container);
     elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
@@ -626,9 +694,9 @@ function addHermesPanel(html) {
 function addMessage(type, content) {
   const messageDiv = document.createElement('div');
   messageDiv.className = `message ${type}`;
-  
+
   const time = formatTime(new Date());
-  
+
   if (type === 'user') {
     messageDiv.innerHTML = `
       <div class="message-content">${escapeHtml(content)}</div>
@@ -644,12 +712,11 @@ function addMessage(type, content) {
 
   elements.messagesContainer.appendChild(messageDiv);
   elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
-  
+
   state.messages.push({ type, content, time });
 }
 
 function formatMessageContent(content) {
-  // 簡單的 Markdown -like 格式化
   return content
     .replace(/\n/g, '<br>')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -679,7 +746,7 @@ function showTyping(show) {
 function formatTime(date) {
   const now = new Date();
   const isToday = date.toDateString() === now.toDateString();
-  
+
   if (isToday) {
     return date.toLocaleTimeString('zh-HK', { hour: '2-digit', minute: '2-digit' });
   } else {
@@ -688,12 +755,65 @@ function formatTime(date) {
 }
 
 // ================================================
+// 日常寒暄檢測
+// ================================================
+
+function checkCasualGreeting(message) {
+  const msg = message.toLowerCase().trim();
+  const greetings = [
+    '/', '你好', 'hello', 'hi', '嗨', '早晨', '午安', '晚安',
+    '你叫咩名', '你係邊個', '你係咩', '你係誰', '你係人定鬼',
+    '做緊咩', '做咩', '忙咩', '最近點', '你好嗎', '點呀',
+    '喂', 'hello呀', 'hi呀', '你好呀', '早晨呀'
+  ];
+
+  const isGreeting = greetings.some(g => msg === g || msg === g + '？' || msg === g + '?');
+
+  if (!isGreeting) return null;
+
+  const casualResponses = [
+    {
+      answer: `👋 你好！我係 **FIFI** 查，你嘅 HKTVmall 商戶小幫手！`,
+      extendedAdvice: `知道你有好多嘢要搞，頭都大埋啦... 不過唔洗驚！我實幫到你架！\n\n有咩想問就尽管開口啦 ^^`
+    },
+    {
+      answer: `唉～我喺度等你問嘢咋！ 😄`,
+      extendedAdvice: `我係 **FIFI 查**，專幫 HKTVmall 商戶解決疑難雜症！\n\n知道你頭痕緊，我一定幫到你掛～ 有咩就出聲啦！`
+    },
+    {
+      answer: `喂！你好！我是 **FIFI** 嚟嘅～  :P`,
+      extendedAdvice: `聽講你好頭痛嚟嘅？唔洗咁緊張！我幫過好多商戶解決問題嘅經驗✨\n\n你慢慢話我知有咩困難，我實幫到你架！`
+    }
+  ];
+
+  const response = casualResponses[Math.floor(Math.random() * casualResponses.length)];
+
+  return `
+    <div class="hermes-analysis">
+      <div class="hermes-analysis-header">
+        <span>🧠</span>
+        <strong>FIFI 查</strong>
+        <span class="confidence-badge confidence-high">線上閒聊中 ^^</span>
+      </div>
+      <div class="hermes-section">
+        <div class="hermes-section-label">💬</div>
+        <div class="hermes-section-content">${response.answer}</div>
+      </div>
+      <div class="hermes-section">
+        <div class="hermes-section-label">🤝</div>
+        <div class="hermes-section-content">${response.extendedAdvice}</div>
+      </div>
+    </div>
+  `;
+}
+
+// ================================================
 // 預設問題晶片
 // ================================================
 
 function initPresetChips() {
   if (!elements.presetChips) return;
-  
+
   const presets = [
     '如何上架新產品？',
     '佣金率是多少？',
@@ -703,7 +823,7 @@ function initPresetChips() {
     '退款政策是怎樣的？'
   ];
 
-  elements.presetChips.innerHTML = presets.map(q => 
+  elements.presetChips.innerHTML = presets.map(q =>
     `<button class="preset-chip" onclick="askPreset('${q}')">${q}</button>`
   ).join('');
 }
@@ -714,18 +834,39 @@ async function askPreset(question) {
 }
 
 // ================================================
-// 對外暴露 API（除錯用）
+// 通知
+// ================================================
+
+function showNotification(message) {
+  const notification = document.createElement('div');
+  notification.className = 'notification';
+  notification.textContent = message;
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.classList.add('show');
+  }, 10);
+
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => notification.remove(), 300);
+  }, 2000);
+}
+
+// ================================================
+// 對外暴露 API
 // ================================================
 
 window.FIFI = {
   state,
+  useStoreId,
+  showConversationHistory,
   resetApiKey: () => {
-    localStorage.removeItem('fifi_api_key');
+    localStorage.removeItem('fifi_apikey');
     state.apiKey = null;
   },
   toggleHermes: toggleHermesMode,
-  searchFAQ: (q) => searchFAQ(q),
-  getFAQContext: () => getFAQContext()
+  searchFAQ: (q) => searchFAQ(q)
 };
 
 // 初始化預設問題
