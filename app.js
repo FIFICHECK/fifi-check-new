@@ -176,9 +176,6 @@ function handleLogin(e) {
     setLoginLoading(false);
   }, 300);
 }
-    setLoginLoading(false);
-  }, 500);
-}
 
 function handleLogout() {
   state.isLoggedIn = false;
