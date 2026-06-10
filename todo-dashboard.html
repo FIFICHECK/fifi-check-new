@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiona Team To-Do List Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #8892b0;
+            font-size: 1rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            align-items: center;
+        }
+        
+        .week-nav {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            background: #3d4a6e;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        select {
+            background: #1a1a2e;
+            color: white;
+            border: 2px solid #667eea;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        .member-filter {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .member-chip {
+            background: #1a1a2e;
+            border: 2px solid #3d4a6e;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .member-chip.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.2);
+        }
+        
+        .member-chip:hover {
+            border-color: #667eea;
+        }
+        
+        .week-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 15px;
+        }
+        
+        .week-title {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .dates-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .date-badge {
+            background: #2d3a5c;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .date-badge .day {
+            color: #8892b0;
+            margin-right: 5px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .task-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .task-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+        }
+        
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+        
+        .task-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .task-status {
+            font-size: 0.8rem;
+            color: #8892b0;
+            margin-left: auto;
+        }
+        
+        .assignments {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .assignment-item {
+            background: #2d3a5c;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .assignment-day {
+            color: #667eea;
+            font-weight: 600;
+            min-width: 35px;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .status-active {
+            background: #4ade80;
+        }
+        
+        .status-inactive {
+            background: #f87171;
+        }
+        
+        .status-pending {
+            background: #fbbf24;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #8892b0;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #8892b0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #2d3a5c;
+            border-radius: 3px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .week-nav {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✅ Fiona Team To-Do List</h1>
+            <p class="subtitle">每週工作分配 Dashboard — 2025 年</p>
+        </header>
+        
+        <div class="controls">
+            <div class="week-nav">
+                <button id="prevWeek">◀ 上一週</button>
+                <select id="weekSelector"></select>
+                <button id="nextWeek">下一週 ▶</button>
+            </div>
+        </div>
+        
+        <div class="member-filter" id="memberFilter"></div>
+        
+        <div class="week-info" id="weekInfo">
+            <div class="week-title" id="weekTitle">載入中...</div>
+            <div class="dates-row" id="datesRow"></div>
+        </div>
+        
+        <div class="dashboard-grid" id="taskGrid"></div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <span class="status-dot status-active"></span>
+                <span>已安排 (1)</span>
+            </div>
+            <div class="legend-item">
+                <span class="status-dot status-inactive"></span>
+                <span>無安排 (X)</span>
+            </div>
+            <div class="legend-item">
+                <span class="status-dot status-pending"></span>
+                <span>其他 (0)</span>
+            </div>
+        </div>
+    </div>
+    
+    <script src="todo-data.js"></script>
+    <script>
+        let currentWeekIndex = 0;
+        let selectedMember = null;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            populateWeekSelector();
+            populateMemberFilter();
+            showWeek(currentWeekIndex);
+            setupEventListeners();
+        });
+        
+        function populateWeekSelector() {
+            const selector = document.getElementById('weekSelector');
+            SCHEDULE_DATA.weeks.forEach((week, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                const dateStr = Object.values(week.dates).filter(d => d).join(' ~ ') || 'N/A';
+                option.textContent = `${week.name} (${dateStr})`;
+                selector.appendChild(option);
+            });
+        }
+        
+        function populateMemberFilter() {
+            const filter = document.getElementById('memberFilter');
+            SCHEDULE_DATA.members.forEach(member => {
+                const chip = document.createElement('div');
+                chip.className = 'member-chip';
+                chip.textContent = member;
+                chip.dataset.member = member;
+                chip.addEventListener('click', () => toggleMember(member, chip));
+                filter.appendChild(chip);
+            });
+        }
+        
+        function toggleMember(member, chip) {
+            if (selectedMember === member) {
+                selectedMember = null;
+                chip.classList.remove('active');
+            } else {
+                document.querySelectorAll('.member-chip').forEach(c => c.classList.remove('active'));
+                selectedMember = member;
+                chip.classList.add('active');
+            }
+            showWeek(currentWeekIndex);
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('prevWeek').addEventListener('click', () => {
+                if (currentWeekIndex > 0) {
+                    currentWeekIndex--;
+                    showWeek(currentWeekIndex);
+                }
+            });
+            
+            document.getElementById('nextWeek').addEventListener('click', () => {
+                if (currentWeekIndex < SCHEDULE_DATA.weeks.length - 1) {
+                    currentWeekIndex++;
+                    showWeek(currentWeekIndex);
+                }
+            });
+            
+            document.getElementById('weekSelector').addEventListener('change', (e) => {
+                currentWeekIndex = parseInt(e.target.value);
+                showWeek(currentWeekIndex);
+            });
+        }
+        
+        function showWeek(index) {
+            currentWeekIndex = index;
+            const week = SCHEDULE_DATA.weeks[index];
+            
+            document.getElementById('weekSelector').value = index;
+            document.getElementById('prevWeek').disabled = index === 0;
+            document.getElementById('nextWeek').disabled = index === SCHEDULE_DATA.weeks.length - 1;
+            
+            // Week title
+            document.getElementById('weekTitle').textContent = week.name;
+            
+            // Dates row
+            const datesRow = document.getElementById('datesRow');
+            datesRow.innerHTML = '';
+            ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].forEach(day => {
+                if (week.dates[day]) {
+                    const badge = document.createElement('div');
+                    badge.className = 'date-badge';
+                    badge.innerHTML = `<span class="day">${day}:</span> ${week.dates[day]}`;
+                    datesRow.appendChild(badge);
+                }
+            });
+            
+            // Task grid
+            const grid = document.getElementById('taskGrid');
+            grid.innerHTML = '';
+            
+            week.tasks.forEach((task, taskIndex) => {
+                const card = createTaskCard(task, index, taskIndex);
+                grid.appendChild(card);
+            });
+        }
+        
+        function createTaskCard(task, weekIdx, taskIdx) {
+            const card = document.createElement('div');
+            card.className = 'task-card';
+            
+            const activeCount = {};
+            const memberIndices = {};
+            
+            ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].forEach(day => {
+                activeCount[day] = 0;
+                if (task.status[day]) {
+                    task.status[day].forEach((status, idx) => {
+                        if (status === '1') {
+                            activeCount[day]++;
+                            if (!memberIndices[day]) memberIndices[day] = [];
+                            memberIndices[day].push(SCHEDULE_DATA.members[idx]);
+                        }
+                    });
+                }
+            });
+            
+            let totalActive = 0;
+            let totalAssigned = 0;
+            
+            card.innerHTML = `
+                <div class="task-header">
+                    <input type="checkbox" class="task-checkbox" id="task-${weekIdx}-${taskIdx}">
+                    <span class="task-name">${task.name}</span>
+                    <span class="task-status" id="status-${weekIdx}-${taskIdx}"></span>
+                </div>
+                <div class="assignments" id="assignments-${weekIdx}-${taskIdx}"></div>
+            `;
+            
+            // Populate assignments
+            const assignmentsDiv = card.querySelector(`#assignments-${weekIdx}-${taskIdx}`);
+            const statusDiv = card.querySelector(`#status-${weekIdx}-${taskIdx}`);
+            
+            ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].forEach(day => {
+                if (task.status[day] && task.status[day].length > 0 && task.status[day].some(s => s !== '')) {
+                    const item = document.createElement('div');
+                    item.className = 'assignment-item';
+                    
+                    const statuses = task.status[day];
+                    const hasActive = statuses.some(s => s === '1');
+                    const hasInactive = statuses.some(s => s === 'X');
+                    
+                    let dotClass = 'status-pending';
+                    if (hasActive && !hasInactive) dotClass = 'status-active';
+                    else if (hasInactive && !hasActive) dotClass = 'status-inactive';
+                    
+                    // Filter by member if selected
+                    let membersHTML = '';
+                    if (selectedMember && memberIndices[day]) {
+                        const idx = SCHEDULE_DATA.members.indexOf(selectedMember);
+                        if (idx >= 0 && task.status[day][idx] === '1') {
+                            membersHTML = `<span class="status-dot ${dotClass}"></span> <span>${selectedMember}</span>`;
+                        }
+                    } else if (!selectedMember) {
+                        membersHTML = `<span class="status-dot ${dotClass}"></span>`;
+                        const activeMembers = memberIndices[day] || [];
+                        if (activeMembers.length > 0) {
+                            membersHTML += ` <span>${activeMembers.join(', ')}</span>`;
+                        }
+                    }
+                    
+                    if (membersHTML) {
+                        item.innerHTML = `<span class="assignment-day">${day}</span>${membersHTML}`;
+                        assignmentsDiv.appendChild(item);
+                    }
+                    
+                    // Count totals
+                    statuses.forEach(s => {
+                        if (s !== '') {
+                            totalAssigned++;
+                            if (s === '1') totalActive++;
+                        }
+                    });
+                }
+            });
+            
+            // Update status
+            if (totalAssigned > 0) {
+                const pct = Math.round((totalActive / totalAssigned) * 100);
+                statusDiv.textContent = `${totalActive}/${totalAssigned} 已安排`;
+            }
+            
+            // Progress bar
+            const progress = document.createElement('div');
+            progress.className = 'progress-bar';
+            const fill = document.createElement('div');
+            fill.className = 'progress-fill';
+            fill.style.width = totalAssigned > 0 ? `${(totalActive / totalAssigned) * 100}%` : '0%';
+            progress.appendChild(fill);
+            card.appendChild(progress);
+            
+            // Checkbox handler
+            const checkbox = card.querySelector('.task-checkbox');
+            checkbox.addEventListener('change', () => {
+                card.style.opacity = checkbox.checked ? '0.6' : '1';
+                localStorage.setItem(`task-${weekIdx}-${taskIdx}`, checkbox.checked);
+            });
+            
+            // Restore saved state
+            if (localStorage.getItem(`task-${weekIdx}-${taskIdx}`) === 'true') {
+                checkbox.checked = true;
+                card.style.opacity = '0.6';
+            }
+            
+            return card;
+        }
+    </script>
+</body>
+</html>
