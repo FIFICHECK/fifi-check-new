@@ -99,8 +99,44 @@ async function semanticSearch(query, topK = 5) {
   return similarities.slice(0, topK).map(item => ({ ...item.faq, similarity: item.similarity }));
 }
 
+// Keyword expansion map for aliases
+const KEYWORD_EXPANSION = {
+  'cs': ['客戶服務', '客服', '售後服務', '售後', '客人服務'],
+  'case': ['個案', '案例', '情況', '問題'],
+  'complaint': ['投訴', '投訴個案', '客人投訴', '投訴處理'],
+  'refund': ['退款', '退錢', '退款申請'],
+  'return': ['退貨', '退貨申請', '退貨處理'],
+  'exchange': ['換貨', '更換', '換貨處理'],
+  'customer': ['客人', '客戶', '顧客'],
+  'service': ['服務', '支援', '支援'],
+  '問題': ['問題', '查詢', '疑問', '不明白'],
+  '投訴': ['投訴', '投訴個案', '客人投訴', '不滿'],
+  '退款': ['退款', '退錢', '退貨款', '退款申請'],
+  '退貨': ['退貨', '退貨申請', '退貨處理', '退貨個案'],
+};
+
+function expandKeywords(query) {
+  const words = query.toLowerCase().split(/[\s\u4e00-\u9fff]+/).filter(w => w.length > 1);
+  const expanded = new Set(words);
+  
+  for (const word of words) {
+    // Direct expansion
+    if (KEYWORD_EXPANSION[word]) {
+      KEYWORD_EXPANSION[word].forEach(expanded.add, expanded);
+    }
+    // Reverse expansion (Chinese -> English aliases)
+    for (const [key, values] of Object.entries(KEYWORD_EXPANSION)) {
+      if (values.includes(word)) {
+        expanded.add(key);
+      }
+    }
+  }
+  
+  return Array.from(expanded);
+}
+
 function keywordSearch(query, topK = 5) {
-  const queryWords = query.toLowerCase().split(/[\s\u4e00-\u9fff]+/).filter(w => w.length > 1);
+  const queryWords = expandKeywords(query);
   const scored = ALL_FAQ.map(faq => {
     let score = 0;
     for (const word of queryWords) {
@@ -145,9 +181,13 @@ async function getRAGContext(query, topK = 5) {
 const ANALYSIS_PROMPT = `你係一個 HKTVmall 商戶問題分析師。
 
 分析以下問題，識別：
-1. 問題類型（登入問題、產品問題、訂單問題、佣金問題、推廣問題等）
-2. 涉及嘅範疇關鍵詞
+1. 問題類型（登入問題、產品問題、訂單問題、佣金問題、推廣問題、CS客服問題、售後服務問題等）
+2. 涉及嘅範疇關鍵詞（包括英文縮寫如CS、CASE、REFUND、RETURN等）
 3. 需要搵咩資料嚟回答
+
+重要類別參考：
+- 售後服務/客服/CS：包括退款、退貨、換貨、投訴、客人問題等
+- 客戶服務相關關鍵詞：CS、case、complaint、refund、return、exchange、售後、客服、投訴、退款、退貨
 
 問題：{question}
 
