@@ -281,6 +281,22 @@ html, body {
   text-align: center;
   overflow-y: auto;
   min-height: 0;
+  /* 確保隱藏時完全移除出佈局 */
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+
+.welcome-screen.hidden {
+  display: none !important;
+  visibility: hidden;
+  opacity: 0;
+  height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  flex: 0 !important;
+  min-height: 0 !important;
+  border: none !important;
 }
 
 .welcome-screen h2 {

@@ -374,11 +374,18 @@ async function sendMessage() {
   elements.chatInput?.focus();
 
   if (elements.welcomeScreen) {
-    elements.welcomeScreen.style.display = 'none';
+    elements.welcomeScreen.classList.add('hidden');
   }
 
   addMessage('user', message);
   showTyping(true);
+
+  // 確保 messages container 滾動到底部
+  requestAnimationFrame(() => {
+    if (elements.messagesContainer) {
+      elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+    }
+  });
 
   try {
     const greetingResponse = checkCasualGreeting(message);
@@ -407,6 +414,13 @@ async function sendMessage() {
     addMessage('assistant', `唉～衰咗衰咗... ${error.message}\n\n等我冷靜下先 😅`);
   } finally {
     showTyping(false);
+    // 確保輸入框可見並滾動到正確位置
+    requestAnimationFrame(() => {
+      if (elements.chatInput) {
+        elements.chatInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        elements.chatInput.focus();
+      }
+    });
   }
 }
 
