@@ -27,7 +27,7 @@ const API_CONFIG = {
   },
   openrouter: {
     endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-    model: 'mistralai/mistral-7b-instruct'
+    model: 'google/gemini-2.0-flash-exp'
   }
 };
 
@@ -745,20 +745,21 @@ ${getFAQContext()}
 function getDefaultHermesResponse(question) {
   const faqMatches = searchFAQ(question);
   if (faqMatches.length > 0) {
+    const match = faqMatches[0];
     return {
-      answer: `哦～呢個問題好常見！ ${faqMatches[0].a}`,
-      extendedAdvice: `參考咗「${faqMatches[0].q}」嘅答案～ 不過每個人情況唔同，最好再問下你嘅 RM 確認下 ^^`,
-      relatedCategory: faqMatches[0].category,
+      answer: `${match.a}`,
+      extendedAdvice: `以上答案來自「${match.category}」分類中的「${match.q}」。如需更多協助，請聯絡您的 RM 或 FIFI 查服務團隊。`,
+      relatedCategory: match.category,
       warning: '',
-      confidence: 0.6
+      confidence: 0.85
     };
   }
   return {
-    answer: '唉～ 今次撞板了，我搵唔到完全Match嘅答案比你...',
-    extendedAdvice: '建議你直接搵 RM 傾偈，佢哋實幫到你！或者可以試下其他關鍵字再搵過 ^^',
+    answer: '抱歉，我暫時未有相關資料...',
+    extendedAdvice: '建議聯絡您的 RM 查詢，或者嘗試其他關鍵字搜尋。你可以隨時聯絡 FIFI 查服務團隊：3998 8139',
     relatedCategory: '聯絡與支援',
     warning: '',
-    confidence: 0.2
+    confidence: 0.1
   };
 }
 
@@ -777,7 +778,15 @@ function getFAQContext() {
 // ================================================
 
 async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
-  if (hermesAnalysis && hermesAnalysis.answer) {
+  // Always prioritize FAQ matches - if we have strong FAQ matches, show them prominently
+  const hasFaqMatch = faqMatches && faqMatches.length > 0;
+  const faqMatch = hasFaqMatch ? faqMatches[0] : null;
+
+  // If AI response is weak (confidence < 0.5) and we have FAQ, prioritize FAQ
+  const aiConfidence = hermesAnalysis?.confidence || 0;
+  const shouldPrioritizeFaq = hasFaqMatch && aiConfidence < 0.5;
+
+  if (hermesAnalysis && hermesAnalysis.answer && !shouldPrioritizeFaq) {
     const confidence = hermesAnalysis.confidence || 0.5;
     const confidenceClass = confidence >= 0.7 ? 'confidence-high' : confidence >= 0.4 ? 'confidence-medium' : 'confidence-low';
     const confidenceText = confidence >= 0.7 ? '高' : confidence >= 0.4 ? '中' : '低';
@@ -826,8 +835,41 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
     `;
 
     addHermesPanel(hermesHtml);
+  } else if (faqMatch) {
+    // Strong FAQ match - show FAQ result prominently
+    let hermesHtml = `
+      <div class="hermes-analysis">
+        <div class="hermes-analysis-header">
+          <span>📖</span>
+          <strong>FAQ 知識庫</strong>
+          <span class="confidence-badge confidence-high">匹配度 高</span>
+        </div>
+
+        <div class="hermes-section">
+          <div class="hermes-section-label">📋 ${faqMatch.category}</div>
+          <div class="hermes-section-content">${escapeHtml(faqMatch.q)}</div>
+        </div>
+
+        <div class="hermes-section">
+          <div class="hermes-section-content" style="background: var(--bg-warm); padding: 12px; border-radius: 6px; margin-top: 8px;">${escapeHtml(faqMatch.a)}</div>
+        </div>
+
+        ${faqMatches.length > 1 ? `
+        <div class="hermes-section" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
+          <div class="hermes-section-label">💡 其他相關問題</div>
+          ${faqMatches.slice(1, 3).map(m => `
+            <div class="hermes-section-content" style="cursor: pointer; color: var(--primary);" onclick="askPreset('${escapeHtml(m.q)}')">• ${escapeHtml(m.q)}</div>
+          `).join('')}
+        </div>
+        ` : ''}
+
+        <div class="hermes-source">📖 資料來源：https://sites.google.com/view/hktv-merc-faq/</div>
+      </div>
+    `;
+
+    addHermesPanel(hermesHtml);
   } else {
-    addMessage('assistant', '抱歉，FIFI查 分析暫時無法使用。請稍後再試或聯絡您的 RM。');
+    addMessage('assistant', '抱歉，我暫時未有相關資料。建議聯絡您的 RM 或 FIFI 查服務團隊：3998 8139');
   }
 }
 
