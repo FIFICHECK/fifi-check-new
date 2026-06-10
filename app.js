@@ -349,7 +349,7 @@ function toggleHermesMode() {
   state.hermesMode = !state.hermesMode;
   if (elements.hermesBadge) {
     elements.hermesBadge.className = state.hermesMode ? 'hermes-badge active' : 'hermes-badge';
-    elements.hermesBadge.title = state.hermesMode ? 'Hermes 分析：開啟' : 'Hermes 分析：關閉';
+    elements.hermesBadge.title = state.hermesMode ? 'FIFI查 分析：開啟' : 'FIFI查 分析：關閉';
   }
 }
 
@@ -761,7 +761,7 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
       <div class="hermes-analysis">
         <div class="hermes-analysis-header">
           <span>🧠</span>
-          <strong>Hermes 分析</strong>
+          <strong>FIFI查 分析</strong>
           <span class="confidence-badge ${confidenceClass}">${confidenceText} — ${Math.round(confidence * 100)}%</span>
         </div>
 
@@ -802,7 +802,7 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
 
     addHermesPanel(hermesHtml);
   } else {
-    addMessage('assistant', '抱歉，Hermes 分析暫時無法使用。請稍後再試或聯絡您的 RM。');
+    addMessage('assistant', '抱歉，FIFI查 分析暫時無法使用。請稍後再試或聯絡您的 RM。');
   }
 }
 
@@ -903,15 +903,15 @@ function checkCasualGreeting(message) {
 
   const casualResponses = [
     {
-      answer: `👋 你好！我係 **FIFI** 查，你嘅 HKTVmall 商戶小幫手！`,
+      answer: `👋 你好！我係 **FIFI查**，你嘅 HKTVmall 商戶小幫手！`,
       extendedAdvice: `知道你有好多嘢要搞，頭都大埋啦... 不過唔洗驚！我實幫到你架！\n\n有咩想問就尽管開口啦 ^^`
     },
     {
       answer: `唉～我喺度等你問嘢咋！ 😄`,
-      extendedAdvice: `我係 **FIFI 查**，專幫 HKTVmall 商戶解決疑難雜症！\n\n知道你頭痕緊，我一定幫到你掛～ 有咩就出聲啦！`
+      extendedAdvice: `我係 **FIFI查**，專幫 HKTVmall 商戶解決疑難雜症！\n\n知道你頭痕緊，我一定幫到你掛～ 有咩就出聲啦！`
     },
     {
-      answer: `喂！你好！我是 **FIFI** 嚟嘅～  :P`,
+      answer: `喂！你好！我是 **FIFI查** 嚟嘅～  :P`,
       extendedAdvice: `聽講你好頭痛嚟嘅？唔洗咁緊張！我幫過好多商戶解決問題嘅經驗✨\n\n你慢慢話我知有咩困難，我實幫到你架！`
     }
   ];
@@ -922,7 +922,7 @@ function checkCasualGreeting(message) {
     <div class="hermes-analysis">
       <div class="hermes-analysis-header">
         <span>🧠</span>
-        <strong>FIFI 查</strong>
+        <strong>FIFI查</strong>
         <span class="confidence-badge confidence-high">線上閒聊中 ^^</span>
       </div>
       <div class="hermes-section">
