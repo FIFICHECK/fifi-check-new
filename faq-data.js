@@ -266,30 +266,149 @@ const ALL_FAQ = Object.values(FAQ_DATA).flatMap(section =>
   }))
 );
 
-// 簡單的關鍵字搜尋函數
+// ================================================
+// 關鍵詞變體映射（口語 ↔ 書面語）
+// ================================================
+const KEYWORD_ALIASES = {
+  // 上架/上新產品
+  '上新產品': ['上架', '上架新產品', '上架新貨', '上新貨', '新產品上架'],
+  '上新': ['上架', '上架新產品', '上架新貨'],
+  '上架': ['上新產品', '上架新產品', '上架新貨'],
+  '加新產品': ['上架新產品', '上架新貨', '上新產品'],
+
+  // 庫存
+  '加庫存': ['更新庫存', '庫存', '增加庫存', '補貨', '入貨'],
+  '點加庫存': ['更新庫存', '如何更新庫存', '加庫存', '增加庫存'],
+  '入貨': ['更新庫存', '加庫存', '補貨', '增加庫存'],
+  '補貨': ['更新庫存', '加庫存', '入貨'],
+
+  // 優惠/推廣
+  '點做優惠': ['設定優惠', '如何設定優惠', '建立優惠', '優惠活動'],
+  '減價': ['折扣', '優惠', '特價', '減價', '打折'],
+  '打折': ['折扣', '優惠', '特價', '減價'],
+  '促銷': ['推廣', '優惠', '推廣活動', '宣傳'],
+
+  // 發貨/送貨
+  '點寄': ['發貨', '如何發貨', '處理發貨', '寄貨', '送貨'],
+  '寄野': ['發貨', '寄貨', '送貨', '如何發貨'],
+  '送貨': ['發貨', '物流', '寄貨'],
+
+  // 退款/退貨
+  '退錢': ['退款', '如何退款', '退款申請'],
+  '退貨': ['退貨申請', '如何退貨', '退貨政策'],
+
+  // 佣金
+  '幾多錢': ['佣金率', '佣金', '收費', '手續費'],
+  '回水': ['佣金', '結算', '收款'],
+
+  // 登入/後台
+  '登入': ['登入後台', '登入商戶後台', '登入後台', 'login'],
+  '後台': ['商戶後台', 'MMS', '管理後台'],
+};
+
+// 拆分關鍵詞（保留繁體中文分詞）
+function tokenize(text) {
+  return text.toLowerCase()
+    .replace(/[^\w\s\u4e00-\u9fff]/g, ' ')  // 保留中文和英文數字
+    .split(/\s+/)
+    .filter(t => t.length > 0);
+}
+
+// 獲取查詢詞的變體關鍵詞
+function getAliases(query) {
+  const tokens = tokenize(query);
+  const aliases = new Set();
+
+  tokens.forEach(token => {
+    // 檢查每個詞是否在別名表中
+    Object.entries(KEYWORD_ALIASES).forEach(([key, values]) => {
+      if (key.includes(token) || token.includes(key)) {
+        aliases.add(key);
+        values.forEach(v => aliases.add(v));
+      }
+    });
+  });
+
+  return Array.from(aliases);
+}
+
+// 簡單的模糊匹配（計算相似度）
+function similarity(str1, str2) {
+  const s1 = str1.toLowerCase();
+  const s2 = str2.toLowerCase();
+
+  // 完全包含
+  if (s1.includes(s2) || s2.includes(s1)) return 0.8;
+
+  // 計算共同字符
+  const set1 = new Set(s1);
+  const set2 = new Set(s2);
+  const intersection = [...set1].filter(c => set2.has(c));
+  const union = new Set([...set1, ...set2]);
+
+  return intersection.length / union.size;
+}
+
+// 增強的關鍵字搜尋函數
 function searchFAQ(query) {
   const normalizedQuery = query.toLowerCase().trim();
-  
-  // 直接匹配
-  const directMatches = ALL_FAQ.filter(item => 
+
+  // Step 1: 直接匹配（最精確）
+  const directMatches = ALL_FAQ.filter(item =>
     item.q.toLowerCase().includes(normalizedQuery) ||
     item.a.toLowerCase().includes(normalizedQuery) ||
     item.category.toLowerCase().includes(normalizedQuery)
   );
 
-  // 如果找到直接匹配，返回結果
   if (directMatches.length > 0) {
     return directMatches.slice(0, 5);
   }
 
-  // 嘗試部分匹配
-  const keywords = normalizedQuery.split(/\s+/);
-  const partialMatches = ALL_FAQ.filter(item => {
+  // Step 2: 變體關鍵詞匹配
+  const aliases = getAliases(normalizedQuery);
+  if (aliases.length > 0) {
+    const aliasMatches = ALL_FAQ.filter(item => {
+      const searchText = (item.q + ' ' + item.a).toLowerCase();
+      return aliases.some(alias => searchText.includes(alias.toLowerCase()));
+    });
+
+    if (aliasMatches.length > 0) {
+      return aliasMatches.slice(0, 5);
+    }
+  }
+
+  // Step 3: 拆分關鍵詞匹配
+  const keywords = tokenize(normalizedQuery);
+  const keywordMatches = ALL_FAQ.filter(item => {
     const searchText = (item.q + ' ' + item.a).toLowerCase();
-    return keywords.some(kw => searchText.includes(kw));
+    // 至少匹配一個關鍵詞
+    return keywords.some(kw =>
+      kw.length >= 2 && searchText.includes(kw)  // 忽略單字符
+    );
   });
 
-  return partialMatches.slice(0, 5);
+  if (keywordMatches.length > 0) {
+    return keywordMatches.slice(0, 5);
+  }
+
+  // Step 4: 模糊相似度匹配
+  const fuzzyMatches = ALL_FAQ
+    .map(item => ({
+      item,
+      score: Math.max(
+        similarity(normalizedQuery, item.q),
+        similarity(normalizedQuery, item.a),
+        ...keywords.map(kw => Math.max(
+          similarity(kw, item.q),
+          similarity(kw, item.a)
+        ))
+      )
+    }))
+    .filter(r => r.score > 0.3)  // 相似度 > 30%
+    .sort((a, b) => b.score - a.score)
+    .map(r => r.item);
+
+  return fuzzyMatches.slice(0, 5);
 }
 
 // 滙出給 app.js 使用
