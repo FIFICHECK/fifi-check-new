@@ -957,6 +957,8 @@ function formatTime(date) {
 
 function checkCasualGreeting(message) {
   const msg = message.toLowerCase().trim();
+
+  // ========== 問候語 ==========
   const greetings = [
     '/', '你好', 'hello', 'hi', '嗨', '早晨', '午安', '晚安',
     '你叫咩名', '你係邊個', '你係咩', '你係誰', '你係人定鬼',
@@ -964,41 +966,133 @@ function checkCasualGreeting(message) {
     '喂', 'hello呀', 'hi呀', '你好呀', '早晨呀'
   ];
 
-  const isGreeting = greetings.some(g => msg === g || msg === g + '？' || msg === g + '?');
-
-  if (!isGreeting) return null;
-
-  const casualResponses = [
-    {
-      answer: `👋 你好！我係 **FIFI查**，你嘅 HKTVmall 商戶小幫手！`,
-      extendedAdvice: `知道你有好多嘢要搞，頭都大埋啦... 不過唔洗驚！我實幫到你架！\n\n有咩想問就尽管開口啦 ^^`
-    },
-    {
-      answer: `唉～我喺度等你問嘢咋！ 😄`,
-      extendedAdvice: `我係 **FIFI查**，專幫 HKTVmall 商戶解決疑難雜症！\n\n知道你頭痕緊，我一定幫到你掛～ 有咩就出聲啦！`
-    },
-    {
-      answer: `喂！你好！我是 **FIFI查** 嚟嘅～  :P`,
-      extendedAdvice: `聽講你好頭痛嚟嘅？唔洗咁緊張！我幫過好多商戶解決問題嘅經驗✨\n\n你慢慢話我知有咩困難，我實幫到你架！`
-    }
+  // ========== 感謝語 ==========
+  const thanks = [
+    'thank', '多謝', '唔該', '唔該晒', '多謝晒', 'thanks',
+    'thank you', 'thx', 'c9', '9c', '謝謝', '谢'
   ];
 
-  const response = casualResponses[Math.floor(Math.random() * casualResponses.length)];
+  // ========== 再見語 ==========
+  const goodbyes = [
+    '拜拜', '再見', '再會', 'bye', 'bye bye', '聽晚見',
+    '聽日見', '聽朝見', '走先', '先走', '下次見'
+  ];
 
+  // ========== 讚美語 ==========
+  const praises = [
+    '好嘢', '勁', '正', '好正', '勁正', '正呀', '正喎',
+    '好叻', '叻', '犀利', '勁犀利', 'good', 'great', 'wow'
+  ];
+
+  // ========== 抱怨語 ==========
+  const complaints = [
+    '好難', '點解咁難', '點解', '唔知點', '頭痕', '好煩',
+    '煩', '死嘢', '仆街', '沒用', '無用', '垃圾', '爛'
+  ];
+
+  // ========== 身份問題 ==========
+  const identityQuestions = [
+    '你係ai嗎', '你係機械人嗎', '你係bot嗎', '你係人嗎',
+    '你識咩', '你可以做咩', '你有咩用', '你幫到我咩'
+  ];
+
+  // ========== 離開話 ==========
+  const leavingQuestions = [
+    '我想走', '我要走', '我想离开', '我要离开'
+  ];
+
+  // ========== 對話類型檢測 ==========
+  const isGreeting = greetings.some(g => msg === g || msg === g + '？' || msg === g + '?');
+  const isThanks = thanks.some(t => msg.includes(t));
+  const isGoodbye = goodbyes.some(g => msg.includes(g));
+  const isPraise = praises.some(p => msg.includes(p));
+  const isComplaint = complaints.some(c => msg.includes(c));
+  const isIdentity = identityQuestions.some(q => msg.includes(q));
+  const isLeaving = leavingQuestions.some(l => msg.includes(l));
+
+  // ========== 回覆邏輯 ==========
+
+  // 感謝回覆
+  if (isThanks && !isGreeting) {
+    const responses = [
+      { answer: `唔該你才是！ 😄`, advice: `能幫到你我好開心～ 有其他問題就尽管問啦！` },
+      { answer: `不客氣！有需要隨時搵我 ^^`, advice: `我成日都在呢度等你架～` },
+      { answer: `小事來的～ 有咩幫到你再出聲話我知！`, advice: `FIFI查 24/7 都在線為你服務 💪` }
+    ];
+    const r = responses[Math.floor(Math.random() * responses.length)];
+    return formatCasualResponse(r.answer, r.advice);
+  }
+
+  // 再見回覆
+  if (isGoodbye || isLeaving) {
+    const responses = [
+      { answer: `拜拜！下次見 ^^`, advice: `記住我哋有咩問題都可以搵 FIFI查～ 支持你！💪` },
+      { answer: `聽日見！記得優惠資訊可以問我～`, advice: `隨時歡迎你回來，我一定幫你 ❤️` },
+      { answer: `好嘢！有需要再搵我啦～`, advice: `你走啦！FIFI查 為你服務緊架 💪` }
+    ];
+    const r = responses[Math.floor(Math.random() * responses.length)];
+    return formatCasualResponse(r.answer, r.advice);
+  }
+
+  // 抱怨回覆
+  if (isComplaint && !isGreeting) {
+    const responses = [
+      { answer: `唉，明白你心情... 我盡量幫你啦！`, advice: `冷靜啲，我一定幫你搵到方法！你試下更具體咁描述問題？` },
+      { answer: `我知道你頭痕... 不如我幫你分析下？`, advice: `你試下直接話我知你想做咩，我實幫到你！` }
+    ];
+    const r = responses[Math.floor(Math.random() * responses.length)];
+    return formatCasualResponse(r.answer, r.advice);
+  }
+
+  // 身份問題回覆
+  if (isIdentity) {
+    const responses = [
+      { answer: `我係 **FIFI查**，HKTVmall 商戶 AI 助理！`, advice: `我可以幫你解答：\n• 上架產品問題\n• 訂單處理\n• 佣金計算\n• 優惠設定\n• 其他商戶疑問\n\n有咩想问就出聲啦！` },
+      { answer: `我係 **FIFI查** 嚟嘅～ 你嘅商戶小幫手！`, advice: `專門幫商戶解決各種疑難雜症！\n\n例如：\n✅ 如何上架新產品\n✅ 佣金率計算\n✅ 優惠活動設定\n✅ 退貨退款處理\n\n我一定幫到你！` }
+    ];
+    const r = responses[Math.floor(Math.random() * responses.length)];
+    return formatCasualResponse(r.answer, r.advice);
+  }
+
+  // 打招呼
+  if (isGreeting) {
+    const casualResponses = [
+      {
+        answer: `👋 你好！我係 **FIFI查**，你嘅 HKTVmall 商戶助理！`,
+        advice: `知道你有好多嘢要搞，頭都大埋啦... 不過唔洗驚！我實幫到你架！\n\n有咩想問就尽管開口啦 ^^`
+      },
+      {
+        answer: `唉～我喺度等你問嘢咋！ 😄`,
+        advice: `我係 **FIFI查**，專幫 HKTVmall 商戶解決疑難雜症！\n\n知道你頭痕緊，我一定幫到你掛～ 有咩就出聲啦！`
+      },
+      {
+        answer: `喂！你好！我是 **FIFI查** 嚟嘅～  :P`,
+        advice: `聽講你好頭痛嚟嘅？唔洗咁緊張！我幫過好多商戶解決問題嘅經驗 ✨\n\n你慢慢話我知有咩困難，我實幫到你架！`
+      }
+    ];
+
+    const response = casualResponses[Math.floor(Math.random() * casualResponses.length)];
+    return formatCasualResponse(response.answer, response.advice);
+  }
+
+  return null;
+}
+
+function formatCasualResponse(answer, advice) {
   return `
     <div class="hermes-analysis">
       <div class="hermes-analysis-header">
-        <span>🧠</span>
+        <span>💬</span>
         <strong>FIFI查</strong>
-        <span class="confidence-badge confidence-high">線上閒聊中 ^^</span>
+        <span class="confidence-badge confidence-high">線上閒聊中</span>
       </div>
       <div class="hermes-section">
         <div class="hermes-section-label">💬</div>
-        <div class="hermes-section-content">${response.answer}</div>
+        <div class="hermes-section-content">${answer}</div>
       </div>
       <div class="hermes-section">
         <div class="hermes-section-label">🤝</div>
-        <div class="hermes-section-content">${response.extendedAdvice}</div>
+        <div class="hermes-section-content">${advice}</div>
       </div>
     </div>
   `;
