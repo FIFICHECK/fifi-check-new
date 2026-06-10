@@ -205,8 +205,10 @@ function checkAuthStatus() {
   if (savedUser) {
     state.user = JSON.parse(savedUser);
     state.isLoggedIn = true;
+    // 【改】不自動載入歷史對話 — 每次睇到都係新開始
+    state.conversationHistory = [];
+    state.messages = [];
     showChatView();
-    loadConversationHistory();
   }
 }
 
@@ -244,8 +246,13 @@ function handleLogin(e) {
     state.user = { username: upperId, loginTime: new Date() };
     localStorage.setItem('fifi_user', JSON.stringify(state.user));
 
-    // 保存 Store ID 到歷史
+    // 保存 Store ID 歷史
     saveStoreId(upperId);
+
+    // 【改】清除舊對話記錄 — 每次登入都係新開始
+    state.conversationHistory = [];
+    state.messages = [];
+    localStorage.removeItem(`fifi_history_${upperId}`);
 
     showChatView();
     setLoginLoading(false);
