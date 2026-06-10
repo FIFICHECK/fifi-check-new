@@ -33,7 +33,7 @@
 /* Base */
 html, body {
   height: 100%;
-  font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif;
+  font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans TC', 'PingFang TC', sans-serif;
   background: var(--bg-light);
   color: var(--text-primary);
   overflow: hidden;

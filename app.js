@@ -415,12 +415,16 @@ async function sendMessage() {
   } finally {
     showTyping(false);
     // 確保輸入框可見並滾動到正確位置
-    requestAnimationFrame(() => {
+    // Mobile Safari needs a small delay for virtual keyboard
+    setTimeout(() => {
       if (elements.chatInput) {
-        elements.chatInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        elements.chatInput.scrollIntoView({ behavior: 'smooth', block: 'end' });
         elements.chatInput.focus();
       }
-    });
+      if (elements.messagesContainer) {
+        elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+      }
+    }, 300);
   }
 }
 
