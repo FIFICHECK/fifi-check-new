@@ -19,7 +19,7 @@ let elements = {};
 const API_CONFIG = {
   openai: {
     endpoint: 'https://api.openai.com/v1/chat/completions',
-    model: 'gpt-4o'
+    model: 'anthropic/claude-haiku-4-5'
   },
   deepseek: {
     endpoint: 'https://api.deepseek.com/v1/chat/completions',
