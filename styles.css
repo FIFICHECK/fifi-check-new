@@ -276,39 +276,30 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 40px;
+  justify-content: flex-start;
+  padding: 30px 20px;
   text-align: center;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .welcome-screen h2 {
-  font-size: 1.5em;
-  font-weight: 300;
-  margin-bottom: 12px;
-  letter-spacing: 0.1em;
+  font-size: 1.3em;
+  font-weight: 400;
+  margin-bottom: 10px;
+  letter-spacing: 0.08em;
 }
 
 .welcome-screen > p {
   color: var(--text-secondary);
   font-size: 0.85em;
-  margin-bottom: 28px;
-}
-
-.welcome-features {
-  list-style: none;
-  margin-bottom: 28px;
-}
-
-.welcome-features li {
-  color: var(--text-secondary);
-  font-size: 0.85em;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .welcome-hint {
   color: var(--text-muted);
-  font-size: 0.75em;
-  margin-bottom: 20px;
+  font-size: 0.8em;
+  margin-bottom: 16px;
 }
 
 .preset-chips {
@@ -344,6 +335,7 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-height: 0;
 }
 
 .message {
