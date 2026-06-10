@@ -927,3 +927,63 @@ html, body {
   border-top: 1px solid var(--border);
   margin-top: 10px;
 }
+
+/* ================================================
+   RAG Enhanced UI - Sources & Analysis
+   ================================================ */
+
+.hermes-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.source-tag {
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75em;
+}
+
+.hermes-analysis-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.analysis-tag {
+  background: linear-gradient(135deg, var(--bg-warm), #e8f4ea);
+  border: 1px solid var(--primary-light);
+  color: var(--primary);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75em;
+}
+
+.related-questions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.related-question-btn {
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 8px 14px;
+  border-radius: 18px;
+  cursor: pointer;
+  font-size: 0.8em;
+  transition: all 0.2s;
+}
+
+.related-question-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}

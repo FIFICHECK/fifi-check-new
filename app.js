@@ -137,7 +137,453 @@ async function getRAGContext(query, topK = 5) {
 }
 
 // ================================================
+// Intelligent Analysis-First RAG System
+// Step 1: Analyze → Step 2: Search → Step 3: Answer
+// ================================================
+
+// Analysis prompt - AI analyzes the question first
+const ANALYSIS_PROMPT = `你係一個 HKTVmall 商戶問題分析師。
+
+分析以下問題，識別：
+1. 問題類型（登入問題、產品問題、訂單問題、佣金問題、推廣問題等）
+2. 涉及嘅範疇關鍵詞
+3. 需要搵咩資料嚟回答
+
+問題：{question}
+
+請以 JSON 格式回覆：
+{
+  "type": "問題類型",
+  "keywords": ["關鍵詞1", "關鍵詞2", "關鍵詞3"],
+  "needed_info": "需要咩資料",
+  "urgency": "normal|urgent",
+  "categories": ["可能相關嘅FAQ類別"]
+}
+
+只回覆 JSON。`;
+
+// Synthesis prompt - AI synthesizes answer from relevant FAQs
+const SYNTHESIS_PROMPT = `你係 Hermes，HKTVmall 商戶支援助理。
+
+你嘅任務係基於以下相關 FAQ 資料，用口語化方式回答用戶問題。
+
+用戶問題：{question}
+
+相關 FAQ 資料：
+{relevant_faqs}
+
+回答要求：
+1. 用廣東話口吻回答，轻鬆活潑
+2. 如果有多個相關 FAQ，整合所有資料給出完整答案
+3. 如有延伸建議，一併提供
+4. 如有警示事項，提提用戶
+5. 標明答案來源（引用邊個 FAQ）
+
+請以 JSON 格式回覆：
+{
+  "answer": "主要答案（口語化）",
+  "sources": ["來源FAQ標題1", "來源FAQ標題2"],
+  "extendedAdvice": "延伸建議（如有）",
+  "warnings": "警示事項（如有）",
+  "relatedQuestions": ["用戶可能想問嘅相關問題1", "相關問題2"],
+  "confidence": 0.0-1.0
+}
+
+只回覆 JSON。`;
+
+// Step 1: Analyze the question
+async function analyzeQuestion(question) {
+  const prompt = ANALYSIS_PROMPT.replace('{question}', question);
+  
+  try {
+    // Use the LLM to analyze
+    const response = await callLLM(prompt);
+    const analysis = JSON.parse(response);
+    console.log('Question analysis:', analysis);
+    return analysis;
+  } catch (error) {
+    console.warn('Analysis failed, using fallback:', error.message);
+    // Fallback analysis
+    return {
+      type: 'general',
+      keywords: question.split(/[\s\u4e00-\u9fff]+/).filter(w => w.length > 1),
+      needed_info: '一般查詢',
+      urgency: 'normal',
+      categories: []
+    };
+  }
+}
+
+// Step 2: Search based on analysis
+async function searchBasedOnAnalysis(question, analysis, topK = 5) {
+  // Combine question and analysis keywords for search
+  const searchQuery = question;
+  
+  // Use enhanced semantic search
+  const results = await searchFAQEnhanced(searchQuery, topK);
+  
+  // Also search for each keyword category if analysis provided relevant categories
+  if (analysis.categories && analysis.categories.length > 0) {
+    const categoryResults = await Promise.all(
+      analysis.categories.slice(0, 2).map(cat => 
+        searchFAQEnhanced(cat, 3)
+      )
+    );
+    
+    // Merge and deduplicate results
+    const merged = [...results];
+    for (const catResults of categoryResults) {
+      for (const r of catResults) {
+        if (!merged.find(m => m.q === r.q)) {
+          merged.push(r);
+        }
+      }
+    }
+    
+    // Re-sort by similarity/score
+    merged.sort((a, b) => (b.similarity || b.score || 0) - (a.similarity || a.score || 0));
+    return merged.slice(0, topK);
+  }
+  
+  return results;
+}
+
+// Step 3: Synthesize answer from relevant FAQs
+async function synthesizeAnswer(question, relevantFaqs) {
+  // Format relevant FAQs for the prompt
+  const faqContext = relevantFaqs.map((faq, i) => 
+    `[FAQ ${i+1}] ${faq.category}：${faq.q}\n答：${faq.a}`
+  ).join('\n\n');
+  
+  const prompt = SYNTHESIS_PROMPT
+    .replace('{question}', question)
+    .replace('{relevant_faqs}', faqContext);
+  
+  try {
+    const response = await callLLM(prompt);
+    const answer = JSON.parse(response);
+    console.log('Synthesized answer:', answer);
+    return {
+      ...answer,
+      relevantFaqs: relevantFaqs.slice(0, 3) // Keep top 3 for display
+    };
+  } catch (error) {
+    console.warn('Synthesis failed, using fallback:', error.message);
+    // Fallback: return first relevant FAQ as answer
+    if (relevantFaqs.length > 0) {
+      const top = relevantFaqs[0];
+      return {
+        answer: top.a,
+        sources: [top.q],
+        extendedAdvice: '',
+        warnings: '',
+        relatedQuestions: [],
+        confidence: 0.7,
+        relevantFaqs: relevantFaqs.slice(0, 3)
+      };
+    }
+    return {
+      answer: '抱歉，暂时搵唔到相關資料，建議您聯絡 FIFI 查服務團隊。',
+      sources: [],
+      extendedAdvice: '',
+      warnings: '',
+      relatedQuestions: [],
+      confidence: 0.0,
+      relevantFaqs: []
+    };
+  }
+}
+
+// Main intelligent analysis function
+async function getIntelligentAnalysis(question) {
+  try {
+    // Step 1: Analyze the question
+    const analysis = await analyzeQuestion(question);
+    
+    // Step 2: Search based on analysis
+    const relevantFaqs = await searchBasedOnAnalysis(question, analysis, 5);
+    
+    // Step 3: Synthesize answer
+    const answer = await synthesizeAnswer(question, relevantFaqs);
+    
+    // Add analysis metadata
+    return {
+      ...answer,
+      analysis: {
+        type: analysis.type,
+        keywords: analysis.keywords,
+        urgency: analysis.urgency
+      }
+    };
+  } catch (error) {
+    console.error('Intelligent analysis failed:', error);
+    return getDefaultHermesResponse(question);
+  }
+}
+
+// Helper: Call LLM (reuse existing logic)
+async function callLLM(prompt) {
+  const config = API_CONFIG[state.apiProvider];
+  const model = config.model;
+  
+  const payload = {
+    model: model,
+    messages: [
+      {
+        role: 'user',
+        content: prompt
+      }
+    ],
+    temperature: 0.7,
+    max_tokens: 2000
+  };
+  
+  const response = await fetch(config.endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${state.apiKey}`
+    },
+    body: JSON.stringify(payload)
+  });
+  
+  if (!response.ok) {
+    throw new Error('LLM API error: ' + response.status);
+  }
+  
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+// ================================================
+// END Intelligent Analysis-First RAG System
+// ================================================
+
+// ================================================
 // Store ID 歷史記錄
+// ================================================
+
+// ================================================
+// Intelligent Analysis-First RAG System
+// Step 1: Analyze → Step 2: Search → Step 3: Answer
+// ================================================
+
+// Analysis prompt - AI analyzes the question first
+const ANALYSIS_PROMPT = `你係一個 HKTVmall 商戶問題分析師。
+
+分析以下問題，識別：
+1. 問題類型（登入問題、產品問題、訂單問題、佣金問題、推廣問題等）
+2. 涉及嘅範疇關鍵詞
+3. 需要搵咩資料嚟回答
+
+問題：{question}
+
+請以 JSON 格式回覆：
+{
+  "type": "問題類型",
+  "keywords": ["關鍵詞1", "關鍵詞2", "關鍵詞3"],
+  "needed_info": "需要咩資料",
+  "urgency": "normal|urgent",
+  "categories": ["可能相關嘅FAQ類別"]
+}
+
+只回覆 JSON。`;
+
+// Synthesis prompt - AI synthesizes answer from relevant FAQs
+const SYNTHESIS_PROMPT = `你係 Hermes，HKTVmall 商戶支援助理。
+
+你嘅任務係基於以下相關 FAQ 資料，用口語化方式回答用戶問題。
+
+用戶問題：{question}
+
+相關 FAQ 資料：
+{relevant_faqs}
+
+回答要求：
+1. 用廣東話口吻回答，轻鬆活潑
+2. 如果有多個相關 FAQ，整合所有資料給出完整答案
+3. 如有延伸建議，一併提供
+4. 如有警示事項，提提用戶
+5. 標明答案來源（引用邊個 FAQ）
+
+請以 JSON 格式回覆：
+{
+  "answer": "主要答案（口語化）",
+  "sources": ["來源FAQ標題1", "來源FAQ標題2"],
+  "extendedAdvice": "延伸建議（如有）",
+  "warnings": "警示事項（如有）",
+  "relatedQuestions": ["用戶可能想問嘅相關問題1", "相關問題2"],
+  "confidence": 0.0-1.0
+}
+
+只回覆 JSON。`;
+
+// Step 1: Analyze the question
+async function analyzeQuestion(question) {
+  const prompt = ANALYSIS_PROMPT.replace('{question}', question);
+  
+  try {
+    // Use the LLM to analyze
+    const response = await callLLM(prompt);
+    const analysis = JSON.parse(response);
+    console.log('Question analysis:', analysis);
+    return analysis;
+  } catch (error) {
+    console.warn('Analysis failed, using fallback:', error.message);
+    // Fallback analysis
+    return {
+      type: 'general',
+      keywords: question.split(/[\s\u4e00-\u9fff]+/).filter(w => w.length > 1),
+      needed_info: '一般查詢',
+      urgency: 'normal',
+      categories: []
+    };
+  }
+}
+
+// Step 2: Search based on analysis
+async function searchBasedOnAnalysis(question, analysis, topK = 5) {
+  // Combine question and analysis keywords for search
+  const searchQuery = question;
+  
+  // Use enhanced semantic search
+  const results = await searchFAQEnhanced(searchQuery, topK);
+  
+  // Also search for each keyword category if analysis provided relevant categories
+  if (analysis.categories && analysis.categories.length > 0) {
+    const categoryResults = await Promise.all(
+      analysis.categories.slice(0, 2).map(cat => 
+        searchFAQEnhanced(cat, 3)
+      )
+    );
+    
+    // Merge and deduplicate results
+    const merged = [...results];
+    for (const catResults of categoryResults) {
+      for (const r of catResults) {
+        if (!merged.find(m => m.q === r.q)) {
+          merged.push(r);
+        }
+      }
+    }
+    
+    // Re-sort by similarity/score
+    merged.sort((a, b) => (b.similarity || b.score || 0) - (a.similarity || a.score || 0));
+    return merged.slice(0, topK);
+  }
+  
+  return results;
+}
+
+// Step 3: Synthesize answer from relevant FAQs
+async function synthesizeAnswer(question, relevantFaqs) {
+  // Format relevant FAQs for the prompt
+  const faqContext = relevantFaqs.map((faq, i) => 
+    `[FAQ ${i+1}] ${faq.category}：${faq.q}\n答：${faq.a}`
+  ).join('\n\n');
+  
+  const prompt = SYNTHESIS_PROMPT
+    .replace('{question}', question)
+    .replace('{relevant_faqs}', faqContext);
+  
+  try {
+    const response = await callLLM(prompt);
+    const answer = JSON.parse(response);
+    console.log('Synthesized answer:', answer);
+    return {
+      ...answer,
+      relevantFaqs: relevantFaqs.slice(0, 3) // Keep top 3 for display
+    };
+  } catch (error) {
+    console.warn('Synthesis failed, using fallback:', error.message);
+    // Fallback: return first relevant FAQ as answer
+    if (relevantFaqs.length > 0) {
+      const top = relevantFaqs[0];
+      return {
+        answer: top.a,
+        sources: [top.q],
+        extendedAdvice: '',
+        warnings: '',
+        relatedQuestions: [],
+        confidence: 0.7,
+        relevantFaqs: relevantFaqs.slice(0, 3)
+      };
+    }
+    return {
+      answer: '抱歉，暂时搵唔到相關資料，建議您聯絡 FIFI 查服務團隊。',
+      sources: [],
+      extendedAdvice: '',
+      warnings: '',
+      relatedQuestions: [],
+      confidence: 0.0,
+      relevantFaqs: []
+    };
+  }
+}
+
+// Main intelligent analysis function
+async function getIntelligentAnalysis(question) {
+  try {
+    // Step 1: Analyze the question
+    const analysis = await analyzeQuestion(question);
+    
+    // Step 2: Search based on analysis
+    const relevantFaqs = await searchBasedOnAnalysis(question, analysis, 5);
+    
+    // Step 3: Synthesize answer
+    const answer = await synthesizeAnswer(question, relevantFaqs);
+    
+    // Add analysis metadata
+    return {
+      ...answer,
+      analysis: {
+        type: analysis.type,
+        keywords: analysis.keywords,
+        urgency: analysis.urgency
+      }
+    };
+  } catch (error) {
+    console.error('Intelligent analysis failed:', error);
+    return getDefaultHermesResponse(question);
+  }
+}
+
+// Helper: Call LLM (reuse existing logic)
+async function callLLM(prompt) {
+  const config = API_CONFIG[state.apiProvider];
+  const model = config.model;
+  
+  const payload = {
+    model: model,
+    messages: [
+      {
+        role: 'user',
+        content: prompt
+      }
+    ],
+    temperature: 0.7,
+    max_tokens: 2000
+  };
+  
+  const response = await fetch(config.endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${state.apiKey}`
+    },
+    body: JSON.stringify(payload)
+  });
+  
+  if (!response.ok) {
+    throw new Error('LLM API error: ' + response.status);
+  }
+  
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+// ================================================
+// END Intelligent Analysis-First RAG System
 // ================================================
 
 // ================================================
@@ -723,35 +1169,9 @@ function exportToExcel() {
 // ================================================
 
 async function getHermesAnalysis(question) {
-  // 加入對話上下文
-  const conversationContext = state.conversationHistory.length > 0
-    ? `\n\n之前的對話記錄（用於理解上下文）：\n${state.conversationHistory.slice(-3).map(h => `問：${h.q}\n答：${h.a}`).join('\n')}`
-    : '';
-
-  // 使用 RAG 獲取相關 FAQ 上下文
-  const ragContext = await getRAGContext(question, 5);
-
-  const hermesPrompt = `你係 Hermes，HKTVmall 商戶支援助理 — 幫緊你幫緊你！
-
-風格：口語化、輕鬆風趣、有時加啲emoji，但係又要專業！
-
-用廣東話口吻回答，好似朋友傾偈咁，但係又幫到手。${conversationContext}
-
-FAQ 知識庫（相關度排序）：
-${ragContext || getFAQContext()}
-
-用戶問題：${question}
-
-請以 JSON 格式回覆：
-{
-  "answer": "主要答案（輕鬆口語化）",
-  "extendedAdvice": "延伸建議/實際操作步驟",
-  "relatedCategory": "相關分類",
-  "warning": "警示事項（如無則留空）",
-  "confidence": 0.0-1.0
+  // 使用智能分析模式：先分析，再搵資料，再回答
+  return await getIntelligentAnalysis(question);
 }
-
-只回覆 JSON，不要其他文字。`;
 
   try {
     if (GAS_CONFIG.gasWebAppUrl) {
@@ -929,9 +1349,51 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
       `;
     }
 
-    if (hermesAnalysis.warning) {
+    if (hermesAnalysis.warnings) {
       hermesHtml += `
-        <div class="hermes-warning">⚠️ ${escapeHtml(hermesAnalysis.warning)}</div>
+        <div class="hermes-warning">⚠️ ${escapeHtml(hermesAnalysis.warnings)}</div>
+      `;
+    }
+
+    // Display sources
+    if (hermesAnalysis.sources && hermesAnalysis.sources.length > 0) {
+      hermesHtml += `
+        <div class="hermes-section">
+          <div class="hermes-section-label">📚 引用來源</div>
+          <div class="hermes-sources">
+            ${hermesAnalysis.sources.map(s => `<span class="source-tag">${escapeHtml(s)}</span>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Display analysis info
+    if (hermesAnalysis.analysis) {
+      const analysis = hermesAnalysis.analysis;
+      if (analysis.type || analysis.keywords) {
+        hermesHtml += `
+          <div class="hermes-section">
+            <div class="hermes-section-label">🔍 問題分析</div>
+            <div class="hermes-analysis-info">
+              ${analysis.type ? `<span class="analysis-tag">🏷️ ${escapeHtml(analysis.type)}</span>` : ''}
+              ${analysis.keywords && analysis.keywords.length > 0 ? `<span class="analysis-tag">🔑 ${analysis.keywords.slice(0, 3).join(', ')}</span>` : ''}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Display related questions
+    if (hermesAnalysis.relatedQuestions && hermesAnalysis.relatedQuestions.length > 0) {
+      hermesHtml += `
+        <div class="hermes-section">
+          <div class="hermes-section-label">💬 您可能想問</div>
+          <div class="related-questions">
+            ${hermesAnalysis.relatedQuestions.slice(0, 3).map(q => 
+              `<button class="related-question-btn" onclick="askPreset('${escapeHtml(q.replace(/'/g, "\'"))}')">${escapeHtml(q)}</button>`
+            ).join('')}
+          </div>
+        </div>
       `;
     }
 
