@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>FIFI CHECK 🐾 — 商戶 AI 助理</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>">
+  <style>
+/* ================================================
+   FIFI CHECK — Japanese Minimalist Style
+   ================================================ */
+:root {
+  --primary: #7c6a5d;
+  --primary-light: #a69587;
+  --secondary: #c4a98b;
+  --accent: #d4a574;
+  --bg-light: #faf8f5;
+  --bg-card: #ffffff;
+  --bg-warm: #f5f0e8;
+  --text-primary: #3d3d3d;
+  --text-secondary: #7a7a7a;
+  --text-muted: #aaaaaa;
+  --border: #e8e4de;
+  --success: #8fae8b;
+  --warning: #d4a574;
+  --danger: #c9928a;
+  --radius: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-soft: 0 2px 8px rgba(0,0,0,0.04);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans TC', 'PingFang TC', sans-serif;
+  background: var(--bg-light);
+  color: var(--text-primary);
+  overflow: hidden;
+  letter-spacing: 0.02em;
+}
+.app-container { display: flex; flex-direction: column; height: 100vh; max-width: 100%; }
+
+/* Header */
+.header {
+  background: var(--bg-card);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.header h1 { font-size: 1.2em; font-weight: 400; color: var(--text-primary); letter-spacing: 0.08em; }
+.header-info { display: flex; align-items: center; gap: 16px; }
+.store-badge {
+  background: var(--bg-warm); padding: 4px 14px; border-radius: 20px;
+  font-size: 0.8em; color: var(--text-secondary); border: 1px solid var(--border);
+}
+.hermes-badge {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--bg-warm); padding: 5px 12px; border-radius: 20px;
+  font-size: 0.75em; cursor: pointer; transition: all 0.2s;
+  border: 1px solid var(--border); color: var(--text-secondary);
+}
+.hermes-badge:hover { background: var(--border); }
+.hermes-badge.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.hermes-badge span:first-child { font-size: 13px; }
+
+/* Login */
+.login-view { display: flex; align-items: center; justify-content: center; height: 100%; background: var(--bg-light); }
+.login-card {
+  background: var(--bg-card); padding: 40px 36px; border-radius: var(--radius);
+  width: 100%; max-width: 360px; box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border); text-align: center;
+}
+.login-card h2 { font-size: 1.4em; font-weight: 300; margin-bottom: 8px; letter-spacing: 0.15em; }
+.login-card .subtitle { color: var(--text-muted); font-size: 0.85em; margin-bottom: 28px; }
+.login-desc { color: var(--text-secondary); font-size: 0.8em; margin-bottom: 28px; }
+.form-group { margin-bottom: 18px; text-align: left; }
+.form-group label { display: block; margin-bottom: 6px; color: var(--text-secondary); font-size: 0.8em; letter-spacing: 0.05em; }
+.form-group input {
+  width: 100%; padding: 11px 14px; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--bg-light); color: var(--text-primary);
+  font-size: 0.95em; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(124,106,93,0.1); }
+.btn { width: 100%; padding: 12px; border: none; border-radius: var(--radius); font-size: 0.9em; font-weight: 500; cursor: pointer; transition: all 0.2s; letter-spacing: 0.05em; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-light); transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.error-message { color: var(--danger); font-size: 0.8em; margin-top: 10px; display: none; }
+.login-footer { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.75em; color: var(--text-muted); }
+.login-footer a { color: var(--primary); text-decoration: none; }
+
+/* Chat View */
+.chat-view { display: none; flex-direction: column; height: 100%; background: var(--bg-light); }
+.chat-header {
+  background: var(--bg-card); padding: 12px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.chat-header-info h3 { font-size: 0.95em; font-weight: 400; }
+.last-login { color: var(--text-muted); font-size: 0.7em; margin-top: 2px; }
+.btn-logout {
+  background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+  padding: 6px 14px; border-radius: var(--radius); cursor: pointer; font-size: 0.75em; transition: all 0.2s;
+}
+.btn-logout:hover { background: var(--bg-warm); }
+.chat-header-actions { display: flex; align-items: center; gap: 10px; }
+.btn-history {
+  background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+  padding: 6px 14px; border-radius: var(--radius); cursor: pointer; font-size: 0.75em; transition: all 0.2s;
+}
+.btn-history:hover { background: var(--bg-warm); color: var(--text-primary); }
+
+/* Welcome */
+.welcome-screen {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-start; padding: 30px 20px; text-align: center;
+  overflow-y: auto; min-height: 0;
+}
+.welcome-screen.hidden { display: none !important; }
+.welcome-screen h2 { font-size: 1.3em; font-weight: 400; margin-bottom: 10px; letter-spacing: 0.08em; }
+.welcome-hint { color: var(--text-muted); font-size: 0.8em; margin-bottom: 16px; }
+.preset-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 500px; }
+.preset-chip {
+  background: var(--bg-card); border: 1px solid var(--border); color: var(--text-secondary);
+  padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: all 0.2s; font-size: 0.8em;
+}
+.preset-chip:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+/* Messages */
+.messages-container {
+  flex: 1; overflow-y: auto; padding: 20px;
+  display: flex; flex-direction: column; gap: 16px; min-height: 0;
+}
+.message { display: flex; gap: 10px; max-width: 80%; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.message.user { align-self: flex-end; flex-direction: column; align-items: flex-end; }
+.message.assistant { align-self: flex-start; }
+.message-avatar {
+  width: 32px; height: 32px; background: var(--bg-warm); border: 1px solid var(--border);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.message-content {
+  background: var(--bg-card); padding: 10px 14px; border-radius: var(--radius);
+  line-height: 1.6; font-size: 0.9em; border: 1px solid var(--border);
+}
+.message.user .message-content { background: var(--primary); color: #fff; border-color: var(--primary); }
+.message-time { font-size: 0.65em; color: var(--text-muted); margin-top: 4px; }
+
+/* Analysis Panel */
+.hermes-panel-container { width: 100%; max-width: 80%; align-self: flex-start; animation: fadeIn 0.4s ease; }
+.hermes-analysis {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 18px; color: var(--text-primary);
+}
+.hermes-analysis-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+}
+.hermes-analysis-header span:first-child { font-size: 16px; }
+.hermes-analysis-header strong { font-weight: 500; font-size: 0.85em; color: var(--text-primary); }
+.confidence-badge { margin-left: auto; padding: 2px 8px; border-radius: 10px; font-size: 0.65em; font-weight: 500; }
+.confidence-high { background: rgba(143,174,139,0.2); color: var(--success); }
+.confidence-medium { background: rgba(212,165,116,0.2); color: var(--warning); }
+.confidence-low { background: rgba(201,146,138,0.2); color: var(--danger); }
+.hermes-section { margin-bottom: 10px; }
+.hermes-section:last-child { margin-bottom: 0; }
+.hermes-section-label { font-size: 0.7em; color: var(--text-muted); margin-bottom: 4px; letter-spacing: 0.05em; }
+.hermes-section-content { font-size: 0.85em; line-height: 1.5; color: var(--text-primary); }
+.hermes-warning { background: rgba(201,146,138,0.1); padding: 8px 12px; border-radius: var(--radius); margin-top: 10px; font-size: 0.8em; color: var(--danger); }
+.hermes-source { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 0.65em; color: var(--text-muted); }
+
+/* Typing */
+.typing-indicator { display: none; align-items: center; gap: 8px; padding: 12px 0; color: var(--text-muted); font-size: 0.8em; }
+.typing-dots { display: flex; gap: 3px; }
+.typing-dot { width: 5px; height: 5px; background: var(--text-muted); border-radius: 50%; animation: typing 1.4s infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing { 0%,60%,100% { opacity: 0.3; } 30% { opacity: 1; } }
+.typing-avatar { font-size: 20px; }
+
+/* Input */
+.chat-input-container {
+  background: var(--bg-card); padding: 14px 18px; border-top: 1px solid var(--border);
+  display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0;
+}
+.chat-input {
+  flex: 1; background: #ffffff; border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 10px 14px; color: var(--text-primary);
+  font-size: 0.9em; resize: none; max-height: 100px; font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.chat-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,106,93,0.12); }
+.chat-input::placeholder { color: var(--text-muted); }
+.btn-send {
+  width: 40px; height: 40px; background: var(--primary); border: none;
+  border-radius: var(--radius); color: #fff; font-size: 16px; cursor: pointer;
+  transition: all 0.2s; display: flex; align-items: center; justify-content: center; opacity: 0.85;
+}
+.btn-send:not(:disabled) { opacity: 1; }
+.btn-send:hover:not(:disabled) { background: var(--primary-light); }
+
+/* Modal */
+.modal {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.3); align-items: center; justify-content: center; z-index: 1000;
+}
+.modal-content {
+  background: var(--bg-card); padding: 28px; border-radius: var(--radius);
+  text-align: center; max-width: 320px; border: 1px solid var(--border);
+}
+.modal-content h3 { font-weight: 400; margin-bottom: 10px; font-size: 1em; }
+.modal-content p { font-size: 0.8em; color: var(--text-secondary); margin-bottom: 20px; }
+.modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+.modal-buttons .btn { flex: 1; }
+.btn-secondary { background: var(--bg-warm); color: var(--text-primary); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--border); }
+
+/* API Key Modal */
+.api-key-content { max-width: 360px; width: 90%; }
+.api-key-content h3 { font-weight: 400; font-size: 1em; margin-bottom: 10px; }
+.api-key-content p { font-size: 0.75em; color: var(--text-secondary); margin-bottom: 18px; line-height: 1.5; }
+.api-key-content input {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--bg-light); font-size: 0.85em; margin-bottom: 14px;
+}
+.api-key-content input:focus { outline: none; border-color: var(--primary); }
+.api-key-buttons { display: flex; gap: 10px; }
+.api-key-buttons .btn { flex: 1; padding: 10px; font-size: 0.8em; }
+
+/* History */
+.history-modal-content { max-width: 500px; max-height: 70vh; display: flex; flex-direction: column; }
+.history-content { max-height: 400px; overflow-y: auto; margin: 15px 0; padding: 10px 0; }
+.history-list { display: flex; flex-direction: column; gap: 16px; }
+.history-item { background: var(--bg-warm); border-radius: var(--radius); padding: 14px; border: 1px solid var(--border); }
+.history-q { font-weight: 500; color: var(--text-primary); margin-bottom: 8px; font-size: 0.9em; }
+.history-a { color: var(--text-secondary); font-size: 0.85em; line-height: 1.5; margin-bottom: 8px; }
+.history-time { font-size: 0.7em; color: var(--text-muted); }
+
+/* Store suggestions */
+.store-suggestions {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+  padding: 10px; background: var(--bg-warm); border-radius: var(--radius); border: 1px solid var(--border);
+}
+.store-suggestion-btn {
+  background: var(--bg-card); border: 1px solid var(--border); color: var(--text-secondary);
+  padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.8em; transition: all 0.2s;
+}
+.store-suggestion-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+/* Notification */
+.notification {
+  position: fixed; bottom: 20px; left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--primary); color: #fff; padding: 12px 24px;
+  border-radius: 25px; font-size: 0.85em; opacity: 0;
+  transition: all 0.3s ease; z-index: 2000; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+@media (max-width: 600px) {
+  .message { max-width: 90%; }
+  .preset-chips { flex-direction: column; }
+  .header h1 { font-size: 1em; }
+  .login-card { padding: 30px 24px; }
+}
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header class="header" id="header">
+      <h1>🐾 FIFI CHECK</h1>
+      <div class="header-info">
+        <span class="hermes-badge active" id="hermesBadge" title="FIFI查 分析：開啟">
+          <span>🧠</span><span>FIFI查</span>
+        </span>
+        <span class="store-badge" id="storeBadge" style="display:none;"></span>
+        <button class="btn-logout" id="btnLogout" style="display:none;">登出</button>
+      </div>
+    </header>
+
+    <!-- Login View -->
+    <div class="login-view" id="loginView">
+      <div class="login-card">
+        <h2>🐾 FIFI CHECK</h2>
+        <p class="subtitle">商戶 AI 助理</p>
+        <p class="login-desc">24小時即時回覆您嘅商戶查詢</p>
+        <form id="loginForm">
+          <div class="error-message" id="errorMessage"></div>
+          <div class="form-group">
+            <label>Store ID</label>
+            <input type="text" id="username" placeholder="輸入 Store ID (H/B/C/P)" autocomplete="username">
+          </div>
+          <button type="submit" class="btn btn-primary" id="btnLogin">登入</button>
+        </form>
+        <div class="login-footer">
+          <p>📖 資料來源：<a href="https://sites.google.com/view/hktv-merc-faq/" target="_blank">HKTV 商戶支援</a></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat View -->
+    <div class="chat-view" id="chatView">
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <h3>🐾 FIFI CHECK — 商戶 AI 助理</h3>
+          <p class="last-login" id="lastLogin"></p>
+        </div>
+        <div class="chat-header-actions">
+          <button class="btn-history" id="btnHistory" title="對話記錄">📜 記錄</button>
+          <button class="btn-logout" id="btnLogoutTop">登出</button>
+        </div>
+      </div>
+
+      <div class="welcome-screen" id="welcomeScreen">
+        <h2>您好！歡迎使用 FIFI CHECK</h2>
+        <p class="welcome-hint">直接輸入您嘅問題，我幫您搵答案 ^^</p>
+        <div class="preset-chips" id="presetChips">
+          <button class="preset-chip" onclick="askPreset('如何上架新產品？')">如何上架新產品？</button>
+          <button class="preset-chip" onclick="askPreset('佣金率是多少？')">佣金率是多少？</button>
+          <button class="preset-chip" onclick="askPreset('如何處理訂單發貨？')">如何處理訂單發貨？</button>
+          <button class="preset-chip" onclick="askPreset('如何設定優惠活動？')">如何設定優惠活動？</button>
+          <button class="preset-chip" onclick="askPreset('如何聯絡我的 RM？')">如何聯絡我的 RM？</button>
+          <button class="preset-chip" onclick="askPreset('退款政策是怎樣的？')">退款政策是怎樣的？</button>
+        </div>
+      </div>
+
+      <div class="messages-container" id="messagesContainer"></div>
+
+      <div class="typing-indicator" id="typingIndicator">
+        <div class="typing-avatar">🐾</div>
+        <div class="typing-dots">
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+        </div>
+        <span>FIFI 思考緊...</span>
+      </div>
+
+      <div class="chat-input-container">
+        <textarea class="chat-input" id="chatInput" placeholder="輸入您的問題..." rows="1"></textarea>
+        <button class="btn-send" id="btnSend" disabled>➤</button>
+      </div>
+    </div>
+
+    <!-- Logout Modal -->
+    <div class="modal" id="logoutModal">
+      <div class="modal-content">
+        <h3>確認登出？</h3>
+        <p>您確定要登出 FIFI CHECK 嗎？</p>
+        <div class="modal-buttons">
+          <button class="btn btn-secondary" id="btnCancelLogout">取消</button>
+          <button class="btn btn-primary" id="btnConfirmLogout">確認登出</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Key Modal -->
+    <div class="modal" id="apiKeyModal">
+      <div class="modal-content api-key-content">
+        <h3>設定 OpenRouter API Key</h3>
+        <p>輸入您的 OpenRouter API Key 以啟用 Claude AI 分析功能</p>
+        <input type="password" id="apiKeyInput" placeholder="sk-or-v1-...">
+        <div class="modal-buttons api-key-buttons">
+          <button class="btn btn-secondary" id="btnSkipApiKey">跳過</button>
+          <button class="btn btn-primary" id="btnSaveApiKey">儲存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="modal" id="historyModal">
+      <div class="modal-content history-modal-content">
+        <h3>📜 我的問答記錄</h3>
+        <div class="history-content" id="historyContent">
+          <p style="text-align:center;color:var(--text-muted);padding:40px;">暫時未有對話記錄</p>
+        </div>
+        <div class="modal-buttons">
+          <button class="btn btn-primary" id="btnCloseHistory">關閉</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ================================================
+// FAQ 知識庫
+// ================================================
+const FAQ_DATA = {
+  basicSetup: {
+    category: "基本後台設置", icon: "⚙️",
+    questions: [
+      { q: "如何登入商戶後台？", a: "要登入 HKTV 商戶後台，請前往 MMS (Merchant Management System)：\nhttps://mms.shoalter.com/mms/\n\n1. 輸入您的 HKTV 帳戶電郵\n2. 輸入密碼\n3. 輸入 Store ID\n4. 點擊登入\n\n如果您忘記密碼，請聯絡 FIFI 查服務團隊或您的 RM。" },
+      { q: "如何設定雙重驗證（2FA）？", a: "為保障帳戶安全，建議您啟用雙重驗證：\n\n1. 登入後台後，進入「設定」\n2. 點擊「安全設定」\n3. 選擇「啟用雙重驗證」\n4. 掃描 QR Code 到您的驗證器 App（如 Google Authenticator）\n5. 輸入一次性驗證碼確認\n\n日後登入時需要輸入驗證器顯示的6位數字。" },
+      { q: "商戶後台有哪些主要功能？", a: "HKTVmall 商戶後台（MMS）主要功能包括：\n\n📦 商品管理 - 上架、編輯、庫存管理\n📋 訂單管理 - 查看、處理發貨、退款\n💰 財務報告 - GMV、佣金、結算\n🎁 推廣活動 - 建立優惠、折扣\n📊 數據分析 - 銷售報告、流量分析\n👥 帳戶管理 - 員工權限、通知設定" },
+      { q: "如何新增後台用戶？", a: "主帳戶可以新增子帳戶給員工：\n\n1. 進入「帳戶設定」\n2. 點擊「用戶管理」\n3. 選擇「新增用戶」\n4. 輸入員工電郵和資料\n5. 設定權限角色（管理員/一般用戶/唯讀）\n6. 發送邀請\n\n員工會收到電郵邀請，點擊連結設定密碼後即可使用。" }
+    ]
+  },
+  productUpload: {
+    category: "上載產品", icon: "📦",
+    questions: [
+      { q: "如何上架新產品？", a: "上架新產品步驟：\n\n1. 登入 MMS 後台\n2. 點擊「商品管理」→「新增商品」\n3. 填寫商品名稱（中英文）、描述、品牌、類別、價格、庫存數量\n4. 上傳商品圖片（最少1張，最多9張）\n5. 填寫物流資料（重量、尺寸）\n6. 點擊「提交」\n\n📌 圖片建議尺寸 800x800px，JPEG/PNG 格式，唔好有水印。" },
+      { q: "產品圖片有咩要求？", a: "HKTVmall 產品圖片要求：\n\n✅ 格式：JPEG 或 PNG\n✅ 尺寸：建議 800x800px 或以上\n✅ 比例：1:1 正方形為最佳\n✅ 檔案大小：每張唔好超過 5MB\n\n❌ 不可有水印、logo、聯絡資料\n❌ 不可有其他平台標誌\n❌ 背景要白色或淺色\n❌ 不可模糊或像素化" },
+      { q: "如何批量上傳產品？", a: "批量上載步驟：\n\n1. 在「商品管理」頁面，點擊「批量上傳」\n2. 下載 Excel 模板\n3. 填寫產品資料（每行一個產品）\n4. 上傳 Excel 檔案\n5. 系統會驗證資料並顯示結果\n\n如果上傳有誤，可以下載錯誤報告修改後重新上傳。" },
+      { q: "Brand Name 品牌名稱有咩要求？", a: "品牌名稱必須為產品上所顯示的品牌名稱，並非公司／店舖／產品名。\n\n🌐 中英文品牌名會分別出現於中英文網頁版本。如不想顯示中文品牌名，申請時只申請英文。\n\n🔍 點擊放大鏡搜尋品牌，只會搜尋到已存在系統中的品牌。如沒有搜尋結果，代表品牌尚未建立，須另行申請新增品牌。" },
+      { q: "如何申請新增品牌？", a: "步驟一：於 MMS 申請新增品牌\n位置：MMS > 電子商務 > 產品 > 品牌\n輸入中英文品牌名稱後按儲存\n\n步驟二：填寫 MCS form 提交給 Operations 審批\n所需資料：品牌名稱、貨品類別、品牌網站、貨品圖片\n審批時間：約 3-5 個工作天\n\n步驟三：審批通過後，於 MMS 系統查看狀態顯示「Approved」即可使用。" },
+      { q: "SKU ID 有咩規定？", a: "SKU ID 規定：\n\n✅ 可用：英文大小楷、數目字、符號 - 或 _\n❌ 不可用：中文字、其他符號及空格、以0為首的純數目字、包含 Merchant ID、超過39個字元\n\n📌 一經儲存後不能再修改，必須為獨立編碼。" }
+    ]
+  },
+  inventory: {
+    category: "庫存管理", icon: "📊",
+    questions: [
+      { q: "如何更新庫存數量？", a: "更新庫存方式：\n\n方式一（逐個）：商品管理 → 找到產品 → 點擊編輯 → 修改庫存數量 → 儲存\n\n方式二（批量）：下載 Excel → 修改數量 → 重新上傳覆蓋\n\n⚠️ 建議設定庫存警告，當數量低於某水平時通知您。" },
+      { q: "如何設定庫存警告？", a: "設定方法：\n\n1. 進入「設定」→「通知設定」\n2. 開啟「低庫存警告」\n3. 設定警告閾值（如：低於20件）\n4. 選擇通知方式（電郵/SMS/App推送）\n\n建議熱賣產品設定較高的警告線。" }
+    ]
+  },
+  orders: {
+    category: "訂單處理", icon: "📋",
+    questions: [
+      { q: "訂單處理要幾耐？", a: "訂單處理時間要求：\n\n📦 標準訂單：\n• 收到訂單後 24 小時內確認\n• 確認後 3 個工作天內發貨\n\n⏰ 逢星期六、日、公眾假期訂單會順延至下一個工作天處理\n\n⚠️ 超時未發貨可能會被罰款。" },
+      { q: "如何處理訂單發貨？", a: "發貨步驟：\n\n1. 登入 MMS，進入「訂單管理」\n2. 找到需要發貨的訂單\n3. 確認訂單資料無誤\n4. 選擇物流方式（HKTV快遞/自選物流）\n5. 輸入物流追蹤號碼（如適用）\n6. 標記為「已發貨」\n\n📌 使用 HKTV 3PL 的商戶可以直接在後台打印運單。" },
+      { q: "客人要求退款點算？", a: "處理退款申請：\n\n1. 登入 MMS，進入「訂單管理」\n2. 找到相關訂單，查看退款原因\n3. 審批退款申請（同意/拒絕）\n4. 如同意，款項會自動退還給客戶\n\n常見退款原因：商品與描述不符、商品損壞、錯寄、客人改變主意\n\n如有爭議，可聯絡 FIFI 查服務團隊。" },
+      { q: "如果發貨延遲點算？", a: "如預計無法準時發貨：\n\n1. 盡快登入 MMS\n2. 在訂單詳情中更新預計發貨時間\n3. 主動聯絡客人解釋情況\n\n💡 主動通知比被動等待好，可以考慮提供優惠券作補償。\n\n如延遲超過規定時間，HKTV 可能會自動取消訂單並退款。" }
+    ]
+  },
+  promotions: {
+    category: "建立優惠活動", icon: "🎁",
+    questions: [
+      { q: "如何設定優惠活動？", a: "建立優惠活動步驟：\n\n1. 登入 MMS，進入「推廣活動」\n2. 點擊「建立新活動」\n3. 選擇活動類型（折扣/買一送一/滿額減/VIP專享價）\n4. 設定活動詳情（名稱、優惠方式、日期、適用商品）\n5. 確認並提交\n\n📌 建議提前 1-2 天建立活動。" },
+      { q: "如何參加 HKTV 主題活動？", a: "參加主題活動方式：\n\n1. 留意 HKTV 發出的活動邀請電郵\n2. 登入 MMS 查看可參加的活動\n3. 選擇想參加的活動\n4. 按要求設定優惠\n5. 確認參加\n\n好處：活動頁面曝光、流量增加、有機會獲得推廣位置。留意 RM 發出的活動通知！" }
+    ]
+  },
+  aftersales: {
+    category: "售後服務", icon: "🤝",
+    questions: [
+      { q: "退貨政策是怎樣的？", a: "退貨政策要點：\n\n✅ 一般情況：收貨後 7 天內可申請退貨，商品必須未使用、包裝完整\n\n❌ 不適用：已使用商品、個人衛生用品（已拆封）、特別訂製商品、有效期短的商品\n\n💡 在商品說明中清晰列明退貨條款，積極處理退貨影響店舖評級。" },
+      { q: "如何處理客人投訴？", a: "處理客人投訴建議：\n\n1️⃣ 收到投訴後 24 小時內回覆\n2️⃣ 仔細閱讀投訴內容，需要時聯絡客人了解詳情\n3️⃣ 提供解決方案（退款/換貨/部分退款/優惠券補償）\n4️⃣ 確認客人滿意後跟進\n\n⭐ 好的售後服務可以將負評轉化為忠誠客戶！" }
+    ]
+  },
+  commission: {
+    category: "佣金與結算", icon: "💰",
+    questions: [
+      { q: "佣金率是多少？", a: "HKTVmall 標準佣金率：\n\n📊 一般類別：約 15-25%（視乎類別）\n\n不同類別佣金率有差異：\n• 食品、鮮活：一般較低\n• 電子產品：一般較高\n• 服裝、家居：中等\n\n💡 登入 MMS 查看您的實際佣金率，如有疑問聯絡您的 RM。" },
+      { q: "結算週期是怎樣的？", a: "結算安排：\n\n📅 一般為每週結算一次（具體日期視乎合約）\n\n結算內容：已完成訂單銷售額，扣除佣金、退款、行政費用\n\n對帳方法：MMS → 財務報告 → 結算報告\n\n⚠️ 如有差異，請即時聯絡 HKTV 財務團隊。" }
+    ]
+  },
+  contact: {
+    category: "聯絡與支援", icon: "📞",
+    questions: [
+      { q: "如何聯絡我的 RM？", a: "聯絡您的商戶關係經理（RM）：\n\n📧 電郵：登入 MMS 查看「帳戶資訊」中的 RM 聯絡電郵\n📱 即時通訊：如 RM 有提供 WhatsApp 等聯繫方式\n\n💡 準備好 Store ID 和具體問題。非緊急可以發電郵，緊急事項直接致電。" },
+      { q: "商戶服務團隊聯絡方式？", a: "聯絡 FIFI 查服務團隊：\n\n📱 WhatsApp：3998 8139\n\n📞 或致電您嘅 RM\n\n💡 有任何問題歡迎隨時聯絡，我哋樂意幫助您解決疑問！" }
+    ]
+  },
+  logistics: {
+    category: "HKTV 3PL", icon: "🚚",
+    questions: [
+      { q: "什麼是 HKTV 3PL？", a: "HKTV 3PL（第三方物流）服務：\n\n商戶將貨品送到 HKTV 倉庫，HKTV 負責儲存、包裝、發貨。\n\n✅ 好處：\n• 省卻自行處理物流\n• 提高發貨效率\n• 有實體店可讓客人自取\n• 庫存與 HKTV 共享\n\n申請方式：聯絡您的 RM，需要支付倉儲和物流費用。" }
+    ]
+  },
+  newMerchant: {
+    category: "新商戶指南", icon: "🌟",
+    questions: [
+      { q: "新商戶要準備什麼？", a: "新加入 HKTVmall 要準備的東西：\n\n📋 文件資料：商業登記證、公司銀行帳戶、聯絡人資料\n📦 商品準備：商品列表和價格、符合要求的圖片、商品描述\n🏭 物流準備：發貨方式（自發/3PL）、包裝材料\n💻 後台準備：開通 MMS 帳戶、設定店舖資料\n\n建議預留 2-4 週準備時間！" }
+    ]
+  },
+  goodSales: {
+    category: "良好銷售手法", icon: "💎",
+    questions: [
+      { q: "如何提升店舖銷量？", a: "提升銷量嘅關鍵策略：\n\n📸 高質量產品圖片：專業燈光、多角度、使用場景\n📝 優化商品描述：詳細特點、突出賣點、使用項目符號\n💰 合理定價：研究競爭對手、預留促銷空間\n⭐ 積極管理評價：邀請客人留評、及時回覆問題\n📦 保持充足庫存：預測高峰期備貨" },
+      { q: "如何增加客人回購率？", a: "提升回購率嘅方法：\n\n✅ 確保產品質素穩定、準時發貨、包裝精美\n🎁 會員計劃：積分獎賞、生日優惠\n📞 主動客戶關係：訂單完成後跟進、推薦相關產品\n💰 回購優惠：優惠券、限時折扣、套裝優惠" }
+    ]
+  },
+  advertising: {
+    category: "商戶廣告投放", icon: "🎯",
+    questions: [
+      { q: "如何在 HKTV 投放廣告？", a: "HKTVmall 廣告投放方式：\n\n📺 廣告類型：橫幅廣告、搜尋廣告、首頁推薦位、分類頁推廣\n\n投放流程：聯絡 RM 查詢 → 了解廣告位和收費 → 提交素材和預算 → 確認投放\n\n收費模式：按點擊(CPC)、按展示(CPM)、固定費用\n\n💡 建議先小規模測試，找出最有效廣告形式！" }
+    ]
+  }
+};
+
+const ALL_FAQ = Object.values(FAQ_DATA).flatMap(section =>
+  section.questions.map(q => ({ ...q, category: section.category, icon: section.icon }))
+);
+
+const KEYWORD_ALIASES = {
+  '上新產品': ['上架', '上架新產品'], '上架': ['上新產品', '加新產品'],
+  '加庫存': ['更新庫存', '補貨', '入貨'], '退錢': ['退款'], '退貨': ['退貨申請'],
+  '幾多錢': ['佣金率', '佣金'], '點寄': ['發貨', '寄貨'], '送貨': ['發貨'],
+  'brand': ['品牌', '品牌名稱'], '品牌': ['brand', '品牌名稱'],
+  '減價': ['折扣', '優惠'], '打折': ['折扣', '優惠'],
+};
+
+function tokenize(text) {
+  return text.toLowerCase().replace(/[^\w\s一-鿿]/g, ' ').split(/\s+/).filter(t => t.length > 0);
+}
+
+function getAliases(query) {
+  const tokens = tokenize(query);
+  const aliases = new Set();
+  tokens.forEach(token => {
+    Object.entries(KEYWORD_ALIASES).forEach(([key, values]) => {
+      if (key.includes(token) || token.includes(key)) {
+        aliases.add(key);
+        values.forEach(v => aliases.add(v));
+      }
+    });
+  });
+  return Array.from(aliases);
+}
+
+function similarity(str1, str2) {
+  const s1 = str1.toLowerCase(), s2 = str2.toLowerCase();
+  if (s1.includes(s2) || s2.includes(s1)) return 0.8;
+  const set1 = new Set(s1), set2 = new Set(s2);
+  const intersection = [...set1].filter(c => set2.has(c));
+  const union = new Set([...set1, ...set2]);
+  return intersection.length / union.size;
+}
+
+function searchFAQ(query) {
+  const q = query.toLowerCase().trim();
+  const direct = ALL_FAQ.filter(item =>
+    item.q.toLowerCase().includes(q) || item.a.toLowerCase().includes(q) || item.category.toLowerCase().includes(q)
+  );
+  if (direct.length > 0) return direct.slice(0, 5);
+
+  const aliases = getAliases(q);
+  if (aliases.length > 0) {
+    const aliasMatches = ALL_FAQ.filter(item => {
+      const text = (item.q + ' ' + item.a).toLowerCase();
+      return aliases.some(a => text.includes(a.toLowerCase()));
+    });
+    if (aliasMatches.length > 0) return aliasMatches.slice(0, 5);
+  }
+
+  const keywords = tokenize(q);
+  const kwMatches = ALL_FAQ.filter(item => {
+    const text = (item.q + ' ' + item.a).toLowerCase();
+    return keywords.some(kw => kw.length >= 2 && text.includes(kw));
+  });
+  if (kwMatches.length > 0) return kwMatches.slice(0, 5);
+
+  return ALL_FAQ
+    .map(item => ({ item, score: Math.max(similarity(q, item.q), similarity(q, item.a)) }))
+    .filter(r => r.score > 0.3).sort((a, b) => b.score - a.score)
+    .map(r => r.item).slice(0, 5);
+}
+
+// ================================================
+// App State & Config
+// ================================================
+let state = {
+  isLoggedIn: false, user: null, apiKey: '',
+  apiProvider: 'openrouter', messages: [],
+  isTyping: false, hermesMode: true, conversationHistory: []
+};
+
+let elements = {};
+
+const API_CONFIG = {
+  openrouter: {
+    endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+    model: 'anthropic/claude-haiku-4-5'  // ✅ Claude AI
+  }
+};
+
+// ================================================
+// Init
+// ================================================
+document.addEventListener('DOMContentLoaded', () => {
+  initElements();
+  initEventListeners();
+  checkAuthStatus();
+  checkApiKeyStatus();
+  showStoreIdSuggestions();
+});
+
+function initElements() {
+  elements.header = document.getElementById('header');
+  elements.loginView = document.getElementById('loginView');
+  elements.chatView = document.getElementById('chatView');
+  elements.storeBadge = document.getElementById('storeBadge');
+  elements.lastLogin = document.getElementById('lastLogin');
+  elements.loginForm = document.getElementById('loginForm');
+  elements.btnLogin = document.getElementById('btnLogin');
+  elements.errorMessage = document.getElementById('errorMessage');
+  elements.btnLogout = document.getElementById('btnLogout');
+  elements.btnLogoutTop = document.getElementById('btnLogoutTop');
+  elements.logoutModal = document.getElementById('logoutModal');
+  elements.btnCancelLogout = document.getElementById('btnCancelLogout');
+  elements.btnConfirmLogout = document.getElementById('btnConfirmLogout');
+  elements.apiKeyModal = document.getElementById('apiKeyModal');
+  elements.apiKeyInput = document.getElementById('apiKeyInput');
+  elements.btnSkipApiKey = document.getElementById('btnSkipApiKey');
+  elements.btnSaveApiKey = document.getElementById('btnSaveApiKey');
+  elements.welcomeScreen = document.getElementById('welcomeScreen');
+  elements.messagesContainer = document.getElementById('messagesContainer');
+  elements.typingIndicator = document.getElementById('typingIndicator');
+  elements.chatInput = document.getElementById('chatInput');
+  elements.btnSend = document.getElementById('btnSend');
+  elements.presetChips = document.getElementById('presetChips');
+  elements.hermesBadge = document.getElementById('hermesBadge');
+  elements.btnHistory = document.getElementById('btnHistory');
+  elements.historyModal = document.getElementById('historyModal');
+}
+
+function initEventListeners() {
+  const on = (el, ev, fn) => { if (el) el.addEventListener(ev, fn); };
+  on(elements.loginForm, 'submit', handleLogin);
+  on(document.getElementById('username'), 'focus', showStoreIdSuggestions);
+  on(elements.btnLogout, 'click', () => showModal(elements.logoutModal));
+  on(elements.btnLogoutTop, 'click', () => showModal(elements.logoutModal));
+  on(elements.btnCancelLogout, 'click', () => hideModal(elements.logoutModal));
+  on(elements.btnConfirmLogout, 'click', handleLogout);
+  on(elements.btnHistory, 'click', () => { showConversationHistory(); showModal(elements.historyModal); });
+  on(document.getElementById('btnCloseHistory'), 'click', () => hideModal(elements.historyModal));
+  on(elements.chatInput, 'input', handleChatInput);
+  on(elements.chatInput, 'keydown', handleChatKeydown);
+  on(elements.btnSend, 'click', sendMessage);
+  on(elements.hermesBadge, 'click', toggleHermesMode);
+  on(elements.btnSkipApiKey, 'click', () => {
+    hideModal(elements.apiKeyModal);
+    localStorage.setItem('fifi_apikey_set', 'true');
+  });
+  on(elements.btnSaveApiKey, 'click', () => {
+    const key = elements.apiKeyInput.value.trim();
+    if (key) {
+      state.apiKey = key;
+      localStorage.setItem('fifi_apikey', key);
+      hideModal(elements.apiKeyModal);
+      localStorage.setItem('fifi_apikey_set', 'true');
+      showNotification('✅ API Key 已設定');
+    }
+  });
+}
+
+function checkAuthStatus() {
+  const saved = localStorage.getItem('fifi_user');
+  if (saved) {
+    state.user = JSON.parse(saved);
+    state.isLoggedIn = true;
+    state.conversationHistory = [];
+    state.messages = [];
+    showChatView();
+  }
+}
+
+function checkApiKeyStatus() {
+  const saved = localStorage.getItem('fifi_apikey');
+  if (saved) { state.apiKey = saved; }
+  else { setTimeout(() => showModal(elements.apiKeyModal), 500); }
+}
+
+// ================================================
+// Store ID History
+// ================================================
+function getStoredStoreIds() {
+  try { return JSON.parse(localStorage.getItem('fifi_store_history') || '[]'); } catch { return []; }
+}
+
+function saveStoreId(id) {
+  const history = getStoredStoreIds().filter(x => x !== id);
+  history.unshift(id);
+  localStorage.setItem('fifi_store_history', JSON.stringify(history.slice(0, 5)));
+}
+
+function showStoreIdSuggestions() {
+  const history = getStoredStoreIds();
+  if (!history.length) return;
+  const usernameInput = document.getElementById('username');
+  if (!usernameInput) return;
+  const old = document.getElementById('storeSuggestions');
+  if (old) old.remove();
+  let html = '<div class="store-suggestions" id="storeSuggestions">';
+  history.forEach(id => { html += `<button class="store-suggestion-btn" onclick="useStoreId('${id}')">${id}</button>`; });
+  html += '</div>';
+  usernameInput.insertAdjacentHTML('afterend', html);
+}
+
+function useStoreId(id) {
+  const input = document.getElementById('username');
+  if (input) { input.value = id; document.getElementById('storeSuggestions')?.remove(); }
+}
+
+// ================================================
+// Login / Logout
+// ================================================
+function handleLogin(e) {
+  e.preventDefault();
+  const storeId = document.getElementById('username')?.value?.trim();
+  if (!storeId) { showError('請輸入 Store ID'); return; }
+  if (!/^[HBCPhbcp]\d{6,8}$/.test(storeId)) { showError('Store ID 格式不正確 (例: H1234567)'); return; }
+  setLoginLoading(true);
+  setTimeout(() => {
+    const id = storeId.toUpperCase();
+    state.isLoggedIn = true;
+    state.user = { username: id, loginTime: new Date() };
+    localStorage.setItem('fifi_user', JSON.stringify(state.user));
+    saveStoreId(id);
+    state.conversationHistory = [];
+    state.messages = [];
+    showChatView();
+    setLoginLoading(false);
+  }, 300);
+}
+
+function handleLogout() {
+  saveConversationHistory();
+  state.isLoggedIn = false; state.user = null; state.messages = []; state.conversationHistory = [];
+  localStorage.removeItem('fifi_user');
+  showLoginView(); hideModal(elements.logoutModal); showStoreIdSuggestions();
+}
+
+function showLoginView() { elements.loginView.style.display = 'flex'; elements.chatView.style.display = 'none'; }
+function showChatView() {
+  elements.loginView.style.display = 'none'; elements.chatView.style.display = 'flex';
+  if (elements.storeBadge) { elements.storeBadge.textContent = state.user?.username; elements.storeBadge.style.display = ''; }
+  if (elements.btnLogout) elements.btnLogout.style.display = '';
+  if (elements.lastLogin && state.user?.loginTime) {
+    elements.lastLogin.textContent = `上次登入：${formatTime(new Date(state.user.loginTime))}`;
+  }
+  if (state.messages.length === 0 && elements.welcomeScreen) elements.welcomeScreen.style.display = 'flex';
+}
+
+function showError(msg) {
+  if (elements.errorMessage) {
+    elements.errorMessage.textContent = msg; elements.errorMessage.style.display = 'block';
+    setTimeout(() => { elements.errorMessage.style.display = 'none'; }, 3000);
+  }
+}
+
+function setLoginLoading(loading) {
+  if (elements.btnLogin) {
+    elements.btnLogin.disabled = loading;
+    elements.btnLogin.textContent = loading ? '登入中...' : '登入';
+  }
+}
+
+function showModal(modal) { if (modal) modal.style.display = 'flex'; }
+function hideModal(modal) { if (modal) modal.style.display = 'none'; }
+
+// ================================================
+// Hermes / FIFI查 Toggle
+// ================================================
+function toggleHermesMode() {
+  state.hermesMode = !state.hermesMode;
+  if (elements.hermesBadge) {
+    elements.hermesBadge.className = state.hermesMode ? 'hermes-badge active' : 'hermes-badge';
+    elements.hermesBadge.title = state.hermesMode ? 'FIFI查 分析：開啟' : 'FIFI查 分析：關閉';
+  }
+}
+
+// ================================================
+// Chat Input
+// ================================================
+function handleChatInput() {
+  const has = elements.chatInput.value.trim().length > 0;
+  elements.btnSend.disabled = !has;
+  elements.btnSend.style.opacity = has ? '1' : '0.5';
+}
+
+function handleChatKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    if (elements.chatInput.value.trim()) sendMessage();
+  }
+}
+
+// ================================================
+// Send Message
+// ================================================
+async function sendMessage() {
+  const message = elements.chatInput.value.trim();
+  if (!message) return;
+  elements.chatInput.value = '';
+  handleChatInput();
+  if (elements.welcomeScreen) elements.welcomeScreen.classList.add('hidden');
+  addMessage('user', message);
+  showTyping(true);
+  requestAnimationFrame(() => {
+    if (elements.messagesContainer) elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+  });
+  try {
+    const greetingResponse = checkCasualGreeting(message);
+    if (greetingResponse) {
+      await new Promise(r => setTimeout(r, 600));
+      addHermesPanel(greetingResponse);
+    } else {
+      const faqMatches = searchFAQ(message);
+      const hermesAnalysis = state.hermesMode ? await getClaudeAnalysis(message) : null;
+      await showAssistantResponse(message, faqMatches, hermesAnalysis);
+      state.conversationHistory.push({
+        q: message, a: hermesAnalysis?.answer || '', timestamp: Date.now()
+      });
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    addMessage('assistant', `唉～衰咗... ${error.message}\n\n等我冷靜下先 😅`);
+  } finally {
+    showTyping(false);
+    setTimeout(() => {
+      elements.chatInput?.focus();
+      if (elements.messagesContainer) elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+    }, 300);
+  }
+}
+
+async function askPreset(question) { elements.chatInput.value = question; sendMessage(); }
+
+// ================================================
+// Claude AI Analysis
+// ================================================
+function getFAQContext() {
+  return ALL_FAQ.map(item => `[${item.category}] ${item.q}\n${item.a}`).join('\n\n');
+}
+
+async function getClaudeAnalysis(question) {
+  const conversationContext = state.conversationHistory.length > 0
+    ? `\n\n之前的對話記錄：\n${state.conversationHistory.slice(-3).map(h => `問：${h.q}\n答：${h.a}`).join('\n')}`
+    : '';
+
+  const systemPrompt = `你係 FIFI查，HKTVmall 商戶支援助理 — 幫緊你幫緊你！
+
+風格：口語化、輕鬆風趣、有時加啲emoji，但係又要專業！
+
+用廣東話口吻回答，好似朋友傾偈咁，但係又幫到手。${conversationContext}
+
+FAQ 知識庫：
+${getFAQContext()}
+
+請以 JSON 格式回覆（只回覆 JSON，唔好其他文字）：
+{
+  "answer": "主要答案（輕鬆口語化）",
+  "extendedAdvice": "延伸建議/實際操作步驟",
+  "relatedCategory": "相關分類名稱",
+  "warning": "警示事項（如無則留空字串）",
+  "confidence": 0.0
+}`;
+
+  // Fallback if no API key
+  if (!state.apiKey) return getDefaultResponse(question);
+
+  try {
+    const config = API_CONFIG[state.apiProvider];
+    const response = await fetch(config.endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.apiKey}` },
+      body: JSON.stringify({
+        model: config.model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: question }
+        ],
+        max_tokens: 800,
+        temperature: 0.3
+      }),
+      signal: AbortSignal.timeout(20000)
+    });
+
+    if (!response.ok) throw new Error(`API error ${response.status}`);
+    const data = await response.json();
+    const content = data.choices[0].message.content.trim();
+    try {
+      const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      return JSON.parse(jsonStr);
+    } catch {
+      return { answer: content, extendedAdvice: '', relatedCategory: '', warning: '', confidence: 0.5 };
+    }
+  } catch (error) {
+    console.log('Claude API failed:', error.message);
+    return getDefaultResponse(question);
+  }
+}
+
+function getDefaultResponse(question) {
+  const matches = searchFAQ(question);
+  if (matches.length > 0) {
+    return {
+      answer: `哦～呢個問題好常見！ ${matches[0].a}`,
+      extendedAdvice: `參考咗「${matches[0].q}」嘅答案～ 不過每個人情況唔同，最好再問下你嘅 RM 確認下 ^^`,
+      relatedCategory: matches[0].category, warning: '', confidence: 0.6
+    };
+  }
+  return {
+    answer: '唉～ 今次撞板了，我搵唔到完全 Match 嘅答案比你...',
+    extendedAdvice: '建議你直接搵 RM 傾偈，佢哋實幫到你！或者可以試下其他關鍵字再搵過 ^^',
+    relatedCategory: '聯絡與支援', warning: '', confidence: 0.2
+  };
+}
+
+// ================================================
+// Display Response
+// ================================================
+async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
+  if (hermesAnalysis && hermesAnalysis.answer) {
+    const conf = hermesAnalysis.confidence || 0.5;
+    const confClass = conf >= 0.7 ? 'confidence-high' : conf >= 0.4 ? 'confidence-medium' : 'confidence-low';
+    const confText = conf >= 0.7 ? '高' : conf >= 0.4 ? '中' : '低';
+
+    let html = `
+      <div class="hermes-analysis">
+        <div class="hermes-analysis-header">
+          <span>🧠</span>
+          <strong>FIFI查 分析</strong>
+          <span class="confidence-badge ${confClass}">${confText} — ${Math.round(conf * 100)}%</span>
+        </div>
+        <div class="hermes-section">
+          <div class="hermes-section-label">📝 答案</div>
+          <div class="hermes-section-content">${escapeHtml(hermesAnalysis.answer)}</div>
+        </div>`;
+
+    if (hermesAnalysis.extendedAdvice) {
+      html += `<div class="hermes-section">
+        <div class="hermes-section-label">💡 延伸建議</div>
+        <div class="hermes-section-content">${escapeHtml(hermesAnalysis.extendedAdvice)}</div>
+      </div>`;
+    }
+    if (hermesAnalysis.relatedCategory) {
+      html += `<div class="hermes-section">
+        <div class="hermes-section-label">📂 相關分類</div>
+        <div class="hermes-section-content">${escapeHtml(hermesAnalysis.relatedCategory)}</div>
+      </div>`;
+    }
+    if (hermesAnalysis.warning) {
+      html += `<div class="hermes-warning">⚠️ ${escapeHtml(hermesAnalysis.warning)}</div>`;
+    }
+    html += `<div class="hermes-source">📖 資料來源：https://sites.google.com/view/hktv-merc-faq/</div></div>`;
+    addHermesPanel(html);
+  } else {
+    addMessage('assistant', '抱歉，FIFI查 分析暫時無法使用。請稍後再試或聯絡您的 RM。');
+  }
+}
+
+function addHermesPanel(html) {
+  const div = document.createElement('div');
+  div.className = 'hermes-panel-container';
+  div.innerHTML = html;
+  if (elements.messagesContainer) {
+    elements.messagesContainer.appendChild(div);
+    elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+  }
+}
+
+// ================================================
+// Messages
+// ================================================
+function addMessage(type, content) {
+  const div = document.createElement('div');
+  div.className = `message ${type}`;
+  const time = formatTime(new Date());
+  if (type === 'user') {
+    div.innerHTML = `<div class="message-content">${escapeHtml(content)}</div><div class="message-time">${time}</div>`;
+  } else {
+    div.innerHTML = `<div class="message-avatar">🤖</div><div class="message-content">${formatContent(content)}</div><div class="message-time">${time}</div>`;
+  }
+  elements.messagesContainer.appendChild(div);
+  elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+  state.messages.push({ type, content, time });
+}
+
+function formatContent(content) {
+  return content.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
+}
+
+function escapeHtml(text) {
+  const d = document.createElement('div'); d.textContent = text; return d.innerHTML;
+}
+
+function showTyping(show) {
+  if (show) {
+    elements.typingIndicator.style.display = 'flex';
+    elements.messagesContainer.appendChild(elements.typingIndicator);
+  } else {
+    elements.typingIndicator.style.display = 'none';
+  }
+}
+
+function formatTime(date) {
+  const now = new Date();
+  if (date.toDateString() === now.toDateString()) {
+    return date.toLocaleTimeString('zh-HK', { hour: '2-digit', minute: '2-digit' });
+  }
+  return date.toLocaleDateString('zh-HK', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+// ================================================
+// Casual Greeting
+// ================================================
+function checkCasualGreeting(message) {
+  const msg = message.toLowerCase().trim();
+  const greetings = ['你好', 'hello', 'hi', '嗨', '早晨', '午安', '晚安', '你好嗎', '喂', '你好呀', 'hello呀', 'hi呀', '早晨呀'];
+  if (!greetings.some(g => msg === g || msg === g + '？' || msg === g + '?')) return null;
+
+  const responses = [
+    { answer: '👋 你好！我係 **FIFI查**，你嘅 HKTVmall 商戶小幫手！', extendedAdvice: '知道你有好多嘢要搞，頭都大埋啦... 不過唔洗驚！我實幫到你架！有咩想問就儘管開口啦 ^^' },
+    { answer: '唉～我喺度等你問嘢咋！😄', extendedAdvice: '我係 **FIFI查**，專幫 HKTVmall 商戶解決疑難雜症！知道你頭痕緊，我一定幫到你掛～' },
+  ];
+  const r = responses[Math.floor(Math.random() * responses.length)];
+  return `<div class="hermes-analysis">
+    <div class="hermes-analysis-header"><span>🧠</span><strong>FIFI查</strong><span class="confidence-badge confidence-high">線上閒聊中 ^^</span></div>
+    <div class="hermes-section"><div class="hermes-section-label">💬</div><div class="hermes-section-content">${r.answer}</div></div>
+    <div class="hermes-section"><div class="hermes-section-label">🤝</div><div class="hermes-section-content">${r.extendedAdvice}</div></div>
+  </div>`;
+}
+
+// ================================================
+// History
+// ================================================
+function saveConversationHistory() {
+  if (!state.conversationHistory.length || !state.user) return;
+  localStorage.setItem(`fifi_history_${state.user.username}`, JSON.stringify({
+    storeId: state.user.username, conversations: state.conversationHistory, lastUpdated: Date.now()
+  }));
+}
+
+function showConversationHistory() {
+  const content = document.getElementById('historyContent');
+  if (!content) return;
+  const history = state.conversationHistory || [];
+  if (!history.length) {
+    content.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:40px;">暫時未有對話記錄</p>';
+    return;
+  }
+  let html = '<div class="history-list">';
+  history.slice().reverse().forEach(item => {
+    const time = new Date(item.timestamp).toLocaleString('zh-HK', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    html += `<div class="history-item">
+      <div class="history-q">❓ ${escapeHtml(item.q)}</div>
+      <div class="history-a">💬 ${escapeHtml(item.a)}</div>
+      <div class="history-time">🕐 ${time}</div>
+    </div>`;
+  });
+  html += '</div>';
+  content.innerHTML = html;
+}
+
+// ================================================
+// Notification
+// ================================================
+function showNotification(msg) {
+  const n = document.createElement('div');
+  n.className = 'notification'; n.textContent = msg;
+  document.body.appendChild(n);
+  setTimeout(() => n.classList.add('show'), 10);
+  setTimeout(() => { n.classList.remove('show'); setTimeout(() => n.remove(), 300); }, 2000);
+}
+</script>
+</body>
+</html>
