@@ -27,7 +27,7 @@ const API_CONFIG = {
   },
   openrouter: {
     endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-    model: 'mistralai/mistral-7b-instruct'
+    model: 'anthropic/claude-haiku-4-5'
   }
 };
 
