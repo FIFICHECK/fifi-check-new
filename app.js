@@ -37,6 +37,109 @@ const GAS_CONFIG = {
   hermesWebhook: ''
 };
 
+
+// ================================================
+// RAG (Retrieval Augmented Generation) — HF Inference API
+// ================================================
+
+const HF_API_URL = 'https://api-inference.huggingface.co/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2';
+let faqEmbeddingsCache = null;
+
+function cosineSimilarity(a, b) {
+  if (a.length !== b.length) return 0;
+  let dotProduct = 0, normA = 0, normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dotProduct += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  normA = Math.sqrt(normA);
+  normB = Math.sqrt(normB);
+  if (normA === 0 || normB === 0) return 0;
+  return dotProduct / (normA * normB);
+}
+
+async function fetchEmbedding(text) {
+  try {
+    const response = await fetch(HF_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ inputs: text }),
+    });
+    if (!response.ok) throw new Error('HF API error: ' + response.status);
+    return await response.json();
+  } catch (error) {
+    console.warn('Embedding fetch failed:', error.message);
+    return null;
+  }
+}
+
+async function getFaqEmbeddings() {
+  if (faqEmbeddingsCache) return faqEmbeddingsCache;
+  const embeddings = [];
+  for (const faq of ALL_FAQ) {
+    const embedding = await fetchEmbedding(faq.q);
+    embeddings.push({ faq, embedding: (embedding && Array.isArray(embedding)) ? embedding : new Array(384).fill(0) });
+  }
+  faqEmbeddingsCache = embeddings;
+  return embeddings;
+}
+
+async function semanticSearch(query, topK = 5) {
+  const queryEmbedding = await fetchEmbedding(query);
+  if (!queryEmbedding || !Array.isArray(queryEmbedding)) {
+    return keywordSearch(query, topK);
+  }
+  const faqEmbeddings = await getFaqEmbeddings();
+  const similarities = faqEmbeddings.map(item => ({
+    faq: item.faq,
+    similarity: cosineSimilarity(queryEmbedding, item.embedding)
+  }));
+  similarities.sort((a, b) => b.similarity - a.similarity);
+  return similarities.slice(0, topK).map(item => ({ ...item.faq, similarity: item.similarity }));
+}
+
+function keywordSearch(query, topK = 5) {
+  const queryWords = query.toLowerCase().split(/[\s\u4e00-\u9fff]+/).filter(w => w.length > 1);
+  const scored = ALL_FAQ.map(faq => {
+    let score = 0;
+    for (const word of queryWords) {
+      const qCount = (faq.q.toLowerCase().match(new RegExp(word, 'g')) || []).length;
+      const aCount = (faq.a.toLowerCase().match(new RegExp(word, 'g')) || []).length;
+      score += qCount * 3 + aCount;
+    }
+    return { ...faq, score };
+  });
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, topK);
+}
+
+async function searchFAQEnhanced(query, topK = 5) {
+  try {
+    const semanticResults = await Promise.race([
+      semanticSearch(query, topK),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Semantic timeout')), 5000))
+    ]);
+    if (semanticResults && semanticResults.length > 0 && semanticResults[0].similarity > 0.3) {
+      return semanticResults;
+    }
+  } catch (e) {
+    console.warn('Semantic search failed, using keyword:', e.message);
+  }
+  return keywordSearch(query, topK);
+}
+
+async function getRAGContext(query, topK = 5) {
+  const relevantFaqs = await searchFAQEnhanced(query, topK);
+  return relevantFaqs.map(faq =>
+    `[相關度 ${(faq.similarity || faq.score || 0).toFixed(2)}] ${faq.category}：${faq.q}\n答：${faq.a}`
+  ).join('\n\n');
+}
+
+// ================================================
+// Store ID 歷史記錄
+// ================================================
+
 // ================================================
 // Store ID 歷史記錄
 // ================================================
@@ -394,7 +497,7 @@ async function sendMessage() {
       addHermesPanel(greetingResponse);
     } else {
       const [faqMatches, hermesAnalysis] = await Promise.all([
-        Promise.resolve(searchFAQ(message)),
+        searchFAQEnhanced(message),
         state.hermesMode ? getHermesAnalysis(message) : Promise.resolve(null)
       ]);
       await showAssistantResponse(message, faqMatches, hermesAnalysis);
@@ -625,14 +728,17 @@ async function getHermesAnalysis(question) {
     ? `\n\n之前的對話記錄（用於理解上下文）：\n${state.conversationHistory.slice(-3).map(h => `問：${h.q}\n答：${h.a}`).join('\n')}`
     : '';
 
+  // 使用 RAG 獲取相關 FAQ 上下文
+  const ragContext = await getRAGContext(question, 5);
+
   const hermesPrompt = `你係 Hermes，HKTVmall 商戶支援助理 — 幫緊你幫緊你！
 
 風格：口語化、輕鬆風趣、有時加啲emoji，但係又要專業！
 
 用廣東話口吻回答，好似朋友傾偈咁，但係又幫到手。${conversationContext}
 
-FAQ 知識庫：
-${getFAQContext()}
+FAQ 知識庫（相關度排序）：
+${ragContext || getFAQContext()}
 
 用戶問題：${question}
 
@@ -655,7 +761,7 @@ ${getFAQContext()}
         body: JSON.stringify({
           action: 'hermesAnalysis',
           question: question,
-          faqContext: getFAQContext()
+          faqContext: await getRAGContext(question, 5)
         }),
         signal: AbortSignal.timeout(25000)
       });
@@ -742,8 +848,8 @@ ${getFAQContext()}
   }
 }
 
-function getDefaultHermesResponse(question) {
-  const faqMatches = searchFAQ(question);
+async function getDefaultHermesResponse(question) {
+  const faqMatches = await searchFAQEnhanced(question);
   if (faqMatches.length > 0) {
     const match = faqMatches[0];
     return {
@@ -767,10 +873,10 @@ function getDefaultHermesResponse(question) {
 // FAQ 搜尋
 // ================================================
 
+// Sync wrapper - returns empty for sync contexts, use getRAGContext for async
 function getFAQContext() {
-  return ALL_FAQ.map(item =>
-    `[${item.category}] ${item.q}\n${item.a}`
-  ).join('\n\n');
+  // Deprecated: use getRAGContext() for RAG-enhanced context
+  return '';
 }
 
 // ================================================
