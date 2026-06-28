@@ -506,6 +506,12 @@ html, body {
   color: var(--text-muted);
 }
 
+.hermes-source a {
+  color: var(--primary, #e4007c);
+  text-decoration: underline;
+  word-break: break-all;
+}
+
 /* Typing Indicator — Minimal */
 .typing-indicator {
   display: none;
