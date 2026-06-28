@@ -1602,8 +1602,6 @@ function formatTime(date) {
 // ================================================
 
 function checkCommissionLookup(message) {
-  if (!window.COMMISSION_DATA || !window.lookupCommission) return null;
-
   const msg = message.toLowerCase();
   const commissionKeywords = ['佣金', 'commission', '佣金率', '傭金', '佣金比率'];
   if (!commissionKeywords.some(k => msg.includes(k))) return null;
@@ -1615,12 +1613,61 @@ function checkCommissionLookup(message) {
     .replace(/[？?！!，,。.\s]+/g, ' ')
     .trim();
 
-  if (!searchTerm || searchTerm.length < 2) return null;
+  if (!searchTerm || searchTerm.length < 1) return null;
 
-  const results = window.lookupCommission(searchTerm);
-  if (!results || results.length === 0) return null;
+  var results = [];
+
+  // Try window.lookupCommission first (if COMMISSION_DATA is loaded)
+  if (window.COMMISSION_DATA && window.lookupCommission) {
+    results = window.lookupCommission(searchTerm) || [];
+  }
+
+  // Fallback: search COMMISSION_RATE_CARD text directly
+  if (results.length === 0) {
+    results = searchCommissionRateCard(searchTerm);
+  }
+
+  if (results.length === 0) return null;
 
   return { results, searchTerm };
+}
+
+// Fallback search: search COMMISSION_RATE_CARD text for keyword
+function searchCommissionRateCard(keyword) {
+  if (!COMMISSION_RATE_CARD || !Array.isArray(COMMISSION_RATE_CARD)) return [];
+  
+  keyword = keyword.toLowerCase();
+  var hits = [];
+  
+  for (var i = 0; i < COMMISSION_RATE_CARD.length; i++) {
+    var line = COMMISSION_RATE_CARD[i].toLowerCase();
+    // Check if keyword is in this line
+    if (line.indexOf(keyword) >= 0) {
+      // Extract category name and rate from line like "  麵包: 26%"
+      var match = COMMISSION_RATE_CARD[i].match(/\s*([^:]+):\s*(\d+(?:\.\d+)?)%?/);
+      if (match) {
+        hits.push({
+          name: match[1].trim(),
+          rate: parseFloat(match[2]),
+          path: 'HKTVmall 佣金分類表',
+          code: ''
+        });
+      }
+    }
+  }
+  
+  // Remove duplicates
+  var seen = {};
+  var unique = [];
+  for (var j = 0; j < hits.length; j++) {
+    var key = hits[j].name + '|' + hits[j].rate;
+    if (!seen[key]) {
+      seen[key] = true;
+      unique.push(hits[j]);
+    }
+  }
+  
+  return unique;
 }
 
 function showCommissionResults(data) {
