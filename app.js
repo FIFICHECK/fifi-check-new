@@ -17,9 +17,9 @@ let state = {
 // DOM 元素緩存
 let elements = {};
 const API_CONFIG = {
-  worker: {
-    endpoint: 'https://fifi-ai-proxy.fificheck.workers.dev/message',
-    model: 'qwen/qwen3.7-max'
+  claude: {
+    endpoint: 'https://REPLACE_WITH_YOUR_WORKER_URL',
+    model: 'claude-haiku-4-5-20251001'
   },
   openai: {
     endpoint: 'https://api.openai.com/v1/chat/completions',
@@ -1116,7 +1116,7 @@ function exportToExcel() {
 // ================================================
 
 async function getHermesAnalysis(question) {
-  // 直接用本地 built-in LLM（快 + 有完整佣金資料）
+  // 直接用完整FAQ知識庫呼叫Claude — 單次API呼叫，更快更穩定
   return await getBuiltInHermesAnalysis(question);
 }
 // MMS system URLs — always injected when question is MMS-related
@@ -1189,7 +1189,7 @@ var COMMISSION_RATE_CARD = [
   '玩具/書籍 (Toys & Books): 23%',
   '運動/旅遊 (Sports & Travel): 10-15%',
   '家居用品 (Housewares): 26%',
-].join('\n');
+];
 
 function getCommissionContext() {
   if (!window.COMMISSION_DATA) return '';
@@ -1210,7 +1210,7 @@ async function getBuiltInHermesAnalysis(question, conversationContext = '') {
     ? '\n\n--- 完整分類數據 (共 ' + (window.COMMISSION_COUNT || '') + ' 個) ---\n' + getCommissionContext()
     : '';
   const commissionSection = isCommissionQ
-    ? '\n\n' + COMMISSION_RATE_CARD + dynamicCtx +
+    ? '\n\n' + COMMISSION_RATE_CARD.join('\n') + dynamicCtx +
       '\n\n佣金查詢指引：\n' +
       '- 根據用戶問嘅產品名稱，找出對應分類同佣金率，直接答出%\n' +
       '- 可樂/汽水類飲品 → 24%；iPhone → 3%；嬰兒奶粉 → 18%\n' +
@@ -1306,8 +1306,7 @@ async function getDefaultHermesResponse(question) {
       rateAnswer = '根據 HKTVmall 佣金分類表：\n' +
         '• 汽水/可樂/飲品: 24%\n• 啤酒: 24%\n• 紅酒/白酒: 18%\n' +
         '• iPhone: 3%\n• 其他手機: 8%\n• 護膚/化妝品: 24%\n' +
-        '• 嬰兒奶粉: 18%\n• 時裝: 15%\n• 寵物: 25%\n' +
-        '• 麵包: 26%\n\n' +
+        '• 嬰兒奶粉: 18%\n• 時裝: 15%\n• 寵物: 25%\n\n' +
         '輸入具體分類名稱（如「汽水」、「護膚」）可查看更詳細佣金率。';
     }
     return {
@@ -1395,7 +1394,7 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
 
         <div class="hermes-section">
           <div class="hermes-section-label">📝 答案</div>
-          <div class="hermes-section-content">${formatTextForHtml(hermesAnalysis.answer)}</div>
+          <div class="hermes-section-content">${escapeHtml(hermesAnalysis.answer)}</div>
         </div>
     `;
 
@@ -1403,7 +1402,7 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
       hermesHtml += `
         <div class="hermes-section">
           <div class="hermes-section-label">💡 延伸建議</div>
-          <div class="hermes-section-content">${formatTextForHtml(hermesAnalysis.extendedAdvice)}</div>
+          <div class="hermes-section-content">${escapeHtml(hermesAnalysis.extendedAdvice)}</div>
         </div>
       `;
     }
@@ -1491,7 +1490,7 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
         </div>
 
         <div class="hermes-section">
-          <div class="hermes-section-content" style="background: var(--bg-warm); padding: 12px; border-radius: 6px; margin-top: 8px;">${formatTextForHtml(faqMatch.a)}</div>
+          <div class="hermes-section-content" style="background: var(--bg-warm); padding: 12px; border-radius: 6px; margin-top: 8px;">${escapeHtml(faqMatch.a)}</div>
         </div>
 
         ${faqMatches.length > 1 ? `
@@ -1567,12 +1566,6 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// 將文字格式化為 HTML：escape HTML 並將換行符轉為 <br>
-function formatTextForHtml(text) {
-  if (!text) return '';
-  return escapeHtml(text).replace(/\n/g, '<br>');
-}
-
 function showTyping(show) {
   if (show) {
     if (elements.typingIndicator) {
@@ -1601,15 +1594,36 @@ function formatTime(date) {
 // 佣金直接查詢
 // ================================================
 
+function searchCommissionRateCard(keyword) {
+  if (!Array.isArray(COMMISSION_RATE_CARD)) return [];
+  keyword = keyword.toLowerCase();
+  var hits = [];
+  for (var i = 0; i < COMMISSION_RATE_CARD.length; i++) {
+    var line = COMMISSION_RATE_CARD[i];
+    if (line.toLowerCase().indexOf(keyword) >= 0) {
+      var match = line.match(/\s*([^:()]+?):\s*(\d+(?:[.\-]\d+)*)%?/);
+      if (match && match[1].trim().length > 1) {
+        hits.push({ name: match[1].trim(), rate: match[2], path: 'HKTVmall 佣金分類表', code: '' });
+      }
+    }
+  }
+  var seen = {}, unique = [];
+  for (var j = 0; j < hits.length; j++) {
+    var k = hits[j].name;
+    if (!seen[k]) { seen[k] = true; unique.push(hits[j]); }
+  }
+  return unique;
+}
+
 function checkCommissionLookup(message) {
   const msg = message.toLowerCase();
   const commissionKeywords = ['佣金', 'commission', '佣金率', '傭金', '佣金比率'];
   if (!commissionKeywords.some(k => msg.includes(k))) return null;
 
-  // Strip commission/question words to get the search term
+  // Strip commission/question words to get the product name
   const searchTerm = message
     .replace(/佣金率?|傭金|commission\s*rate?|commission|佣金比率/gi, '')
-    .replace(/是多少|是幾多|有幾多|幾多|多少|是什麼|係幾多|係咩|查詢|查看|如何查|如何知道|怎樣查|怎樣|點查|點睇|有冇/gi, '')
+    .replace(/是多少|是幾多|有幾多|幾多|多少|是什麼|係幾多|係咩|查詢|查看|如何查|如何知道|怎樣查|怎樣|點查|點睇|有冇|係咩/gi, '')
     .replace(/[？?！!，,。.\s]+/g, ' ')
     .trim();
 
@@ -1617,57 +1631,18 @@ function checkCommissionLookup(message) {
 
   var results = [];
 
-  // Try window.lookupCommission first (if COMMISSION_DATA is loaded)
+  // Try full commission data first (if loaded)
   if (window.COMMISSION_DATA && window.lookupCommission) {
     results = window.lookupCommission(searchTerm) || [];
   }
 
-  // Fallback: search COMMISSION_RATE_CARD text directly
+  // Fallback: search rate card array directly
   if (results.length === 0) {
     results = searchCommissionRateCard(searchTerm);
   }
 
   if (results.length === 0) return null;
-
   return { results, searchTerm };
-}
-
-// Fallback search: search COMMISSION_RATE_CARD text for keyword
-function searchCommissionRateCard(keyword) {
-  if (!COMMISSION_RATE_CARD || !Array.isArray(COMMISSION_RATE_CARD)) return [];
-  
-  keyword = keyword.toLowerCase();
-  var hits = [];
-  
-  for (var i = 0; i < COMMISSION_RATE_CARD.length; i++) {
-    var line = COMMISSION_RATE_CARD[i].toLowerCase();
-    // Check if keyword is in this line
-    if (line.indexOf(keyword) >= 0) {
-      // Extract category name and rate from line like "  麵包: 26%"
-      var match = COMMISSION_RATE_CARD[i].match(/\s*([^:]+):\s*(\d+(?:\.\d+)?)%?/);
-      if (match) {
-        hits.push({
-          name: match[1].trim(),
-          rate: parseFloat(match[2]),
-          path: 'HKTVmall 佣金分類表',
-          code: ''
-        });
-      }
-    }
-  }
-  
-  // Remove duplicates
-  var seen = {};
-  var unique = [];
-  for (var j = 0; j < hits.length; j++) {
-    var key = hits[j].name + '|' + hits[j].rate;
-    if (!seen[key]) {
-      seen[key] = true;
-      unique.push(hits[j]);
-    }
-  }
-  
-  return unique;
 }
 
 function showCommissionResults(data) {
