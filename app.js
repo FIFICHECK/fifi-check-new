@@ -1330,7 +1330,7 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
 
         <div class="hermes-section">
           <div class="hermes-section-label">📝 答案</div>
-          <div class="hermes-section-content">${escapeHtml(hermesAnalysis.answer)}</div>
+          <div class="hermes-section-content">${formatTextForHtml(hermesAnalysis.answer)}</div>
         </div>
     `;
 
@@ -1338,7 +1338,7 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
       hermesHtml += `
         <div class="hermes-section">
           <div class="hermes-section-label">💡 延伸建議</div>
-          <div class="hermes-section-content">${escapeHtml(hermesAnalysis.extendedAdvice)}</div>
+          <div class="hermes-section-content">${formatTextForHtml(hermesAnalysis.extendedAdvice)}</div>
         </div>
       `;
     }
@@ -1426,7 +1426,7 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
         </div>
 
         <div class="hermes-section">
-          <div class="hermes-section-content" style="background: var(--bg-warm); padding: 12px; border-radius: 6px; margin-top: 8px;">${escapeHtml(faqMatch.a)}</div>
+          <div class="hermes-section-content" style="background: var(--bg-warm); padding: 12px; border-radius: 6px; margin-top: 8px;">${formatTextForHtml(faqMatch.a)}</div>
         </div>
 
         ${faqMatches.length > 1 ? `
@@ -1500,6 +1500,12 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// 將文字格式化為 HTML：escape HTML 並將換行符轉為 <br>
+function formatTextForHtml(text) {
+  if (!text) return '';
+  return escapeHtml(text).replace(/\n/g, '<br>');
 }
 
 function showTyping(show) {
