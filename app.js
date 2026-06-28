@@ -1199,27 +1199,91 @@ function getCommissionContext() {
 }
 
 async function getBuiltInHermesAnalysis(question, conversationContext = '') {
-  // Use Cloudflare Worker as backend - simpler and faster
-  const WORKER_URL = 'https://fifi-ai-proxy.fificheck.workers.dev/message';
-  
+  const config = API_CONFIG[state.apiProvider];
+
+  const isCommissionQ = /佣金|commission|傭金|佣金率/i.test(question);
+  const isMmsQ = /mms|庫存|inventory|存貨|上架|下架|商品管理|後台|merchant\.shoalter|mms\.shoalter/i.test(question);
+  const mmsSection = isMmsQ ? '\n\n' + MMS_URLS : '';
+
+  // Always include the hardcoded rate card for commission questions; supplement with dynamic data if loaded
+  const dynamicCtx = (isCommissionQ && window.COMMISSION_DATA)
+    ? '\n\n--- 完整分類數據 (共 ' + (window.COMMISSION_COUNT || '') + ' 個) ---\n' + getCommissionContext()
+    : '';
+  const commissionSection = isCommissionQ
+    ? '\n\n' + COMMISSION_RATE_CARD + dynamicCtx +
+      '\n\n佣金查詢指引：\n' +
+      '- 根據用戶問嘅產品名稱，找出對應分類同佣金率，直接答出%\n' +
+      '- 可樂/汽水類飲品 → 24%；iPhone → 3%；嬰兒奶粉 → 18%\n' +
+      '- 如果產品唔喺上面清單，估計最接近分類並說明\n' +
+      '- 提醒用戶：實際佣金以合約為準，如有疑問請聯絡 RM'
+    : '';
+
+  const systemPrompt = `你係 Hermes，HKTVmall 商戶支援助理 — 幫緊你幫緊你！
+
+風格：口語化、輕鬆風趣、有時加啲emoji，但係又要專業！
+
+用廣東話口吻回答，好似朋友傾偈咁，但係又幫到手。${conversationContext}
+
+回答規則：
+1. 優先參考下面 FAQ 知識庫回答
+2. 如果 FAQ 無相關資料，用你對 HKTVmall 商戶系統的一般知識回答
+3. 佣金/commission 相關問題：參考下面佣金分類表，根據產品找出對應分類同佣金率，直接告知用戶具體%數。唔好叫用戶去查 PCR — 直接答！
+4. 永遠唔好話「我唔知」或者「我冇資料」— 至少指引商戶去邊度搵答案
+5. answer 欄位必須有實質內容，唔可以留空
+
+FAQ 知識庫：
+${isCommissionQ ? getFAQContext(['佣金及付款']) : getFAQContext()}${commissionSection}${mmsSection}
+
+請以 JSON 格式回覆（只回覆 JSON）：
+{
+  "answer": "主要答案（輕鬆口語化，例如：唉！呢個問題問得好，常見嘅係...）",
+  "extendedAdvice": "延伸建議/實際操作步驟（用bullet points，越實際越好）",
+  "relatedCategory": "相關分類名稱",
+  "warning": "警示事項（如無則留空）",
+  "confidence": 0.0-1.0
+}`;
+
   try {
-    const response = await fetch(WORKER_URL, {
+    const response = await fetch(config.endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question: question }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${state.apiKey}`
+      },
+      body: JSON.stringify({
+        model: config.model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: question }
+        ],
+        max_tokens: 800,
+        temperature: 0.3
+      }),
       signal: AbortSignal.timeout(20000)
     });
 
-    if (!response.ok) throw new Error('Worker API error: ' + response.status);
+    if (!response.ok) throw new Error('LLM API error');
 
     const data = await response.json();
-    return data;
+    const content = data.choices[0].message.content.trim();
+
+    try {
+      const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      return JSON.parse(jsonStr);
+    } catch {
+      return {
+        answer: content,
+        extendedAdvice: '',
+        relatedCategory: '',
+        warning: '',
+        confidence: 0.5
+      };
+    }
   } catch (error) {
-    console.log('Worker LLM failed:', error.message);
+    console.log('Built-in LLM failed:', error.message);
     return getDefaultHermesResponse(question);
   }
 }
-
 
 async function getDefaultHermesResponse(question) {
   // Commission questions: use rate card directly — don't fall back to the generic FAQ answer
