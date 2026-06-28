@@ -7,7 +7,7 @@ let state = {
   isLoggedIn: false,
   user: null,
   apiKey: '',
-  apiProvider: 'openrouter',
+  apiProvider: 'worker',
   messages: [],
   isTyping: false,
   hermesMode: true,
@@ -17,9 +17,9 @@ let state = {
 // DOM 元素緩存
 let elements = {};
 const API_CONFIG = {
-  claude: {
-    endpoint: 'https://REPLACE_WITH_YOUR_WORKER_URL',
-    model: 'claude-haiku-4-5-20251001'
+  worker: {
+    endpoint: 'https://fifi-ai-proxy.fificheck.workers.dev/message',
+    model: 'qwen/qwen3.7-max'
   },
   openai: {
     endpoint: 'https://api.openai.com/v1/chat/completions',
