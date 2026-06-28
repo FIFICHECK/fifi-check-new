@@ -7,7 +7,7 @@ let state = {
   isLoggedIn: false,
   user: null,
   apiKey: '',
-  apiProvider: 'worker',
+  apiProvider: 'openrouter',
   messages: [],
   isTyping: false,
   hermesMode: true,
@@ -1116,21 +1116,8 @@ function exportToExcel() {
 // ================================================
 
 async function getHermesAnalysis(question) {
-  // 直接用 Worker (qwen) — 簡單直接
-  const WORKER_URL = 'https://fifi-ai-proxy.fificheck.workers.dev/message';
-  try {
-    const response = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question: question }),
-      signal: AbortSignal.timeout(20000)
-    });
-    if (!response.ok) throw new Error('Worker API error: ' + response.status);
-    return await response.json();
-  } catch (error) {
-    console.log('Worker failed:', error.message);
-    return getDefaultHermesResponse(question);
-  }
+  // 直接用本地 built-in LLM（快 + 有完整佣金資料）
+  return await getBuiltInHermesAnalysis(question);
 }
 // MMS system URLs — always injected when question is MMS-related
 var MMS_URLS = '【MMS 系統入口】\n• MMS 2.0（現時使用）：https://merchant.shoalter.com/\n• MMS 1.0（舊，庫存功能已停用）：https://mms.shoalter.com/mms/#/login\n\n【庫存管理教學】\n• 單件更新庫存：https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Inventory-Management/single-update-inventory\n• 批量更新庫存：https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Inventory-Management/batch-update-inventory';
@@ -1319,7 +1306,8 @@ async function getDefaultHermesResponse(question) {
       rateAnswer = '根據 HKTVmall 佣金分類表：\n' +
         '• 汽水/可樂/飲品: 24%\n• 啤酒: 24%\n• 紅酒/白酒: 18%\n' +
         '• iPhone: 3%\n• 其他手機: 8%\n• 護膚/化妝品: 24%\n' +
-        '• 嬰兒奶粉: 18%\n• 時裝: 15%\n• 寵物: 25%\n\n' +
+        '• 嬰兒奶粉: 18%\n• 時裝: 15%\n• 寵物: 25%\n' +
+        '• 麵包: 26%\n\n' +
         '輸入具體分類名稱（如「汽水」、「護膚」）可查看更詳細佣金率。';
     }
     return {
