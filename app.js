@@ -1116,8 +1116,21 @@ function exportToExcel() {
 // ================================================
 
 async function getHermesAnalysis(question) {
-  // 直接用完整FAQ知識庫呼叫Claude — 單次API呼叫，更快更穩定
-  return await getBuiltInHermesAnalysis(question);
+  // 直接用 Worker (qwen) — 簡單直接
+  const WORKER_URL = 'https://fifi-ai-proxy.fificheck.workers.dev/message';
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: question }),
+      signal: AbortSignal.timeout(20000)
+    });
+    if (!response.ok) throw new Error('Worker API error: ' + response.status);
+    return await response.json();
+  } catch (error) {
+    console.log('Worker failed:', error.message);
+    return getDefaultHermesResponse(question);
+  }
 }
 // MMS system URLs — always injected when question is MMS-related
 var MMS_URLS = '【MMS 系統入口】\n• MMS 2.0（現時使用）：https://merchant.shoalter.com/\n• MMS 1.0（舊，庫存功能已停用）：https://mms.shoalter.com/mms/#/login\n\n【庫存管理教學】\n• 單件更新庫存：https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Inventory-Management/single-update-inventory\n• 批量更新庫存：https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Inventory-Management/batch-update-inventory';
