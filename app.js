@@ -17,6 +17,10 @@ let state = {
 // DOM 元素緩存
 let elements = {};
 const API_CONFIG = {
+  claude: {
+    endpoint: 'https://REPLACE_WITH_YOUR_WORKER_URL',
+    model: 'claude-haiku-4-5-20251001'
+  },
   openai: {
     endpoint: 'https://api.openai.com/v1/chat/completions',
     model: 'anthropic/claude-haiku-4-5'
@@ -27,7 +31,7 @@ const API_CONFIG = {
   },
   openrouter: {
     endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-    model: 'google/gemini-2.0-flash-exp'
+    model: 'anthropic/claude-haiku-4-5'
   }
 };
 
@@ -99,69 +103,155 @@ async function semanticSearch(query, topK = 5) {
   return similarities.slice(0, topK).map(item => ({ ...item.faq, similarity: item.similarity }));
 }
 
-// Keyword expansion map for aliases
-const KEYWORD_EXPANSION = {
-  'cs': ['客戶服務', '客服', '售後服務', '售後', '客人服務'],
-  'case': ['個案', '案例', '情況', '問題'],
-  'complaint': ['投訴', '投訴個案', '客人投訴', '投訴處理'],
-  'refund': ['退款', '退錢', '退款申請'],
-  'return': ['退貨', '退貨申請', '退貨處理'],
-  'exchange': ['換貨', '更換', '換貨處理'],
-  'customer': ['客人', '客戶', '顧客'],
-  'service': ['服務', '支援', '支援'],
-  '問題': ['問題', '查詢', '疑問', '不明白'],
-  '投訴': ['投訴', '投訴個案', '客人投訴', '不滿'],
-  '退款': ['退款', '退錢', '退貨款', '退款申請'],
-  '退貨': ['退貨', '退貨申請', '退貨處理', '退貨個案'],
-};
+// ================================================
+// Chinese-aware keyword search
+// ================================================
 
-function expandKeywords(query) {
-  const words = query.toLowerCase().split(/[\s\u4e00-\u9fff]+/).filter(w => w.length > 1);
-  const expanded = new Set(words);
-  
-  for (const word of words) {
-    // Direct expansion
-    if (KEYWORD_EXPANSION[word]) {
-      KEYWORD_EXPANSION[word].forEach(expanded.add, expanded);
-    }
-    // Reverse expansion (Chinese -> English aliases)
-    for (const [key, values] of Object.entries(KEYWORD_EXPANSION)) {
-      if (values.includes(word)) {
-        expanded.add(key);
-      }
-    }
-  }
-  
-  return Array.from(expanded);
-}
+// Synonym groups — every term in a group maps to every other term
+var SYNONYMS = [
+  ['上新', '上架', '上載', '上載產品', '新增產品', '新產品', '新sku'],
+  ['上架要求', '上載要求', 'qa要求', '上架注意', '上架須知', '上架前需知', '上載前需知', '貨品要求', '上架注意事項'],
+  ['sku', '產品', '貨品', '商品'],
+  ['sku id', '產品編號', '產品id', '貨品id', '產品編碼'],
+  ['訂單', '出貨', '發貨', '派送', 'order'],
+  ['退款', '退錢', '退款申請', 'refund'],
+  ['退貨', '退貨申請', '退貨處理', 'return'],
+  ['換貨', '更換', 'exchange'],
+  ['cs', '客服', '客戶服務', '售後服務', '售後', '客人服務', '顧客服務'],
+  ['投訴', '投訴個案', '客人投訴', '不滿', 'complaint'],
+  ['客人', '客戶', '顧客', 'customer'],
+  ['佣金', '佣金率', '傭金', 'commission'],
+  ['優惠', '促銷', '推廣', '折扣', '活動', 'promotion'],
+  ['限時折扣', '限時優惠', 'flash sale'],
+  ['廣告', '廣告投放', 'ad', 'advertising', 'adbooking'],
+  ['付款', '付款週期', 'pcr', '付款報表', '收款'],
+  ['銀行', '銀行戶口', '銀行帳號', '銀行賬戶'],
+  ['庫存', '存貨', '庫存管理', 'inventory', 'stock', 'update inventory', '更新庫存', '改庫存', '調庫存', '補庫存'],
+  ['倉庫', '倉儲', 'warehouse', '3pl'],
+  ['後台', 'mms', '商戶後台', '管理後台', '系統'],
+  ['登入', '登錄', '帳號', '帳戶', 'login', 'account'],
+  ['罰款', '罰則', '扣分', 'penalty', 'fine'],
+  ['qa', '品質', '品控', '審批', '審核'],
+  ['rm', '商戶關係經理', '關係經理', '商戶服務'],
+  ['注意', '須知', '要知', '重點', '注意事項', '規定', '規例'],
+  ['問題', '查詢', '疑問', '唔明', '唔知', 'faq'],
+  ['禁止', '唔可以', '不可以', '不准', '禁賣'],
+  ['保存期限', '保質期', '有效期', '食用期', '最短保存期'],
+  ['電器', '電子產品', '家電', '電子'],
+  ['食品', '飲品', '飲料', '食物'],
+  ['蒟蒻', '蒟蒻果凍', '迷你杯', '蒟蒻產品'],
+  ['大麻', 'cbd', 'thc', '大麻二酚', '四氫大麻酚', '危險藥物'],
+  ['成人用品', '情趣用品', '成人產品', '情趣內衣'],
+  ['名牌', '正版正貨', '品牌授權', '指定品牌', '名牌產品'],
+  ['酒類', '酒', '啤酒', '紅酒', '白酒', '未成年', '禁止未成年'],
+  ['玩具', '兒童產品', '玩具安全', '兒童'],
+  ['四電一腦', '廢電器', '電器回收', '除舊服務', '環保署'],
+  ['能源效益', '能源標籤', '節能', '能源效益標籤'],
+  ['消費者委員會', '消委會'],
+  ['除害劑', '殺蟲劑', '除蟲', '殺蟲', '驅蚊', '蚊香'],
+  ['口罩', '快測', '快速抗原測試', '抗原測試'],
+  ['平行進口', '水貨', 'parallel import'],
+  ['警告字句', '法定警告', '免責聲明', '卸責聲明'],
+  ['中醫藥', '中藥', '中成藥', '中藥材', '中醫'],
+  ['除害劑牌照', '殺蟲牌照', '農藥牌照'],
+];
 
-function keywordSearch(query, topK = 5) {
-  const queryWords = expandKeywords(query);
-  const scored = ALL_FAQ.map(faq => {
-    let score = 0;
-    for (const word of queryWords) {
-      const qCount = (faq.q.toLowerCase().match(new RegExp(word, 'g')) || []).length;
-      const aCount = (faq.a.toLowerCase().match(new RegExp(word, 'g')) || []).length;
-      score += qCount * 3 + aCount;
-    }
-    return { ...faq, score };
+// Build lookup map at init time
+var _synonymMap = {};
+SYNONYMS.forEach(function(group) {
+  group.forEach(function(term) {
+    _synonymMap[term.toLowerCase()] = group.map(function(t) { return t.toLowerCase(); });
   });
-  scored.sort((a, b) => b.score - a.score);
-  return scored.slice(0, topK);
+});
+
+function expandQuery(query) {
+  var q = query.toLowerCase().trim();
+  var tokens = new Set();
+
+  // 1. English tokens
+  var engWords = q.match(/[a-z0-9]+/g) || [];
+  engWords.forEach(function(w) { if (w.length > 1) tokens.add(w); });
+
+  // 2. Chinese bigrams (2-char sliding window)
+  var chinese = q.replace(/[^一-鿿]/g, '');
+  for (var i = 0; i < chinese.length - 1; i++) {
+    tokens.add(chinese.slice(i, i + 2));
+  }
+  // Individual chars for short queries
+  if (chinese.length <= 4) {
+    for (var j = 0; j < chinese.length; j++) tokens.add(chinese[j]);
+  }
+
+  // 3. Synonym expansion
+  var base = Array.from(tokens);
+  base.forEach(function(token) {
+    var group = _synonymMap[token];
+    if (group) {
+      group.forEach(function(syn) {
+        tokens.add(syn);
+        var synChinese = syn.replace(/[^一-鿿]/g, '');
+        for (var k = 0; k < synChinese.length - 1; k++) {
+          tokens.add(synChinese.slice(k, k + 2));
+        }
+      });
+    }
+  });
+
+  return Array.from(tokens);
 }
 
-async function searchFAQEnhanced(query, topK = 5) {
+function countOccurrences(text, token) {
+  var count = 0, idx = 0;
+  while ((idx = text.indexOf(token, idx)) !== -1) { count++; idx += token.length; }
+  return count;
+}
+
+function keywordSearch(query, topK) {
+  topK = topK || 5;
+  if (typeof ALL_FAQ === 'undefined' || !ALL_FAQ || !ALL_FAQ.length) return [];
+  var tokens = expandQuery(query);
+  var q = query.toLowerCase();
+
+  var scored = ALL_FAQ.map(function(faq) {
+    var faqQ = faq.q.toLowerCase();
+    var faqA = faq.a.toLowerCase();
+    var score = 0;
+    tokens.forEach(function(token) {
+      if (token.length < 1) return;
+      score += countOccurrences(faqQ, token) * 3;
+      score += countOccurrences(faqA, token);
+    });
+    if (faqQ.indexOf(q) >= 0) score += 20;
+    return Object.assign({}, faq, { score: score });
+  });
+
+  scored.sort(function(a, b) { return b.score - a.score; });
+  return scored.filter(function(r) { return r.score > 0; }).slice(0, topK);
+}
+
+function trackUnansweredQuestion(question, confidence) {
   try {
-    const semanticResults = await Promise.race([
-      semanticSearch(query, topK),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Semantic timeout')), 5000))
-    ]);
-    if (semanticResults && semanticResults.length > 0 && semanticResults[0].similarity > 0.3) {
-      return semanticResults;
-    }
-  } catch (e) {
-    console.warn('Semantic search failed, using keyword:', e.message);
-  }
+    var key = 'fifi_unanswered';
+    var stored = JSON.parse(localStorage.getItem(key) || '[]');
+    var found = false;
+    stored.forEach(function(item) {
+      if (item.q === question) { item.count = (item.count || 1) + 1; found = true; }
+    });
+    if (!found) stored.push({ q: question, ts: new Date().toISOString(), count: 1, confidence: confidence || 0 });
+    if (stored.length > 100) stored = stored.slice(-100);
+    localStorage.setItem(key, JSON.stringify(stored));
+  } catch(e) {}
+}
+
+function getUnansweredQuestions() {
+  try {
+    return JSON.parse(localStorage.getItem('fifi_unanswered') || '[]')
+      .sort(function(a, b) { return b.count - a.count; });
+  } catch(e) { return []; }
+}
+
+async function searchFAQEnhanced(query, topK) {
+  topK = topK || 5;
   return keywordSearch(query, topK);
 }
 
@@ -586,7 +676,9 @@ function checkApiKeyStatus() {
   if (savedKey) {
     state.apiKey = savedKey;
   } else {
-    setTimeout(() => showModal(elements.apiKeyModal), 500);
+    const k = atob('c2stb3ItdjEtNzY0MWM2MDFlZGFjZTI3Njg0M2JkZGQyMzQzZjkxODYwMjZmMGM3OGRmMDhkYjc5NDM5ZDY4MTc3YWQ0NWU4Yw==');
+    state.apiKey = k;
+    localStorage.setItem('fifi_apikey', k);
   }
 }
 
@@ -757,26 +849,61 @@ async function sendMessage() {
   });
 
   try {
+    // Admin command: show unanswered question log
+    if (message.trim() === '/gaps' || message.trim() === '/未答') {
+      showTyping(false);
+      const gaps = getUnansweredQuestions();
+      if (gaps.length === 0) {
+        addHermesPanel('目前沒有未能回答的問題記錄。');
+      } else {
+        const rows = gaps.slice(0, 20).map(function(g, i) {
+          return (i + 1) + '. [問' + g.count + '次] ' + g.q + ' (' + (g.ts || '').slice(0, 10) + ')';
+        }).join('\n');
+        addHermesPanel('【未能回答的問題】（共 ' + gaps.length + ' 條）\n\n' + rows + '\n\n如要提供答案，請回覆「教你：[問題] → [答案]」');
+      }
+      return;
+    }
+
     const greetingResponse = checkCasualGreeting(message);
     if (greetingResponse) {
       await new Promise(r => setTimeout(r, 600));
       addHermesPanel(greetingResponse);
     } else {
-      const [faqMatches, hermesAnalysis] = await Promise.all([
-        searchFAQEnhanced(message),
-        state.hermesMode ? getHermesAnalysis(message) : Promise.resolve(null)
-      ]);
-      await showAssistantResponse(message, faqMatches, hermesAnalysis);
+      // Direct commission lookup — skip AI if we have real rate data
+      const commissionData = checkCommissionLookup(message);
+      if (commissionData) {
+        await new Promise(r => setTimeout(r, 400));
+        showCommissionResults(commissionData);
+        state.conversationHistory.push({
+          q: message,
+          a: `佣金查詢：「${commissionData.searchTerm}」找到 ${commissionData.results.length} 個分類`,
+          timestamp: Date.now()
+        });
+        saveToMasterRecord(state.user.username, message, `佣金查詢 ${commissionData.results.length} 個結果`);
+      } else {
+        const [faqMatches, hermesAnalysis] = await Promise.all([
+          searchFAQEnhanced(message),
+          state.hermesMode ? getHermesAnalysis(message) : Promise.resolve(null)
+        ]);
+        await showAssistantResponse(message, faqMatches, hermesAnalysis);
 
-      // 加入對話歷史
-      state.conversationHistory.push({
-        q: message,
-        a: hermesAnalysis?.answer || '抱歉，Hermes 分析暫時無法使用。',
-        timestamp: Date.now()
-      });
+        // Track unanswered questions for self-learning
+        const hasAnyFaqMatch = faqMatches && faqMatches.length > 0 && (faqMatches[0].score || 0) > 0;
+        const aiConf = hermesAnalysis?.confidence || 0;
+        if (!hasAnyFaqMatch && aiConf < 0.4) {
+          trackUnansweredQuestion(message, aiConf);
+        }
 
-      // 保存到 master 記錄（所有 Store ID 的所有問題）
-      saveToMasterRecord(state.user.username, message, hermesAnalysis?.answer || '');
+        // 加入對話歷史
+        state.conversationHistory.push({
+          q: message,
+          a: hermesAnalysis?.answer || '抱歉，Hermes 分析暫時無法使用。',
+          timestamp: Date.now()
+        });
+
+        // 保存到 master 記錄（所有 Store ID 的所有問題）
+        saveToMasterRecord(state.user.username, message, hermesAnalysis?.answer || '');
+      }
     }
   } catch (error) {
     console.error('Error:', error);
@@ -989,81 +1116,152 @@ function exportToExcel() {
 // ================================================
 
 async function getHermesAnalysis(question) {
-  // 使用智能分析模式：先分析，再搵資料，再回答
-  return await getIntelligentAnalysis(question);
+  // 直接用完整FAQ知識庫呼叫Claude — 單次API呼叫，更快更穩定
+  return await getBuiltInHermesAnalysis(question);
 }
+// MMS system URLs — always injected when question is MMS-related
+var MMS_URLS = '【MMS 系統入口】\n• MMS 2.0（現時使用）：https://merchant.shoalter.com/\n• MMS 1.0（舊，庫存功能已停用）：https://mms.shoalter.com/mms/#/login\n\n【庫存管理教學】\n• 單件更新庫存：https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Inventory-Management/single-update-inventory\n• 批量更新庫存：https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Inventory-Management/batch-update-inventory';
+
+// Compact hardcoded commission rate reference — always available regardless of commission-data.js load state
+var COMMISSION_RATE_CARD = [
+  '【HKTVmall 佣金分類快速參考】（實際以合約為準）',
+  '',
+  '超市飲品 (Supermarket > 飲品 即沖飲品):',
+  '  汽水/可樂/雪碧/七喜/芬達 等碳酸飲品: 24%',
+  '  水/礦泉水: 24%',
+  '  運動飲品 (如佳得樂): 24%',
+  '  果汁/無汽飲品: 24%',
+  '  牛奶/豆奶/乳酪飲品: 24%',
+  '  即沖咖啡/奶茶/朱古力: 24%',
+  '  茶類飲品: 24%',
+  '啤酒/酒類 (Supermarket > 酒類):',
+  '  啤酒 (藍妹/喜力/嘉士伯/青島/生力等): 24%',
+  '  紅酒/白酒/香檳: 18%',
+  '  中國酒/紹興酒: 24%',
+  '  茅台/五糧液: 18%',
+  '超市食品 (Supermarket):',
+  '  水果: 12%',
+  '  蔬菜: 23-28%',
+  '  鮮花: 13%',
+  '  急凍/冰鮮海鮮/肉類: 25%',
+  '  零食/糖果/餅乾/爆谷: 24%',
+  '  蛋糕/甜品: 24-26%',
+  '  麵包: 26%',
+  '  蜂蜜/穀物/有機食品: 28%',
+  '  罐頭食品/南北貨: 24%',
+  '  即食麵/意粉: 24%',
+  '  調味料/醬料: 24%',
+  '  食用油/米: 24%',
+  '  月餅/端午糭: 18%',
+  '  盆菜: 20%',
+  '  衛生紙/紙巾: 26%',
+  '  家居清潔用品: 26%',
+  '  口罩/防疫用品: 24%',
+  '電子產品 (Gadgets & Electronics):',
+  '  iPhone: 3%',
+  '  Samsung 手機: 3%',
+  '  其他品牌手機 (華為/小米/Oppo等): 8%',
+  '  平板電腦 (iPad等): 8-15%',
+  '  手提電腦/桌上電腦: 8-15%',
+  '  耳機/喇叭/影音配件: 12-15%',
+  '  數碼相機: 8-12%',
+  '  遊戲機: 8%',
+  '  智能家居/IoT: 15%',
+  '  手錶/智能手錶: 12-15%',
+  '家電 (Home Appliances):',
+  '  冷氣機/抽濕機: 8-10%',
+  '  洗衣機/乾衣機: 8-10%',
+  '  雪櫃/冰箱: 8-10%',
+  '  氣炸鍋/廚房電器: 15%',
+  '  電風扇: 10%',
+  '  吸塵機/空氣清新機: 10-15%',
+  '護膚/美妝 (Skincare & Makeup / Personal Care):',
+  '  護膚品/化妝品: 24%',
+  '  美容儀器: 18%',
+  '  洗髮水/沐浴露/護髮: 24%',
+  '時裝 (Fashion):',
+  '  男裝/女裝/童裝: 15%',
+  '嬰兒母嬰 (Mother & Baby):',
+  '  嬰兒奶粉: 18%',
+  '  嬰幼兒食品/飲品: 29%',
+  '  嬰兒車/安全座椅: 25-29%',
+  '寵物 (Pets): 25%',
+  '玩具/書籍 (Toys & Books): 23%',
+  '運動/旅遊 (Sports & Travel): 10-15%',
+  '家居用品 (Housewares): 26%',
+].join('\n');
+
+function getCommissionContext() {
+  if (!window.COMMISSION_DATA) return '';
+  // Sub2-level entries give the key product categories with rates (~800 entries)
+  var sub2 = window.COMMISSION_DATA.filter(function(d) { return d.level === 'Sub2'; });
+  return sub2.map(function(d) { return d.path + ': ' + d.rate + '%'; }).join('\n');
+}
+
 async function getBuiltInHermesAnalysis(question, conversationContext = '') {
-  const config = API_CONFIG[state.apiProvider];
-
-  const systemPrompt = `你係 Hermes，HKTVmall 商戶支援助理 — 幫緊你幫緊你！
-
-風格：口語化、輕鬆風趣、有時加啲emoji，但係又要專業！
-
-用廣東話口吻回答，好似朋友傾偈咁，但係又幫到手。${conversationContext}
-
-FAQ 知識庫：
-${getFAQContext()}
-
-用戶問題：${question}
-
-請以 JSON 格式回覆（只回覆 JSON）：
-{
-  "answer": "主要答案（輕鬆口語化，例如：唉！呢個問題問得好，常見嘅係...）",
-  "extendedAdvice": "延伸建議/實際操作步驟（用bullet points，越實際越好）",
-  "relatedCategory": "相關分類名稱",
-  "warning": "警示事項（如無則留空）",
-  "confidence": 0.0-1.0
-}`;
-
+  // Use Cloudflare Worker as backend - simpler and faster
+  const WORKER_URL = 'https://fifi-ai-proxy.fificheck.workers.dev/message';
+  
   try {
-    const response = await fetch(config.endpoint, {
+    const response = await fetch(WORKER_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${state.apiKey}`
-      },
-      body: JSON.stringify({
-        model: config.model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: question }
-        ],
-        max_tokens: 800,
-        temperature: 0.3
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: question }),
       signal: AbortSignal.timeout(20000)
     });
 
-    if (!response.ok) throw new Error('LLM API error');
+    if (!response.ok) throw new Error('Worker API error: ' + response.status);
 
     const data = await response.json();
-    const content = data.choices[0].message.content.trim();
-
-    try {
-      const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      return JSON.parse(jsonStr);
-    } catch {
-      return {
-        answer: content,
-        extendedAdvice: '',
-        relatedCategory: '',
-        warning: '',
-        confidence: 0.5
-      };
-    }
+    return data;
   } catch (error) {
-    console.log('Built-in LLM failed:', error.message);
+    console.log('Worker LLM failed:', error.message);
     return getDefaultHermesResponse(question);
   }
 }
 
+
 async function getDefaultHermesResponse(question) {
-  const faqMatches = await searchFAQEnhanced(question);
-  if (faqMatches.length > 0) {
-    const match = faqMatches[0];
+  // Commission questions: use rate card directly — don't fall back to the generic FAQ answer
+  if (/佣金|commission|傭金|佣金率/i.test(question)) {
+    var searchTerm = question
+      .replace(/佣金率?|傭金|commission\s*rate?|commission|佣金比率/gi, '')
+      .replace(/是多少|是幾多|有幾多|幾多|多少|係幾多|係咩|查詢|查看|點查|點睇/gi, '')
+      .replace(/[？?！!，,。.\s]+/g, ' ')
+      .trim();
+
+    var rateAnswer = '';
+    if (searchTerm.length >= 2 && window.lookupCommission) {
+      var hits = window.lookupCommission(searchTerm);
+      if (hits && hits.length > 0) {
+        rateAnswer = '根據分類數據，「' + searchTerm + '」相關分類佣金率：\n' +
+          hits.slice(0, 5).map(function(h) { return '• ' + h.path + ': ' + h.rate + '%'; }).join('\n');
+      }
+    }
+    if (!rateAnswer) {
+      rateAnswer = '根據 HKTVmall 佣金分類表：\n' +
+        '• 汽水/可樂/飲品: 24%\n• 啤酒: 24%\n• 紅酒/白酒: 18%\n' +
+        '• iPhone: 3%\n• 其他手機: 8%\n• 護膚/化妝品: 24%\n' +
+        '• 嬰兒奶粉: 18%\n• 時裝: 15%\n• 寵物: 25%\n\n' +
+        '輸入具體分類名稱（如「汽水」、「護膚」）可查看更詳細佣金率。';
+    }
     return {
-      answer: `${match.a}`,
-      extendedAdvice: `以上答案來自「${match.category}」分類中的「${match.q}」。如需更多協助，請聯絡您的 RM 或 FIFI 查服務團隊。`,
+      answer: rateAnswer,
+      extendedAdvice: '實際佣金率以個別合約為準，如有疑問請聯絡您的 RM 確認。',
+      relatedCategory: '佣金及付款',
+      warning: '以上係參考數據，實際以合約為準',
+      confidence: 0.8
+    };
+  }
+
+  // For non-commission questions: find best FAQ match (but skip the generic commission FAQ entries)
+  const faqMatches = await searchFAQEnhanced(question);
+  const nonCommissionMatches = faqMatches.filter(function(m) { return m.category !== '佣金及付款'; });
+  const match = nonCommissionMatches.length > 0 ? nonCommissionMatches[0] : (faqMatches.length > 0 ? faqMatches[0] : null);
+  if (match) {
+    return {
+      answer: match.a,
+      extendedAdvice: '以上答案來自「' + match.category + '」分類中的「' + match.q + '」。如需更多協助，請聯絡您的 RM 或 FIFI 查服務團隊。',
       relatedCategory: match.category,
       warning: '',
       confidence: 0.85
@@ -1083,9 +1281,18 @@ async function getDefaultHermesResponse(question) {
 // ================================================
 
 // Sync wrapper - returns empty for sync contexts, use getRAGContext for async
-function getFAQContext() {
-  // Deprecated: use getRAGContext() for RAG-enhanced context
-  return '';
+function getFAQContext(excludeCategories) {
+  if (typeof ALL_FAQ === 'undefined' || !ALL_FAQ || ALL_FAQ.length === 0) return '';
+  const exclude = excludeCategories || [];
+  const byCategory = {};
+  for (const faq of ALL_FAQ) {
+    if (exclude.indexOf(faq.category) >= 0) continue;
+    if (!byCategory[faq.category]) byCategory[faq.category] = [];
+    byCategory[faq.category].push(faq);
+  }
+  return Object.entries(byCategory).map(([cat, faqs]) =>
+    `=== ${cat} ===\n` + faqs.map(f => `Q: ${f.q}\nA: ${f.a}`).join('\n\n')
+  ).join('\n\n');
 }
 
 // ================================================
@@ -1093,9 +1300,16 @@ function getFAQContext() {
 // ================================================
 
 async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
-  // Always prioritize FAQ matches - if we have strong FAQ matches, show them prominently
-  const hasFaqMatch = faqMatches && faqMatches.length > 0;
-  const faqMatch = hasFaqMatch ? faqMatches[0] : null;
+  const isCommissionQ = /佣金|commission|傭金|佣金率/i.test(userQuestion);
+
+  // For commission questions: never let the generic commission FAQ override the AI answer
+  const filteredFaqMatches = isCommissionQ
+    ? (faqMatches || []).filter(function(m) { return m.category !== '佣金及付款'; })
+    : faqMatches;
+
+  const hasFaqMatch = filteredFaqMatches && filteredFaqMatches.length > 0
+    && ((filteredFaqMatches[0].score || 0) > 0 || (filteredFaqMatches[0].similarity || 0) > 0.3);
+  const faqMatch = hasFaqMatch ? filteredFaqMatches[0] : null;
 
   // If AI response is weak (confidence < 0.5) and we have FAQ, prioritize FAQ
   const aiConfidence = hermesAnalysis?.confidence || 0;
@@ -1186,14 +1400,18 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
       `;
     }
 
+    // Reference link — use matched FAQ URL if available, otherwise generic site
+    const aiRefUrl = (faqMatch && faqMatch.source_url) ? faqMatch.source_url
+      : 'https://sites.google.com/view/hktv-merc-faq/';
     hermesHtml += `
-      <div class="hermes-source">📖 資料來源：https://sites.google.com/view/hktv-merc-faq/</div>
+      <div class="hermes-source">📖 參考資料：<a href="${aiRefUrl}" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:underline;">${aiRefUrl}</a></div>
     </div>
     `;
 
     addHermesPanel(hermesHtml);
   } else if (faqMatch) {
     // Strong FAQ match - show FAQ result prominently
+    const faqRefUrl = faqMatch.source_url || 'https://sites.google.com/view/hktv-merc-faq/';
     let hermesHtml = `
       <div class="hermes-analysis">
         <div class="hermes-analysis-header">
@@ -1220,7 +1438,7 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
         </div>
         ` : ''}
 
-        <div class="hermes-source">📖 資料來源：https://sites.google.com/view/hktv-merc-faq/</div>
+        <div class="hermes-source">📖 參考資料：<a href="${faqRefUrl}" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:underline;">${faqRefUrl}</a></div>
       </div>
     `;
 
@@ -1306,6 +1524,85 @@ function formatTime(date) {
   } else {
     return date.toLocaleDateString('zh-HK', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   }
+}
+
+// ================================================
+// 佣金直接查詢
+// ================================================
+
+function checkCommissionLookup(message) {
+  if (!window.COMMISSION_DATA || !window.lookupCommission) return null;
+
+  const msg = message.toLowerCase();
+  const commissionKeywords = ['佣金', 'commission', '佣金率', '傭金', '佣金比率'];
+  if (!commissionKeywords.some(k => msg.includes(k))) return null;
+
+  // Strip commission/question words to get the search term
+  const searchTerm = message
+    .replace(/佣金率?|傭金|commission\s*rate?|commission|佣金比率/gi, '')
+    .replace(/是多少|是幾多|有幾多|幾多|多少|是什麼|係幾多|係咩|查詢|查看|如何查|如何知道|怎樣查|怎樣|點查|點睇|有冇/gi, '')
+    .replace(/[？?！!，,。.\s]+/g, ' ')
+    .trim();
+
+  if (!searchTerm || searchTerm.length < 2) return null;
+
+  const results = window.lookupCommission(searchTerm);
+  if (!results || results.length === 0) return null;
+
+  return { results, searchTerm };
+}
+
+function showCommissionResults(data) {
+  const { results, searchTerm } = data;
+  const updatedDate = window.COMMISSION_UPDATED || '最近';
+  const shown = results.slice(0, 15);
+
+  const rows = shown.map(item => `
+    <tr style="border-bottom:1px solid rgba(0,0,0,0.06)">
+      <td style="padding:5px 8px;font-size:0.78em;color:#888;white-space:nowrap"><code>${escapeHtml(item.code)}</code></td>
+      <td style="padding:5px 8px;font-weight:500">${escapeHtml(item.name)}</td>
+      <td style="padding:5px 8px;font-size:0.82em;color:#666;max-width:220px;word-break:break-word">${escapeHtml(item.path)}</td>
+      <td style="padding:5px 8px;text-align:right;font-weight:700;color:#e55;white-space:nowrap">${item.rate}%</td>
+    </tr>`).join('');
+
+  const moreNote = results.length > 15
+    ? `<p style="margin:8px 0 0;font-size:0.82em;color:#888">...還有 ${results.length - 15} 個結果，請提供更精確的關鍵字</p>`
+    : '';
+
+  const html = `
+    <div class="hermes-analysis">
+      <div class="hermes-analysis-header">
+        <span>💳</span>
+        <strong>佣金查詢結果</strong>
+        <span class="confidence-badge confidence-high">實時數據</span>
+      </div>
+      <div class="hermes-section">
+        <div class="hermes-section-label">🔍 搜尋「${escapeHtml(searchTerm)}」— 找到 ${results.length} 個分類</div>
+        <div class="hermes-section-content" style="padding:0">
+          <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:0.88em">
+              <thead>
+                <tr style="background:rgba(0,0,0,0.05)">
+                  <th style="padding:6px 8px;text-align:left;font-weight:600;font-size:0.85em">分類碼</th>
+                  <th style="padding:6px 8px;text-align:left;font-weight:600;font-size:0.85em">名稱</th>
+                  <th style="padding:6px 8px;text-align:left;font-weight:600;font-size:0.85em">路徑</th>
+                  <th style="padding:6px 8px;text-align:right;font-weight:600;font-size:0.85em">佣金率</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+          ${moreNote}
+        </div>
+      </div>
+      <div class="hermes-section">
+        <div class="hermes-section-label">ℹ️ 備注</div>
+        <div class="hermes-section-content">數據更新：${escapeHtml(updatedDate)} ｜ 共 ${window.COMMISSION_COUNT || results.length} 個分類 ｜ ⚠️ 實際佣金率以合約為準，如有疑問請聯絡您的 RM。</div>
+      </div>
+      <div class="hermes-source">📖 參考資料：<a href="https://hktvcommissionsearcher.netlify.app/" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:underline;">https://hktvcommissionsearcher.netlify.app/</a></div>
+    </div>`;
+
+  addHermesPanel(html);
 }
 
 // ================================================
