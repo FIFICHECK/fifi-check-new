@@ -1230,6 +1230,7 @@ async function getBuiltInHermesAnalysis(question, conversationContext = '') {
 3. 佣金/commission 相關問題：參考下面佣金分類表，根據產品找出對應分類同佣金率，直接告知用戶具體%數。唔好叫用戶去查 PCR — 直接答！
 4. 永遠唔好話「我唔知」或者「我冇資料」— 至少指引商戶去邊度搵答案
 5. answer 欄位必須有實質內容，唔可以留空
+6. 如果問題包含「詳細」、「教學」、「步驟」、「點做」、「如何」等字，必須以 Step 1:、Step 2:、Step 3: 格式逐步回答
 
 FAQ 知識庫：
 ${isCommissionQ ? getFAQContext(['佣金及付款']) : getFAQContext()}${commissionSection}${mmsSection}
@@ -1595,11 +1596,14 @@ function formatTime(date) {
 // ================================================
 
 function searchCommissionRateCard(keyword) {
-  if (!Array.isArray(COMMISSION_RATE_CARD)) return [];
+  // Handle both array and joined-string forms of COMMISSION_RATE_CARD
+  var lines = Array.isArray(COMMISSION_RATE_CARD)
+    ? COMMISSION_RATE_CARD
+    : (COMMISSION_RATE_CARD || '').split('\n');
   keyword = keyword.toLowerCase();
   var hits = [];
-  for (var i = 0; i < COMMISSION_RATE_CARD.length; i++) {
-    var line = COMMISSION_RATE_CARD[i];
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
     if (line.toLowerCase().indexOf(keyword) >= 0) {
       var match = line.match(/\s*([^:()]+?):\s*(\d+(?:[.\-]\d+)*)%?/);
       if (match && match[1].trim().length > 1) {
@@ -1615,34 +1619,62 @@ function searchCommissionRateCard(keyword) {
   return unique;
 }
 
+function extractProductTerm(message) {
+  // Strip commission keywords, context words, Cantonese particles, question words
+  var term = message
+    .replace(/佣金率?|傭金|commission\s*rate?|commission|佣金比率/gi, '')
+    .replace(/我想問|我想查|我賣|我有|我係賣|我地|我哋|關於|以下|以上|請問|你好|你知唔知/gi, '')
+    .replace(/是多少|是幾多|有幾多|幾多|多少|是什麼|係幾多|係咩|係咪|如何查|如何知道|怎樣查|怎樣|點查|點睇|有冇|查詢|查看/gi, '')
+    .replace(/[嘅既囉喇咋㗎呢嘛喎啊哦]/g, '')
+    .replace(/[？?！!，,。.\s]+/g, ' ')
+    .trim();
+  return term;
+}
+
 function checkCommissionLookup(message) {
   const msg = message.toLowerCase();
   const commissionKeywords = ['佣金', 'commission', '佣金率', '傭金', '佣金比率'];
   if (!commissionKeywords.some(k => msg.includes(k))) return null;
 
-  // Strip commission/question words to get the product name
-  const searchTerm = message
-    .replace(/佣金率?|傭金|commission\s*rate?|commission|佣金比率/gi, '')
-    .replace(/是多少|是幾多|有幾多|幾多|多少|是什麼|係幾多|係咩|查詢|查看|如何查|如何知道|怎樣查|怎樣|點查|點睇|有冇|係咩/gi, '')
-    .replace(/[？?！!，,。.\s]+/g, ' ')
-    .trim();
-
+  var searchTerm = extractProductTerm(message);
   if (!searchTerm || searchTerm.length < 1) return null;
 
   var results = [];
+  var usedTerm = searchTerm;
 
   // Try full commission data first (if loaded)
   if (window.COMMISSION_DATA && window.lookupCommission) {
     results = window.lookupCommission(searchTerm) || [];
   }
 
-  // Fallback: search rate card array directly
+  // Fallback: search rate card text
   if (results.length === 0) {
     results = searchCommissionRateCard(searchTerm);
   }
 
+  // If still no results, try 2-char Chinese bigrams to extract the product name
+  if (results.length === 0 && searchTerm.length > 2) {
+    var chineseOnly = searchTerm.replace(/[^一-鿿]/g, '');
+    for (var b = 0; b <= chineseOnly.length - 2; b++) {
+      var bigram = chineseOnly.slice(b, b + 2);
+      var bigramResults = [];
+      if (window.COMMISSION_DATA && window.lookupCommission) {
+        bigramResults = window.lookupCommission(bigram) || [];
+      }
+      if (bigramResults.length === 0) {
+        bigramResults = searchCommissionRateCard(bigram);
+      }
+      // Accept bigram if it returns a reasonable number of results (not too broad)
+      if (bigramResults.length > 0 && bigramResults.length <= 50) {
+        results = bigramResults;
+        usedTerm = bigram;
+        break;
+      }
+    }
+  }
+
   if (results.length === 0) return null;
-  return { results, searchTerm };
+  return { results, searchTerm: usedTerm };
 }
 
 function showCommissionResults(data) {
