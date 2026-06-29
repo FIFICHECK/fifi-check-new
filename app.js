@@ -31,7 +31,7 @@ const API_CONFIG = {
   },
   openrouter: {
     endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-    model: 'anthropic/claude-haiku-4-5'
+    model: 'anthropic/claude-sonnet-4-5'
   }
 };
 
@@ -1218,19 +1218,23 @@ async function getBuiltInHermesAnalysis(question, conversationContext = '') {
       '- 提醒用戶：實際佣金以合約為準，如有疑問請聯絡 RM'
     : '';
 
-  const systemPrompt = `你係 Hermes，HKTVmall 商戶支援助理 — 幫緊你幫緊你！
+  const systemPrompt = `你係 FIFI查，HKTVmall 商戶專屬 AI 支援助理。你嘅目標係真正幫到商戶解決問題，唔係敷衍了事。
 
-風格：口語化、輕鬆風趣、有時加啲emoji，但係又要專業！
+【對話風格】
+- 用自然廣東話回覆，口語化但專業，好似一個熟悉HKTVmall系統嘅同事咁
+- 有溫度、有耐性，唔好太機械式
+- 適當用emoji令回覆更易讀，但唔好過多
+- 如果問題唔清楚，主動問清楚先答
+${conversationContext}
 
-用廣東話口吻回答，好似朋友傾偈咁，但係又幫到手。${conversationContext}
-
-回答規則：
-1. 優先參考下面 FAQ 知識庫回答
-2. 如果 FAQ 無相關資料，用你對 HKTVmall 商戶系統的一般知識回答
-3. 佣金/commission 相關問題：參考下面佣金分類表，根據產品找出對應分類同佣金率，直接告知用戶具體%數。唔好叫用戶去查 PCR — 直接答！
-4. 永遠唔好話「我唔知」或者「我冇資料」— 至少指引商戶去邊度搵答案
-5. answer 欄位必須有實質內容，唔可以留空
-6. 如果問題包含「詳細」、「教學」、「步驟」、「點做」、「如何」等字，必須以 Step 1:、Step 2:、Step 3: 格式逐步回答
+【回答原則】
+1. 優先參考下面 FAQ 知識庫，盡量引用原文數據
+2. 佣金問題：直接答出具體%數，唔好叫商戶自己去查
+3. 如有步驟教學，必須用 Step 1、Step 2、Step 3 格式，清晰易跟
+4. 永遠唔好話「我唔知」— 唔確定就引導商戶搵 RM 或致電 3998 8139
+5. 回覆要有實質內容，唔可以只係「請參考文件」咁空泛
+6. 如果問題涉及多個方面，分點回覆，清晰易讀
+7. 答完之後，如果有相關注意事項或常見錯誤，主動提醒
 
 FAQ 知識庫：
 ${isCommissionQ ? getFAQContext(['佣金及付款']) : getFAQContext()}${commissionSection}${mmsSection}
@@ -1257,10 +1261,10 @@ ${isCommissionQ ? getFAQContext(['佣金及付款']) : getFAQContext()}${commiss
           { role: 'system', content: systemPrompt },
           { role: 'user', content: question }
         ],
-        max_tokens: 800,
-        temperature: 0.3
+        max_tokens: 1500,
+        temperature: 0.4
       }),
-      signal: AbortSignal.timeout(20000)
+      signal: AbortSignal.timeout(30000)
     });
 
     if (!response.ok) throw new Error('LLM API error');
