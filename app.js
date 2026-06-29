@@ -881,28 +881,48 @@ async function sendMessage() {
         });
         saveToMasterRecord(state.user.username, message, `佣金查詢 ${commissionData.results.length} 個結果`);
       } else {
-        const [faqMatches, hermesAnalysis] = await Promise.all([
-          searchFAQEnhanced(message),
-          state.hermesMode ? getHermesAnalysis(message) : Promise.resolve(null)
-        ]);
-        await showAssistantResponse(message, faqMatches, hermesAnalysis);
+        // ── Opt 1: Check answer cache first ──────────────────────────────────
+        const cached = getCachedAnswer(message);
+        if (cached) {
+          await new Promise(r => setTimeout(r, 200));
+          await showAssistantResponse(message, [], cached);
+          state.conversationHistory.push({ q: message, a: cached.answer || '', timestamp: Date.now() });
+          saveToMasterRecord(state.user.username, message, cached.answer || '');
+        } else {
+          // Always run FAQ search; only call AI if hermesMode on
+          const faqMatches = await searchFAQEnhanced(message);
 
-        // Track unanswered questions for self-learning
-        const hasAnyFaqMatch = faqMatches && faqMatches.length > 0 && (faqMatches[0].score || 0) > 0;
-        const aiConf = hermesAnalysis?.confidence || 0;
-        if (!hasAnyFaqMatch && aiConf < 0.4) {
-          trackUnansweredQuestion(message, aiConf);
+          // ── Opt 4: High-confidence FAQ direct answer (skip AI) ────────────
+          const topScore = faqMatches && faqMatches.length > 0 ? (faqMatches[0].score || 0) : 0;
+          const isSimpleQ = message.length < 25;
+          const skipAI = topScore >= 25 && isSimpleQ;
+
+          const hermesAnalysis = (!skipAI && state.hermesMode)
+            ? await getHermesAnalysis(message)
+            : (skipAI ? { answer: faqMatches[0].a, extendedAdvice: '', relatedCategory: faqMatches[0].category, warning: '', confidence: 0.92 } : null);
+
+          await showAssistantResponse(message, faqMatches, hermesAnalysis);
+
+          // Track unanswered questions for self-learning
+          const hasAnyFaqMatch = topScore > 0;
+          const aiConf = hermesAnalysis?.confidence || 0;
+          if (!hasAnyFaqMatch && aiConf < 0.4) {
+            trackUnansweredQuestion(message, aiConf);
+          }
+
+          // Save to answer cache (if AI was called and confident)
+          if (hermesAnalysis && aiConf >= 0.5) {
+            setCachedAnswer(message, hermesAnalysis);
+          }
+
+          // 加入對話歷史
+          state.conversationHistory.push({
+            q: message,
+            a: hermesAnalysis?.answer || '',
+            timestamp: Date.now()
+          });
+          saveToMasterRecord(state.user.username, message, hermesAnalysis?.answer || '');
         }
-
-        // 加入對話歷史
-        state.conversationHistory.push({
-          q: message,
-          a: hermesAnalysis?.answer || '抱歉，Hermes 分析暫時無法使用。',
-          timestamp: Date.now()
-        });
-
-        // 保存到 master 記錄（所有 Store ID 的所有問題）
-        saveToMasterRecord(state.user.username, message, hermesAnalysis?.answer || '');
       }
     }
   } catch (error) {
@@ -1115,9 +1135,46 @@ function exportToExcel() {
 // Hermes 分析引擎
 // ================================================
 
+// ── Opt 1: Answer Cache ───────────────────────────────────────────────────────
+var ANSWER_CACHE_TTL = 24 * 60 * 60 * 1000;
+var ANSWER_CACHE_MAX = 150;
+var ANSWER_CACHE_PREFIX = 'fifi_ans_';
+
+function _cacheKey(q) {
+  return ANSWER_CACHE_PREFIX + q.toLowerCase().trim().replace(/\s+/g, ' ').slice(0, 100);
+}
+function getCachedAnswer(question) {
+  try {
+    var raw = localStorage.getItem(_cacheKey(question));
+    if (!raw) return null;
+    var entry = JSON.parse(raw);
+    if (Date.now() - entry.ts > ANSWER_CACHE_TTL) { localStorage.removeItem(_cacheKey(question)); return null; }
+    return entry.data;
+  } catch(e) { return null; }
+}
+function setCachedAnswer(question, data) {
+  try {
+    var keys = Object.keys(localStorage).filter(function(k){ return k.startsWith(ANSWER_CACHE_PREFIX); });
+    if (keys.length >= ANSWER_CACHE_MAX) {
+      var oldest = keys.map(function(k){ try{ return {k:k, ts:JSON.parse(localStorage.getItem(k)).ts}; }catch(e){ return {k:k,ts:0}; } })
+        .sort(function(a,b){ return a.ts-b.ts; })[0];
+      if (oldest) localStorage.removeItem(oldest.k);
+    }
+    localStorage.setItem(_cacheKey(question), JSON.stringify({ts: Date.now(), data: data}));
+  } catch(e) {}
+}
+
+// ── Opt 3: Conversation Context ───────────────────────────────────────────────
+function buildConversationContext() {
+  var history = (state.conversationHistory || []).slice(-3);
+  if (history.length === 0) return '';
+  return '\n\n【最近對話記錄（供參考）】\n' + history.map(function(h) {
+    return '商戶：' + h.q + '\nFIFI查：' + (h.a || '').slice(0, 300);
+  }).join('\n\n');
+}
+
 async function getHermesAnalysis(question) {
-  // 直接用完整FAQ知識庫呼叫Claude — 單次API呼叫，更快更穩定
-  return await getBuiltInHermesAnalysis(question);
+  return await getBuiltInHermesAnalysis(question, buildConversationContext());
 }
 // MMS system URLs — always injected when question is MMS-related
 var MMS_URLS = '【MMS 系統入口】\n• MMS 2.0（現時使用）：https://merchant.shoalter.com/\n• MMS 1.0（舊，庫存功能已停用）：https://mms.shoalter.com/mms/#/login\n\n【庫存管理教學】\n• 單件更新庫存：https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Inventory-Management/single-update-inventory\n• 批量更新庫存：https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Inventory-Management/batch-update-inventory';
@@ -1260,6 +1317,23 @@ ${getFAQContext()}
     systemArray.push({ type: 'text', text: dynamicParts.join('\n\n') });
   }
 
+  // ── Opt 2: Streaming fetch ───────────────────────────────────────────────────
+  // Create a live streaming panel so user sees text arrive in real-time
+  const streamContainer = document.createElement('div');
+  streamContainer.className = 'hermes-panel-container';
+  streamContainer.innerHTML = `
+    <div class="hermes-analysis" id="fifi-streaming-panel">
+      <div class="hermes-analysis-header"><span>💭</span><strong>FIFI 查 思考中...</strong></div>
+      <div class="hermes-section">
+        <div class="hermes-section-content" id="fifi-stream-text" style="white-space:pre-wrap;min-height:2em"></div>
+      </div>
+    </div>`;
+  if (elements.messagesContainer) {
+    elements.messagesContainer.appendChild(streamContainer);
+    elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+  }
+  const streamTextEl = streamContainer.querySelector('#fifi-stream-text');
+
   try {
     const response = await fetch(config.endpoint, {
       method: 'POST',
@@ -1275,19 +1349,55 @@ ${getFAQContext()}
         system: systemArray,
         messages: [{ role: 'user', content: question }],
         max_tokens: 1500,
-        temperature: 0.4
+        temperature: 0.4,
+        stream: true
       }),
       signal: AbortSignal.timeout(30000)
     });
 
     if (!response.ok) throw new Error('LLM API error');
 
-    const data = await response.json();
-    // Support both OpenRouter (choices[]) and Anthropic native (content[]) response formats
-    const content = (data.choices
-      ? data.choices[0].message.content
-      : data.content[0].text
-    ).trim();
+    // Read SSE stream and extract answer text for live display
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    let answerStarted = false;
+    let displayBuffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      for (const line of chunk.split('\n')) {
+        if (!line.startsWith('data: ')) continue;
+        const payload = line.slice(6).trim();
+        if (payload === '[DONE]') break;
+        try {
+          const parsed = JSON.parse(payload);
+          const delta = parsed.choices?.[0]?.delta?.content
+            || parsed.delta?.text || '';
+          if (!delta) continue;
+          fullText += delta;
+          // Live-stream the "answer" field text only
+          if (!answerStarted && fullText.includes('"answer": "')) answerStarted = true;
+          if (answerStarted) {
+            const start = fullText.indexOf('"answer": "') + 11;
+            let raw = fullText.slice(start);
+            // Remove everything from the next field onward
+            const nextField = raw.search(/"(?:extendedAdvice|relatedCategory|warning|confidence)"/);
+            if (nextField > 0) raw = raw.slice(0, nextField);
+            displayBuffer = raw.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/"?\s*$/, '');
+            if (streamTextEl) streamTextEl.textContent = displayBuffer;
+            elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+          }
+        } catch(e) {}
+      }
+    }
+
+    // Remove streaming panel — will be replaced by full structured response
+    if (streamContainer.parentNode) streamContainer.parentNode.removeChild(streamContainer);
+
+    const content = fullText.trim();
 
     try {
       const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
