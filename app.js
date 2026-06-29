@@ -1203,29 +1203,15 @@ async function getBuiltInHermesAnalysis(question, conversationContext = '') {
 
   const isCommissionQ = /佣金|commission|傭金|佣金率/i.test(question);
   const isMmsQ = /mms|庫存|inventory|存貨|上架|下架|商品管理|後台|merchant\.shoalter|mms\.shoalter/i.test(question);
-  const mmsSection = isMmsQ ? '\n\n' + MMS_URLS : '';
 
-  // Always include the hardcoded rate card for commission questions; supplement with dynamic data if loaded
-  const dynamicCtx = (isCommissionQ && window.COMMISSION_DATA)
-    ? '\n\n--- 完整分類數據 (共 ' + (window.COMMISSION_COUNT || '') + ' 個) ---\n' + getCommissionContext()
-    : '';
-  const commissionSection = isCommissionQ
-    ? '\n\n' + COMMISSION_RATE_CARD.join('\n') + dynamicCtx +
-      '\n\n佣金查詢指引：\n' +
-      '- 根據用戶問嘅產品名稱，找出對應分類同佣金率，直接答出%\n' +
-      '- 可樂/汽水類飲品 → 24%；iPhone → 3%；嬰兒奶粉 → 18%\n' +
-      '- 如果產品唔喺上面清單，估計最接近分類並說明\n' +
-      '- 提醒用戶：實際佣金以合約為準，如有疑問請聯絡 RM'
-    : '';
-
-  const systemPrompt = `你係 FIFI查，HKTVmall 商戶專屬 AI 支援助理。你嘅目標係真正幫到商戶解決問題，唔係敷衍了事。
+  // ── Static block (CACHED) — identical every request, maximises cache hits ──
+  const staticBlock = `你係 FIFI查，HKTVmall 商戶專屬 AI 支援助理。你嘅目標係真正幫到商戶解決問題，唔係敷衍了事。
 
 【對話風格】
 - 用自然廣東話回覆，口語化但專業，好似一個熟悉HKTVmall系統嘅同事咁
 - 有溫度、有耐性，唔好太機械式
 - 適當用emoji令回覆更易讀，但唔好過多
 - 如果問題唔清楚，主動問清楚先答
-${conversationContext}
 
 【回答原則】
 1. 優先參考下面 FAQ 知識庫，盡量引用原文數據
@@ -1237,7 +1223,7 @@ ${conversationContext}
 7. 答完之後，如果有相關注意事項或常見錯誤，主動提醒
 
 FAQ 知識庫：
-${isCommissionQ ? getFAQContext(['佣金及付款']) : getFAQContext()}${commissionSection}${mmsSection}
+${getFAQContext()}
 
 請以 JSON 格式回覆（只回覆 JSON）：
 {
@@ -1248,19 +1234,46 @@ ${isCommissionQ ? getFAQContext(['佣金及付款']) : getFAQContext()}${commiss
   "confidence": 0.0-1.0
 }`;
 
+  // ── Dynamic block (NOT cached) — varies per request ──
+  const dynamicParts = [];
+  if (conversationContext) dynamicParts.push(conversationContext);
+  if (isCommissionQ) {
+    const dynamicCtx = window.COMMISSION_DATA
+      ? '\n\n--- 完整分類數據 (共 ' + (window.COMMISSION_COUNT || '') + ' 個) ---\n' + getCommissionContext()
+      : '';
+    dynamicParts.push(
+      '【佣金查詢補充數據】\n' + COMMISSION_RATE_CARD + dynamicCtx +
+      '\n\n佣金查詢指引：\n' +
+      '- 根據用戶問嘅產品名稱，找出對應分類同佣金率，直接答出%\n' +
+      '- 可樂/汽水類飲品 → 24%；iPhone → 3%；嬰兒奶粉 → 18%\n' +
+      '- 如果產品唔喺上面清單，估計最接近分類並說明\n' +
+      '- 提醒用戶：實際佣金以合約為準，如有疑問請聯絡 RM'
+    );
+  }
+  if (isMmsQ) dynamicParts.push('【MMS系統補充資料】\n' + MMS_URLS);
+
+  // Build system array — static part gets cache_control for prompt caching
+  const systemArray = [
+    { type: 'text', text: staticBlock, cache_control: { type: 'ephemeral' } }
+  ];
+  if (dynamicParts.length > 0) {
+    systemArray.push({ type: 'text', text: dynamicParts.join('\n\n') });
+  }
+
   try {
     const response = await fetch(config.endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${state.apiKey}`
+        'Authorization': `Bearer ${state.apiKey}`,
+        'anthropic-beta': 'prompt-caching-2024-07-31',
+        'HTTP-Referer': 'https://fificheck.github.io',
+        'X-Title': 'FIFI Check'
       },
       body: JSON.stringify({
         model: config.model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: question }
-        ],
+        system: systemArray,
+        messages: [{ role: 'user', content: question }],
         max_tokens: 1500,
         temperature: 0.4
       }),
@@ -1270,7 +1283,11 @@ ${isCommissionQ ? getFAQContext(['佣金及付款']) : getFAQContext()}${commiss
     if (!response.ok) throw new Error('LLM API error');
 
     const data = await response.json();
-    const content = data.choices[0].message.content.trim();
+    // Support both OpenRouter (choices[]) and Anthropic native (content[]) response formats
+    const content = (data.choices
+      ? data.choices[0].message.content
+      : data.content[0].text
+    ).trim();
 
     try {
       const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
