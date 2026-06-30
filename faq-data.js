@@ -516,6 +516,92 @@ Product ID：
       }
     ]
   },
+  // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Upload-SKU/sku-online-offline
+  skuOnlineOffline: {
+    category: '產品上架/下架設置',
+    icon: '🔛',
+    tags: ['online', 'offline', 'SKU status', 'product status', 'activate', 'deactivate', 'suspend', 'suspended', '上架', '下架', '在線', '離線', '暫停上架', '上架設置', '下架設置', '產品狀態', '货品状态', '上线', '下线', '暂停上架', 'online offline', '啟用', '停用', 'suspend listing'],
+    questions: [
+      {
+        q: '如何單件設置產品上架（在線）或下架（離線）？',
+        a: `**位置：**
+MMS > 商品及庫存 > 商品管理 > 選擇商品後選擇【在線 / 離線】> 按【更改】
+
+Location: MMS > Product and Inventory > Product Management > Select SKU then select "Online / Offline" > Select "Change"`
+      },
+      {
+        q: '如何批量設置產品上架/下架？',
+        a: `**位置：**
+MMS > 商品及庫存 > 商品管理 > 批量建立/更新 > 批量更新（部分欄位）
+
+Location: MMS > E-Commerce > Product > Batch Add/ Edit Product
+
+**步驟：**
+1. 下載並打開 Excel 文件
+2. 填寫 SKU ID
+3. 在下拉式選單選擇：**ONLINE（上架）** 或 **OFFLINE（下架）**
+4. 上傳文件
+
+**注意：** 上載後自動轉至【修改記錄】頁面：
+- 狀態為「成功」：無需處理
+- 狀態為「失敗」：下載錯誤報告，更改後重新上載`
+      },
+      {
+        q: '產品顯示「暫停上架」是什麼情況？商戶應如何處理？',
+        a: `**「暫停上架」原因：**
+當 QA 團隊發現商戶產品出現問題，將會主動將產品下架，在線狀態改為【暫停上架】。
+
+**影響：**
+- 產品不會顯示於網店頁面
+- 商戶**無法自行**重新上架該產品
+
+**處理步驟：**
+1. 留意來自 **QA 團隊的電郵** —— 內容會說明被暫停上架的原因
+2. 根據電郵指引修正產品問題
+3. 待 QA 團隊確認產品合乎規格後，商戶才可為該產品重新上架`
+      }
+    ]
+  },
+
+  // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Upload-SKU/MMS-Product-Management
+  mmsProductMgmt: {
+    category: '全新MMS 2.0 商品管理功能',
+    icon: '🖥️',
+    tags: ['MMS 2.0', 'MMS 2', 'new MMS', 'product management', 'merchant management system', '商品管理', '货品管理', 'MMS upgrade', 'MMS 升級', '新MMS', '全新MMS', '商品管理功能', 'product create', 'product edit', '建立產品', '新增產品', 'MMS 2.0 商品', '批量建立', '批量編輯', 'MMS功能'],
+    questions: [
+      {
+        q: '全新MMS 2.0 商品管理功能包括哪些內容？何時開始可用？',
+        a: `**開始日期：** 2024年10月28日起，商戶可優先試用全新 MMS 2.0 商品管理功能。
+
+**功能包括：**
+- 單件和批量建立新產品
+- 單件和批量編輯產品資訊
+
+**注意：** 商戶可試用全新 MMS 2.0 產品管理，同時繼續使用現有 MMS 1.0 的產品管理功能。`
+      },
+      {
+        q: 'MMS 2.0 商品管理功能的入口在哪裡？',
+        a: `**最新位置：**
+MMS 2.0 > 商品及庫存 > 商品管理
+
+**登入入口：** https://merchant.shoalter.com/
+
+**詳細PDF教學（商品管理功能）：**
+https://drive.google.com/file/d/11OsLB7KXecwIQteNSrTMedo1EWoWypaC/view`
+      },
+      {
+        q: '可否同時使用 MMS 1.0 和 MMS 2.0 的商品管理功能？',
+        a: `**可以。** 商戶可同時使用：
+- **MMS 2.0**（新）商品管理：https://merchant.shoalter.com/
+- **MMS 1.0**（舊）商品管理：https://mms.shoalter.com/mms/#/login
+
+兩個平台目前均可使用，但 HKTVmall 正逐步將所有功能遷移至 MMS 2.0。建議盡早熟悉新系統。
+
+**注意：** 2024年12月16日起，批量上傳新增／修改產品功能已自動跳轉至 MMS 2.0。`
+      }
+    ]
+  },
+
   // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Upload-SKU/minimum-shelf-life
   shelfLife: {
     category: '商品保存期限要求',
@@ -609,6 +695,25 @@ Product ID：
       {
         q: '如何登入MMS 2.0？MMS新系統入口在哪裡？',
         a: '【MMS 系統登入連結】\n• MMS 2.0（現時使用）：https://merchant.shoalter.com/\n• MMS 1.0（舊系統）：https://mms.shoalter.com/mms/#/login\n\n庫存管理功能已全面遷移至 MMS 2.0。\n如忘記密碼，於登入頁按「Forgot Password」重設。'
+      },
+      {
+        q: '如何匯出庫存報表？（單一產品 / 所有產品）',
+        a: `**匯出單一產品庫存：**
+1. 在庫存管理頁面勾選所需產品
+2. 於右側欄目選擇「匯出選取 SKUs」
+3. 系統自動跳轉至匯出紀錄，於「下載報表」欄目下載
+
+**匯出所有產品庫存：**
+1. 於庫存管理右側欄目選擇「匯出報表」
+2. 選擇商業平台及商店
+3. 按「匯出報表」
+4. 系統自動跳轉至匯出紀錄，於「下載報表」欄目下載
+
+**自訂報表顯示欄位：**
+庫存管理右側欄目 > 選擇「編輯顯示欄位」
+
+**庫存管理PDF教學（單件及批量編輯）：**
+https://docs.google.com/presentation/d/1dgaF0aOOnypfFZ9xwQH_BphxKtB-d4MC-UtOOn2EKc0/present`
       },
       {
         q: '庫存缺貨超過15天會怎樣？產品自動隱藏點處理？',
@@ -1318,6 +1423,8 @@ var FAQ_URL_MAP = {
   greenPack:         'https://sites.google.com/view/hktv-merc-faq/%E5%95%86%E6%88%B6%E6%8E%A8%E5%BB%A3/%E7%8D%8E%E5%8B%B5%E8%A8%88%E5%8A%83/%E6%B8%9B%E5%A1%91%E5%85%88%E9%8B%92%E6%8E%A8%E5%BB%A3%E7%8D%8E%E5%8B%B5%E8%A8%88%E5%8A%83',
   singleUpload:      'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Upload-SKU/single-upload-sku',
   batchUpload:       'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Upload-SKU/edit-sku',
+  skuOnlineOffline:  'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Upload-SKU/sku-online-offline',
+  mmsProductMgmt:    'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Upload-SKU/MMS-Product-Management',
 
   depositHealthBeauty: 'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Upload-SKU/%E6%96%B0%E5%95%86%E6%88%B6%E9%A0%88%E7%9F%A5-%E8%AD%B7%E7%90%86%E4%BF%9D%E5%81%A5%E8%AD%B7%E8%86%9A%E5%8C%96%E5%A6%9D%E5%95%86%E5%93%81%E9%A1%9E%E5%88%A5%E4%BF%9D%E8%AD%89%E9%87%91',
 };
