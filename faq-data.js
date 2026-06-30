@@ -986,6 +986,75 @@ https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5
     ]
   },
 
+  // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/promotion-rule-guideline
+  promotionRules: {
+    category: '優惠內容指引',
+    icon: '📋',
+    tags: ['promotion rules', 'promotion guideline', 'promo rules', 'promotion content', 'title format', 'description format', '優惠指引', '優惠準則', '優惠內容指引', '標題格式', '優惠標題', '描述格式', '組合優惠準則', '換購準則', '贈品準則', 'mix match rules', 'redemption rules', 'free gift rules', 'guideline summary', '優惠規則', '內容規範'],
+    questions: [
+      {
+        q: '什麼是「優惠內容指引」？適用於哪些優惠活動？',
+        a: `**優惠內容指引** 是 HKTVmall 制定的統一標準，目的是讓客戶能更容易及準確地理解實際享有的優惠，避免因優惠內容不清晰而衍生誤會。
+
+**適用於以下優惠活動：**
+- 組合優惠（Mix & Match）
+- 換購優惠（Redemption）
+- 贈品優惠（Free Gift）`
+      },
+      {
+        q: '優惠內容指引的一般原則是什麼？優惠標題有什麼規定？',
+        a: `**優惠內容指引 — 四大原則：**
+
+**1. 移除非必要條款細則**
+只保留以下兩種情況的條款：
+- 優惠可享 X 次
+- 優惠至 X 月 X 日
+
+**2. 用字精簡及準確**
+例如：「6包裝 × 4排」→ 應寫成「24包」
+
+**3. 優惠標題集中描述關鍵賣點**
+例如：
+- 產品功能特色
+- 折後的平均價格
+
+**4. 優惠標題結尾不要加入標點符號**
+（系統預設標題結尾已有「:」）`
+      },
+      {
+        q: '組合優惠 (Mix & Match) 的標題及描述格式如何設定？',
+        a: `組合優惠（Mix & Match）的優惠標題及描述格式會視乎**產品數量**及**優惠等級**而有所不同。
+
+**詳細準則請參閱官方 Google Slides：**
+https://docs.google.com/presentation/d/1LS0hiFv1iJMueupElRHQ1Th3GxfMduHlzRgZFJk917w/present?slide=id.g13a7254eb8b_2_77
+
+**優惠準則總結（所有類別）：**
+https://docs.google.com/presentation/d/1a3zEr8P9Wi3Hajsl0yJ8y51MjJIXv1X1jbioEDeYvQM/present?slide=id.gf44d074604_2_82`
+      },
+      {
+        q: '換購優惠 (Redemption) 及贈品優惠 (Free Gift) 的標題格式如何設定？',
+        a: `**換購優惠（Redemption）：**
+優惠標題及描述格式視乎**換購價位、換購品數量、優惠門檻**而有所不同。
+
+→ 詳細準則：
+https://docs.google.com/presentation/d/1M-LvI0ukaxsBg5ODLtikbcWQj8LVjuPuGb0ihpKxC5c/present?slide=id.g134dfa4b9a2_2_77
+
+---
+
+**贈品優惠（Free Gift）：**
+優惠標題及描述格式視乎**優惠等級**及**贈品是否累積計算**而有所不同。
+
+→ 詳細準則：
+https://docs.google.com/presentation/d/1IM85-GRIJKFzcMN0mUsXd_A06wt8yOMbRIq9knrhhV0/present?slide=id.g120298454d9_2_77
+
+---
+
+**所有類別優惠準則總結：**
+https://docs.google.com/presentation/d/1a3zEr8P9Wi3Hajsl0yJ8y51MjJIXv1X1jbioEDeYvQM/present?slide=id.gf44d074604_2_82`
+      }
+    ]
+  },
+
   // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/MMS-Promotion-Management
   mmsPromoMgmt: {
     category: 'MMS 優惠活動管理系統',
