@@ -1,5 +1,5 @@
 // Auto-generated from https://sites.google.com/view/hktv-merc-faq/
-// Last updated: 2026-06-30 (RRMP enriched + userSettings section added)
+// Last updated: 2026-06-30 (bankAccount added; all sections: multilingual tags for EN/繁/簡/口語)
 // All content scraped from real HKTV Merchant FAQ site using Playwright
 
 const FAQ_DATA = {
@@ -8,6 +8,7 @@ const FAQ_DATA = {
   commissions: {
     category: '佣金及付款',
     icon: '💳',
+    tags: ['commission', 'payment', 'pay', 'rate', 'settlement', 'payout', 'PCR', '佣金', '傭金', '付款', '結算', '截數', '截数', '扣数', '扣數', '手續費', '手续费', '服務費', '收款', '出糧', '工資', 'commission rate', 'payment cycle', '佣金率', '結款週期', '點計佣金'],
     questions: [
       {
         q: '佣金率是多少？如何查看我的佣金率？',
@@ -32,6 +33,7 @@ const FAQ_DATA = {
   basicSetup: {
     category: '基本後台設置',
     icon: '🏪',
+    tags: ['setup', 'system', 'MMS', 'login', 'warehouse', 'packaging', '配置', '設置', '設定', '系統', '帳戶', '登入', '倉庫', '包裝', 'basic setup', 'storefront', 'non-business days', '后台', '初始設定', 'MMS系統', '基本設置', '休息日', '網店', 'merchant portal'],
     questions: [
       {
         q: '如何登入MMS系統？',
@@ -64,6 +66,7 @@ const FAQ_DATA = {
   userSettings: {
     category: 'MMS 商店/用戶設置',
     icon: '👤',
+    tags: ['user', 'admin', 'operator', 'email', 'password', 'merchant admin', 'login', '用戶', '管理員', '密碼', '電郵', '帳號', 'user permissions', 'finance', 'notification', '用戶設定', '帳戶管理', '新增用戶', '用戶權限', 'add user', 'create user', 'edit user', '財務通知', '訂單通知', '誰有權限'],
     questions: [
       {
         q: '如何登入MMS？忘記密碼怎麼辦？',
@@ -100,6 +103,7 @@ const FAQ_DATA = {
   bankAccount: {
     category: '銀行戶口設置',
     icon: '🏦',
+    tags: ['bank', 'banking', 'bank account', 'account number', 'transfer', '銀行', '戶口', '銀行戶口', '銀行帳戶', '銀行账号', '收款', '改户口', '改戶口', '過數', '过数', '更改銀行', '新銀行戶口', '銀行代碼', '分行代碼', '帳號', '提款', '收款銀行', 'change bank', 'update bank', 'bank details'],
     questions: [
       {
         q: '商戶更改銀行戶口的完整流程是怎樣的？',
@@ -124,6 +128,7 @@ const FAQ_DATA = {
   productUpload: {
     category: '上載產品',
     icon: '📦',
+    tags: ['product', 'upload', 'SKU', 'listing', 'add product', 'publish', '產品', '上載', '上架', '上新', '上傳', 'SKU ID', '發佈', '新產品', '新品', 'bulk upload', 'excel', 'batch', 'single product', '批量上載', '產品名稱', '產品描述', '新增商品', 'create listing', 'edit product', '商品', '貨品'],
     questions: [
       {
         q: '上載產品前需要注意什麼？',
@@ -148,6 +153,7 @@ const FAQ_DATA = {
   shelfLife: {
     category: '商品保存期限要求',
     icon: '⏰',
+    tags: ['shelf life', 'expiry', 'best before', 'expiration', 'fresh', '保存期限', '食用期限', '到期日', '有效期', '有效期限', '鮮貨', '食品', '保鮮期', '日期要求', '最少期限', '保存要求', '食用日期', '派送日期', 'minimum shelf life', 'delivery date requirement'],
     questions: [
       {
         q: '什麼是商品最少食用及保存期限要求？',
@@ -172,6 +178,7 @@ const FAQ_DATA = {
   inventory: {
     category: '庫存管理',
     icon: '📊',
+    tags: ['inventory', 'stock', 'quantity', 'update stock', 'out of stock', '庫存', '库存', '存貨', '存货', '貨存', '數量', '缺貨', '有貨', '強制缺貨', '管理庫存', '修改庫存', '庫存數量', 'check stock', 'batch inventory', 'force OOS', '改庫存', '調整庫存', '备货', '备貨'],
     questions: [
       {
         q: '如何在MMS 2.0更新/管理庫存？係邊到update inventory？',
@@ -208,6 +215,7 @@ const FAQ_DATA = {
   fulfillment: {
     category: '訂單處理',
     icon: '📬',
+    tags: ['order', 'delivery', 'fulfillment', 'shipping', 'pickup', 'logistics', '訂單', '派送', '物流', '配送', '送貨', '送货', '取貨', '發貨', '发货', 'delivery mode', 'standard delivery', 'merchant delivery', '訂單流程', '標準集運', '商戶派送', '運送', '配貨', '處理訂單', '接單', 'shipping method'],
     questions: [
       {
         q: 'HKTVmall有哪些訂單派送方式？',
@@ -228,6 +236,7 @@ const FAQ_DATA = {
   standardDelivery: {
     category: '訂單處理 (標準集運)',
     icon: '🏭',
+    tags: ['standard delivery', 'pickup', 'waybill', 'pick list', 'GOGOX', 'gogox', '標準集運', '取貨日期', '運單', '撿貨單', '中轉站', '入倉', '拆單', 'order acknowledge', 'picked status', 'in hub form', '訂單確認', '運單列印', '待辦運單', '集運', 'standard shipping', '集中運送'],
     questions: [
       {
         q: '標準集運MMS訂單管理系統點用？有咩步驟？標準集運訂單流程係點？',
@@ -264,6 +273,7 @@ const FAQ_DATA = {
   merchantDelivery: {
     category: '訂單處理 (商戶派送)',
     icon: '🚚',
+    tags: ['merchant delivery', 'self delivery', '商戶派送', '自行配送', '商戶運費', '大型傢俬', '大電器', 'oversized items', 'signature', 'delivery confirmation', 'return replacement', '退換貨', '顧客簽收', '已簽收', '確認簽收', '商戶配貨', '派送聯絡', 'undelivered', 'delivery tracking', '自送'],
     questions: [
       {
         q: '邊啲貨品可以用商戶派送？商戶派送適用產品分類係邊啲？',
@@ -300,6 +310,7 @@ const FAQ_DATA = {
   packingGuideline: {
     category: '包裝及收貨指引',
     icon: '📦',
+    tags: ['packing', 'packaging', 'carton', 'box', 'waybill', 'tape', 'label', '包裝', '紙箱', '膠紙', '運單', '運單貼法', '冷凍包裝', '包裝標準', '包裝材料', 'bubble wrap', 'fragile', 'frozen food', 'fresh meat', '冷藏', '急凍', '包裝要求', '易碎品', '特殊包裝', '包裝費用', 'packing standard'],
     questions: [
       {
         q: '標準集運一般貨品（室溫貨）有什麼包裝要求？可以用什麼外包裝？',
@@ -356,6 +367,7 @@ const FAQ_DATA = {
   afterSales: {
     category: '售後服務',
     icon: '↩️',
+    tags: ['return', 'refund', 'after sales', '3R', 'replacement', '退貨', '退款', '退货', '退钱', '換貨', '售後', '顧客服務', '取消', 'cancel', 'return policy', 'refund process', 'customer service', 'return request', '退款程序', '7天退貨', 'seven days', '退錢', '換返'],
     questions: [
       {
         q: 'HKTVmall的退換貨政策是什麼？',
@@ -376,6 +388,7 @@ const FAQ_DATA = {
   promotions: {
     category: '建立優惠活動',
     icon: '🎁',
+    tags: ['promotion', 'discount', 'offer', 'deal', 'sale', 'promo', '優惠', '优惠', '折扣', '促銷', '活動', '優惠活動', 'timed discount', 'limited time', 'mix and match', 'buy more save more', 'free gift', 'redemption', '紅價', '限時優惠', '組合優惠', '贈品', '換購', 'create promotion', '打折', '特價'],
     questions: [
       {
         q: '商戶可以自行建立哪些優惠活動？',
@@ -404,6 +417,7 @@ const FAQ_DATA = {
   buyMoreSaveMore: {
     category: '大手折扣 (Buy More Save More)',
     icon: '💸',
+    tags: ['buy more save more', 'quantity discount', 'bulk discount', 'tiered pricing', 'BMSM', '大手折扣', '買越多越便宜', '數量折扣', '批量折扣', '份量優惠', '多買優惠', 'volume discount', 'bulk pricing', 'quantity break', '買多省多', '階梯折扣'],
     questions: [
       {
         q: '什麼是大手折扣 (Buy More Save More)？',
@@ -424,6 +438,7 @@ const FAQ_DATA = {
   personalPrice: {
     category: '個人專屬價',
     icon: '💰',
+    tags: ['personal price', 'personalized pricing', 'targeted discount', '個人專屬價', '個人價', '客製化價格', '目標顧客', 'personalized offer', 'custom price', 'member price', 'exclusive price', 'special pricing', '個人化優惠', '指定顧客優惠'],
     questions: [
       {
         q: '什麼是「個人專屬價」功能？',
@@ -444,6 +459,7 @@ const FAQ_DATA = {
   rrmp: {
     category: '評分及評論管理 (RRMP)',
     icon: '⭐',
+    tags: ['review', 'rating', 'RRMP', 'comment', 'feedback', '評分', '评分', '星', '星級', '評論', '评论', '差評', '好評', '顧客評價', '客人評論', 'review management', 'respond review', 'reply comment', 'Q&A', '問問大家', '回覆評論', '評分管理', 'customer feedback', 'product rating', 'store rating'],
     questions: [
       {
         q: '什麼是RRMP評分及評論管理平台？點用？',
@@ -492,6 +508,7 @@ const FAQ_DATA = {
   salesExcellence: {
     category: '良好銷售手法',
     icon: '🏆',
+    tags: ['sales excellence', 'quality', 'standard', 'QA', 'best practice', 'compliance', '銷售', '品質', '標準', 'QA要求', '良好銷售', '產品要求', '銷售手法', 'product description', 'product info', 'merchant standard', 'product quality', '產品規格', '合規', '產品合規'],
     questions: [
       {
         q: 'HKTVmall對商戶的產品標準有什麼要求？',
@@ -508,6 +525,7 @@ const FAQ_DATA = {
   adBooking: {
     category: '廣告投放',
     icon: '📢',
+    tags: ['advertising', 'ad', 'ads', 'ad booking', 'campaign', 'sponsored', '廣告', '广告', '廣告投放', '广告投放', '推廣', '廣告活動', 'ad placement', 'paid promotion', 'ad credit', 'ad token', '廣告代幣', '廣告費', '投放廣告', 'sponsored listing', '競價', 'bidding'],
     questions: [
       {
         q: '如何在HKTVmall投放廣告？',
@@ -532,6 +550,7 @@ const FAQ_DATA = {
   marketingTips: {
     category: '市場推廣要訣',
     icon: '💡',
+    tags: ['marketing', 'promotion', 'sales tips', 'optimization', 'SEO', 'search', '推廣', '行銷', '銷售技巧', '優化', '搜尋', 'marketing strategy', 'keyword optimization', 'storefront design', 'product page', 'visibility', '增加銷量', '推廣技巧', 'free sticker', '免費貼士', '貼士'],
     questions: [
       {
         q: '如何優化店舖及商品頁面？',
@@ -552,6 +571,7 @@ const FAQ_DATA = {
   shareHub: {
     category: 'ShareHub 網上社區',
     icon: '🌐',
+    tags: ['sharehub', 'community', 'social commerce', 'content', 'post', '社群', '社區', '內容', '帖文', '貼文', 'community engagement', 'content sharing', 'social platform', 'merchant posts', 'sharehub marketing', '網上社區', '分享', '口碑'],
     questions: [
       {
         q: '什麼是ShareHub？',
@@ -576,6 +596,7 @@ const FAQ_DATA = {
   greenPackaging: {
     category: '「減塑先鋒」推廣獎勵計劃',
     icon: '♻️',
+    tags: ['green packaging', 'eco-friendly', 'sustainability', 'reduce plastic', 'rebate', '環保', '減塑', '綠色包裝', '可持續', '减塑先鋒', 'eco packaging', 'green initiative', 'plastic reduction', '環保計劃', '減少塑膠', '獎勵計劃', '返現', '回贈'],
     questions: [
       {
         q: '什麼是「減塑先鋒」推廣獎勵計劃？',
@@ -600,6 +621,7 @@ const FAQ_DATA = {
   support: {
     category: 'HKTVmall 商戶支援',
     icon: '📞',
+    tags: ['support', 'help', 'contact', 'customer service', 'RM', 'MET', 'MCS form', '幫助', '聯絡', '客戶服務', '支援', '商戶支援', '商戶關係經理', 'contact support', 'help desk', 'reach out', 'ask for help', 'support ticket', 'merchant experience team', '聯絡我們', '投訴', 'useful link'],
     questions: [
       {
         q: '如何聯絡我的商戶關係經理 (RM)？',
@@ -620,6 +642,7 @@ const FAQ_DATA = {
   merchantScore: {
     category: '商戶評級獎勵計劃',
     icon: '🎖️',
+    tags: ['merchant scorecard', 'scoring', 'rating scheme', 'reward', 'award', '商戶評級', '評分', '獎勵', '商戶獎勵計劃', 'scorecard scheme', 'performance rating', 'merchant quality', 'score points', 'reward program', 'excellence reward', '商戶等級', '評分制度', 'KPI', '績效', '排名'],
     questions: [
       {
         q: '什麼是商戶評級獎勵計劃 (Merchant Scorecard Scheme)？',
@@ -640,6 +663,7 @@ const FAQ_DATA = {
   merchantPromo: {
     category: '商戶推廣項目',
     icon: '🚀',
+    tags: ['merchant promo', 'greenlab', 'HKTV live', 'zoom sales', 'live selling', 'live streaming', '商戶推廣', 'GreenLab', '直播', '臨期百貨', 'live shopping', 'inventory clearance', 'near expiry', 'real time sales', '商戶推廣項目', '直播銷售', '大減價', '即時銷售'],
     questions: [
       {
         q: '什麼是GreenLab 臨期百貨計劃？',
@@ -664,6 +688,7 @@ const FAQ_DATA = {
   beforeUpload: {
     category: '上載產品前需知',
     icon: '📋',
+    tags: ['before upload', 'product rules', 'upload requirements', 'compliance', 'restricted items', 'prohibited', '上架前', '禁止產品', '上載規則', '產品要求', 'restricted products', '限制產品', 'CBD', 'medicine', 'controlled substances', '大閘蟹', '食品規定', '審批', '需要許可', 'product restrictions', '禁賣品'],
     questions: [
       {
         q: '上新產品要注意咩？上架前有什麼要知道？',
@@ -692,6 +717,7 @@ const FAQ_DATA = {
   qaUploadReq: {
     category: 'QA上載貨品須知',
     icon: '🔍',
+    tags: ['QA', 'quality assurance', 'product requirements', 'upload standards', 'photo requirements', 'QA規定', 'QA要求', '產品說明', '照片', '電器', '食品', '藥物', '化妝品', '玩具', 'product compliance', 'product information', 'upload guidelines', 'legal requirements', 'image requirements', 'description rules', '產品圖片', '規格'],
     questions: [
       {
         q: '上載貨品有什麼QA要求？上架產品要注意什麼？',
@@ -830,7 +856,8 @@ window.ALL_FAQ = Object.entries(FAQ_DATA).flatMap(function(entry) {
       icon: section.icon,
       source_url: FAQ_URL_MAP[key] || '',
       q: faq.q,
-      a: faq.a
+      a: faq.a,
+      tags: (section.tags || []).concat(faq.tags || [])
     };
   });
 });
