@@ -986,6 +986,260 @@ https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5
     ]
   },
 
+  // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/MMS-Promotion-Management
+  mmsPromoMgmt: {
+    category: 'MMS 優惠活動管理系統',
+    icon: '⚙️',
+    tags: ['MMS promotion management', 'promotion system', '優惠活動管理系統', '優惠管理', '促銷管理系統', 'promo management', 'MMS promotion', '優惠建立系統', '跨店優惠', 'cross store promotion', 'multi store promotion', 'PDP combo', 'combo promotion', '組合優惠PDP', '2024年3月'],
+    questions: [
+      {
+        q: 'MMS 優惠活動管理系統是什麼？何時推出？有什麼功能？',
+        a: `**MMS 優惠活動管理系統** 是 HKTVmall 推出的全新優惠活動建立平台。
+
+**推出時間：** 2024年3月25日起，所有與優惠活動相關的 MMS 功能已搬遷至優惠活動管理系統。
+
+**系統優點：**
+- 優化系統操作界面，更易查看或修改優惠內容
+- 時區設定已更新為**香港時間（GMT+8）**
+
+**位置：** MMS > 優惠活動管理 > 組合優惠 > 建立優惠活動
+
+**詳細教學（Google Slides）：**
+https://docs.google.com/presentation/d/1cFw2HhnLBv7oqXhaFk3c2La0d9yyacb2SjUJ2zzhSzQ/present?slide=id.g164dc672dba_0_3`
+      },
+      {
+        q: '商戶可在MMS優惠活動管理系統自行建立哪些優惠活動？',
+        a: `商戶可自行在 MMS 優惠活動管理系統建立以下優惠：
+
+1. **組合優惠（Mix & Match）** — 任選組合折扣
+2. **換購優惠（Redemption）** — 惠顧指定金額/數量，以優惠價換取貨品
+3. **贈品優惠（Free Gift）** — 惠顧指定金額/數量，免費獲得贈品
+4. **組合優惠（PDP Combo）** — 產品詳情頁組合優惠
+
+**注意：** 遇到任何困難，仍可聯絡商戶關係經理（RM）協助建立。`
+      },
+      {
+        q: '如何建立跨店優惠活動？有什麼限制？',
+        a: `**跨店優惠活動** 適合持有多間店鋪的商戶，可聯合舉辦推廣活動。
+
+**可建立的跨店優惠類型：**
+- 組合優惠（Mix & Match）
+- 換購優惠（Redemption）
+- 贈品優惠（Free Gift）
+
+**位置：** MMS > 優惠活動管理 > 組合優惠 > 建立優惠活動
+
+**賬戶角色要求：**
+需擁有相關店鋪的**商店管理權限**。支援角色：
+- Merchant Admin
+- Merchant
+- Merchant Basic
+
+**重要限制：**
+- 建立跨店優惠時，可直接從商品列表挑選產品，或以 Excel 批量加入
+- 一旦建立優惠活動，只可新增**已選商店**中的產品（例如：選了店A+店B，就不能加入店C的產品）
+
+**用戶角色設定教學：** MMS > Global Settings > Store & User Setting`
+      }
+    ]
+  },
+
+  // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/merchant-upload-promotion/mix-and-match
+  mixAndMatch: {
+    category: '任選組合優惠 (Mix & Match)',
+    icon: '🛒',
+    tags: ['mix and match', 'mix & match', 'combination discount', 'combo', '任選組合', '任选组合', '組合優惠', '组合优惠', '搭配優惠', 'bundle discount', '買X件', '數量折扣', '購買組合', '組合折扣', '折扣等級', '多件優惠'],
+    questions: [
+      {
+        q: '什麼是任選組合優惠 (Mix & Match)？如何設置優惠等級？',
+        a: `**任選組合優惠（Mix & Match Discount）** 讓商戶為貨品設定不同組合折扣。
+
+**特點：**
+- 客人無需購買相同產品，可**自由組合**購買以享有優惠
+- 每款優惠最多可設有 **3 個優惠等級**（等級越高，折扣越大）
+
+**折扣類型：**
+- **百分比折扣（%OFF）：** 輸入 1-99 的數字，例如「20」= 8折，「60」= 4折
+- **指定金額折扣（Fixed Amount）：** 輸入 1-100000 的數字，例如「20」= 減$20
+
+**注意：** 如產品設有長行紅價，折扣按**長行紅價（Selling Price）**計算，而非原價。`
+      },
+      {
+        q: '建立任選組合優惠前有哪些注意事項？',
+        a: `建立 Mix & Match 優惠前，請注意：
+
+1. **折扣成本由商戶承擔** — 優惠折扣差額由商戶負責，HKTVmall 不承擔任何差額賠償
+2. **不可同時建立兩個優惠** — 同一件貨品不可同時享有兩個或以上折扣優惠；需待現有活動結束後，才可建立新活動
+3. **已下架/隱藏貨品不可參加** — Offline（已下架）、Invisible（不可見）、Out of Stock（缺貨）的貨品無法加入優惠
+4. **發佈後不可修改** — 活動開始日期、活動條件、折扣類型、優惠內容及活動代碼一旦發佈便不可修改
+5. **開始時間限制** — 開始時間必須比優惠建立時間遲`
+      },
+      {
+        q: '任選組合優惠折扣計算例子是怎樣的？',
+        a: `**例子A：產品原價$100，沒有設置長行紅價**
+
+- 金額折扣「買2件，減$20」：$100×2 - $20 = **$180**（每件 $90）
+- 百分比折扣「買2件，即享8折」：$100×2×80% = **$160**（每件 $80）
+
+**例子B：產品原價$100，長行紅價$90**
+
+- 金額折扣「買2件，減$20」：$90×2 - $20 = **$160**（每件 $80）
+- 百分比折扣「買2件，即享9折」：$90×2×90% = **$162**（每件 $81）
+
+**產品圖片要求（超市/個人護理/寵物類別）：**
+- 使用鮮紅色（Hex: #E41932）
+- 清晰標示平均價格及數量：[買X件平均$X/1件]`
+      },
+      {
+        q: '如何在MMS建立任選組合優惠？步驟是怎樣的？',
+        a: `**建立任選組合優惠步驟：**
+
+**第1步：進入優惠活動管理**
+MMS > 優惠活動管理（Promotion Management）> 選擇商店
+
+**第2步：設定日期**
+填寫開始及結束日期（開始時間必須比建立時間遲）
+
+**第3步：設定優惠內容**
+- 設定優惠等級（最多3層）
+- 設置門檻：件數（Items）或金額（Amount）
+- 設置折扣：%OFF 或 Fixed Amount
+
+**第4步：加入產品**
+- 單件逐項加入，或以 Excel 範本批量加入（格式：xxxx_S_yyyy，xxxx = Store ID，yyyy = SKU ID）
+
+**第5步：設定優惠頁面資料**
+- 活動編碼（預設或自訂，最多10個字元，只限英文字母及數字）
+- 優惠字體顏色、產品排序方式
+- 宣傳字句、活動簡介及詳細介紹
+
+**第6步：發佈**
+發佈後，以下內容不可修改：開始日期、活動條件、折扣類型、優惠內容、活動代碼`
+      }
+    ]
+  },
+
+  // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/merchant-upload-promotion/timed-discount
+  timedDiscount: {
+    category: '設置限時優惠 (Timed Discount)',
+    icon: '⏱️',
+    tags: ['timed discount', 'limited time offer', 'time limited', 'discount period', 'selling price', 'price promotion', '限時優惠', '限时优惠', '有限期折扣', '折扣期', '紅價', '红价', '特價期', 'price information', '長期紅價', '临时优惠', '期間限定', '折扣價格', '優惠合約', 'promotional contract'],
+    questions: [
+      {
+        q: '長期紅價與有限期折扣有什麼分別？',
+        a: `**長期紅價（Long-term Red Price）：**
+- 長期設定的折扣售價，**無時間限制**
+- 設置位置：MMS > E-commerce > Product > Add/Edit Product > Price Information
+- Selling Price 欄位填寫特價（必須低於 Original Price 原價）
+- 如需移除長行紅價，需輸入 **0** 後按「SAVE」
+
+**有限期折扣（Timed Discount）：**
+- 設有**起始及結束日期**的折扣優惠
+- 需填寫 Price Information，包括折扣起始及結束日期
+- 設置位置：MMS > E-commerce > Contract > Batch Upload Promotion
+
+⚠️ 每次更新價錢後，必須自行加入購物車**檢查價錢**是否正確。`
+      },
+      {
+        q: '如何建立有限期折扣優惠？步驟是怎樣的？',
+        a: `**建立有限期折扣步驟：**
+
+**第1步：下載 Excel 範本**
+MMS > E-Commerce > Contract > Batch Upload Promotion > Download Template
+
+**第2步：填寫範本**
+填寫以下資料：
+- 商店編號
+- SKU ID
+- 開始及結束時間
+- 折扣後金額
+- 價錢顯示方式
+- 中英優惠字眼
+
+**第3步：上載已完成 Excel 檔案**
+
+**第4步：等待審核**（如折扣後金額為原價三折或以下，需由 HKTVmall 核實後方可實行）
+
+⚠️ **重要：** 一旦確認後，系統會生成優惠合約（Promotional Contract），優惠期間無法修改：原價、紅色價錢及優惠期限。`
+      },
+      {
+        q: '折扣後金額是原價三折或以下有什麼特殊要求？',
+        a: `如商戶設置的**折扣後金額為原價（黑色價錢）的三折（30%）或以下**：
+
+- **不能**使用 Price Information 直接設置
+- **必須**以「建立有限期折扣優惠」方法，上傳 Excel 範本
+- 上傳後需由 **HKTVmall 核實**後才能實行
+
+HKTVmall **不會**就商戶自行設置的價格異常作出任何賠償。如發現價格錯誤，應立即：
+1. 將商品設為**強制缺貨（Force out of stock）**
+2. 下架（Offline）`
+      },
+      {
+        q: '如何修改優惠內容或提早結束有限期折扣優惠？',
+        a: `**有限期折扣優惠一旦確認，無法直接修改以下內容：**
+- 黑色原價
+- 紅色價錢（折扣後價格）
+- 優惠期限
+
+**如需提早結束優惠：**
+位置：MMS > E-Commerce > Contract > Contract Status
+> 找到相關合約 > 按「**Terminate**」終止合約
+
+如需修改優惠內容，需先終止現有合約，再重新建立新優惠。`
+      }
+    ]
+  },
+
+  // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/merchant-upload-promotion/Free-Gift
+  freeGift: {
+    category: '贈品優惠 (Free Gift)',
+    icon: '🎀',
+    tags: ['free gift', 'gift promotion', 'giveaway', 'gift with purchase', 'GWP', '贈品', '赠品', '贈品優惠', '免費贈品', '買送', '買贈', 'free product', '贈品活動', '購物贈品', '免費貨品', '附送贈品', '贈品SKU'],
+    questions: [
+      {
+        q: '什麼是贈品優惠 (Free Gift)？有哪些設定要求？',
+        a: `**贈品優惠（Free Gift）：** 顧客惠顧指定數量或金額，即可**免費獲得贈品**。
+
+**設定要求：**
+- 商戶必須先**上載贈品 SKU** 至系統
+- 每款優惠活動最多可設 **3 個階段**的贈品
+- 每張訂單**最多只能送一次贈品**
+- 需標明**中英文**優惠細節
+- 可預設優惠**開始及結束日期**
+
+**申請方法：** 經 MMS 優惠活動管理系統自行設置
+位置：MMS > 優惠活動管理 > 組合優惠 > 建立優惠活動`
+      }
+    ]
+  },
+
+  // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/merchant-upload-promotion/Redemption
+  redemption: {
+    category: '換購優惠 (Redemption)',
+    icon: '🔄',
+    tags: ['redemption', 'add-on purchase', 'discounted add-on', 'add on deal', '換購', '换购', '換購優惠', '加購', '以優惠價換購', '換購貨品', '優惠換購', 'redemption promotion', 'purchase with purchase', 'PWP', '換購品', '換購金額'],
+    questions: [
+      {
+        q: '什麼是換購優惠 (Redemption)？有哪些設定要求？',
+        a: `**換購優惠（Redemption）：** 顧客惠顧指定數量或金額，即可以**優惠價換取**指定貨品。
+
+**設定要求：**
+- 優惠開始前，確保所有貨品為：
+  - 在線狀態：**Online（上架）**
+  - 可見狀態：**Invisible flag 設定為「No」**
+- 每款優惠活動最多可設置 **3 組**不同換購金額的貨品
+- 需標明**中英文**優惠細節
+- 可預設優惠**開始及結束日期**
+
+**不可同時進行的優惠：**
+大手折扣、額外折扣優惠、換購優惠**不可同時推廣**同一件產品。
+
+**申請方法：** 經 MMS 優惠活動管理系統自行設置
+位置：MMS > 優惠活動管理 > 組合優惠 > 建立優惠活動`
+      }
+    ]
+  },
+
   // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/rm-upload-promotion
   buyMoreSaveMore: {
     category: '大手折扣 (Buy More Save More)',
@@ -1465,6 +1719,7 @@ var FAQ_URL_MAP = {
   sdih:              'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Fulfilment/delivery-mode/%E5%95%86%E6%88%B68%E5%B0%8F%E6%99%82%E9%80%81%E8%B2%A8%E8%A8%88%E5%8A%83',
   packingGuideline:  'https://sites.google.com/view/hktv-merc-faq/packing-guideline',
   promotions:        'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation',
+  mmsPromoMgmt:      'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/MMS-Promotion-Management',
   promotionOverview: 'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/promotion-overview',
   promotionRules:    'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/promotion-rule-guideline',
   timedDiscount:     'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/merchant-upload-promotion/timed-discount',
