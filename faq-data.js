@@ -1833,7 +1833,7 @@ MMS 2.0 > 系統 > 商戶賬戶設定 > 開啟「客戶服務通知」功能`
   qaUploadReq: {
     category: 'QA上載貨品須知',
     icon: '🔍',
-    tags: ['QA', 'quality assurance', 'product requirements', 'upload standards', 'photo requirements', 'QA規定', 'QA要求', '產品說明', '照片', '電器', '食品', '藥物', '化妝品', '玩具', 'product compliance', 'product information', 'upload guidelines', 'legal requirements', 'image requirements', 'description rules', '產品圖片', '規格'],
+    tags: ['QA', 'quality assurance', 'product requirements', 'upload standards', 'photo requirements', 'QA規定', 'QA要求', '產品說明', '照片', '電器', '食品', '藥物', '化妝品', '玩具', 'product compliance', 'product information', 'upload guidelines', 'legal requirements', 'image requirements', 'description rules', '產品圖片', '規格', '不良廣告', '醫療聲稱', '禁用詞', '產地', '商品說明條例', '每月巡查', '急凍食品溫度', '訂單執行評估', '問題訂單率', '十大常犯錯誤', 'QA教學', 'QA指引PDF'],
     questions: [
       {
         q: '上載貨品有什麼QA要求？上架產品要注意什麼？',
@@ -1914,6 +1914,104 @@ MMS 2.0 > 系統 > 商戶賬戶設定 > 開啟「客戶服務通知」功能`
       {
         q: '平行進口（水貨）產品點上架？需要特別標注嗎？',
         a: '【平行進口（水貨）產品上架規定】\n\n平行進口的產品必須於中英文產品標題同時註明：\n「平行進口 Parallel import」\n\n例子：\n中文標題：[產品名稱] 平行進口\n英文標題：[Product Name] Parallel import\n\n其他注意事項：\n• 必須確保產品簡介與實物一致\n• 如實物包裝有更改（例如版本不同），必須立即更新HKTVmall上的資料及相片\n• 平行進口的醫藥產品同樣需要在香港完成藥物註冊方可售賣\n\n【不可售賣的產品】\n• 非常規貨裝容量的產品\n• 貨品來源為贈品/免費/非賣品\n• 印有「Not For Sale」、「Not For Individual Sale」、「Tester」、「Sample」等字樣的產品\n\n如有疑問，先設產品為OFFLINE後，填寫MCS表格向QA查詢：\nhttps://hktvmallmerhelp.zendesk.com/hc/zh-tw/requests/new?ticket_form_id=5101014333470'
+      }
+      {
+        q: 'QA上載貨品指引有哪些文件及教學資源？',
+        a: `**QA上載貨品指引文件資源：**
+
+**教學簡報（中文版）：**
+https://drive.google.com/file/d/1u9bNvg4kwkuCearoVJE2HthPRKncwXGi/view
+
+**QA Requirements for Uploading Products（英文版）：**
+https://drive.google.com/file/d/1b5b48N_FCLTIzRmrdQIKHwan5_cZh0Hz/view
+
+**有關提升產品描述質素的提醒及新增對不清晰產品描述罰款條款細則：**
+https://drive.google.com/file/d/1mUk2bKe2z0jcEwQjVZliSeBeSfxA6e5_/view
+
+**十大常犯錯誤：**
+https://drive.google.com/file/d/1KpA6Mns11QOjr2oRNq9Wj2bpUuEqSJg7/view
+
+**QA查詢表格（MCS）：**
+https://hktvmallmerhelp.zendesk.com/hc/zh-tw/requests/new?ticket_form_id=5101014333470
+
+⚠️ QA 會優先檢查新上載產品，建議商戶在上架前先閱讀以上文件。`
+      },
+      {
+        q: '《不良廣告（醫藥）條例》有哪些常見違規例子？哪些詞彙不可使用？',
+        a: `根據香港法例第231章《不良廣告（醫藥）條例》，任何不合法的醫療聲稱，均不可展示於產品包裝及描述上。
+
+**常見違規例子：**
+
+**例子（1）：肌與骨骼系統疾病聲稱**
+產品廣告宣傳上不能聲稱可應對以下疾病，包括風濕病、關節炎及坐骨神經痛。
+違規示例：產品包裝列出「Rheumatism Pain Relieve」→ 違反條例第231章附表1第11部分「風濕病」。
+
+**例子（2）：血壓及癌症聲稱**
+聲稱可「降低血壓」或「預防大腸癌」均屬違法（即使是水貨保健品）。
+
+**常見禁用詞彙（不可在廣告/描述中使用）：**
+關節炎、利尿、血糖、血脂、膽固醇、血壓、骨質疏鬆症、降血脂、降膽固醇、陽萎、靜脈曲張、神經痛症、貧血
+
+**不良廣告附表1（禁止發布廣告所涉疾病及病理情況）：**
+https://www.elegislation.gov.hk/hk/cap231!en-zh-Hant-HK?INDEX_CS=N&xpid=ID_1438402864126_001
+
+⚠️ 已核准的健康食品聲稱請參閱另一Q&A「健康食品/營養補充品關於血糖、血壓、膽固醇的描述」。`
+      },
+      {
+        q: '什麼是《商品說明條例》中的「真正產地」要求？日本品牌一定是日本製造嗎？',
+        a: `根據香港法例第362章《商品說明條例》，最常見的虛假商品說明包括貨品**產地**。
+
+**重要提示：**
+日本品牌/日文包裝的產品**不一定**是「日本製造」。商戶於輸入產地前，必須先了解清楚**真正產地**。
+
+**違規後果：**
+在HKTVmall上顯示錯誤產地屬虛假商品說明，違反《商品說明條例》。
+
+**商戶責任：**
+- 確認實際生產地，並在MMS如實填寫
+- 如實物包裝有更改，立即更新HKTVmall上的資料及相片
+- 不得作出誤導性遺漏或餌誘式廣告宣傳`
+      },
+      {
+        q: '每月商戶營運表現巡查包含什麼？急凍食品溫度要求及訂單執行評估如何運作？',
+        a: `HKTVmall 定期進行兩項商戶營運巡查：
+
+---
+
+**一、急凍食品溫度定期巡查**
+
+**巡查準則：**
+- 急凍食品（-18°C, Frozen Food）：交貨時表面溫度**不得高於 -12°C**
+- 必須使用**「紅色」凍貨膠袋**包裝
+
+**巡查方式：**
+- 每月抽樣檢測商戶運往青衣8樓（TY8）倉庫的急凍食品
+- 收貨時以**紅外線測溫槍**量度貨物表面溫度
+- 如溫度不達標：紀錄貨件並**拒收**
+
+**後果：**
+HKTVmall 根據最近六次檢測紀錄通知商戶 RM，未達標 SKU 需暫時下架跟進，並按未達標次數作出相應措施。
+
+---
+
+**二、每月商戶訂單執行評估**
+
+**問題訂單率 = 問題訂單總量 / 商戶當月總訂單量**
+
+**觸發審核的條件：**
+問題訂單率 **> 5%** → 商戶被納入審核名單
+
+**問題訂單包括（但不限於）：**
+- 重新包裝
+- 遲送貨 / 早送貨
+- 取消訂單
+- 錯貨 / 漏貨
+- 超過預定時間執行訂單
+
+**跟進機制：**
+HKTVmall 根據過去六個月的表現，定期通知商戶 RM 作出跟進並提供改善建議。
+
+如有疑問，請聯絡所屬商戶關係經理或商戶體驗團隊。`
       }
     ]
   }
