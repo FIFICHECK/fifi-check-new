@@ -817,6 +817,68 @@ https://docs.google.com/presentation/d/1dgaF0aOOnypfFZ9xwQH_BphxKtB-d4MC-UtOOn2E
     ]
   },
 
+  // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Fulfilment/delivery-mode/%E5%95%86%E6%88%B68%E5%B0%8F%E6%99%82%E9%80%81%E8%B2%A8%E8%A8%88%E5%8A%83
+  sdih: {
+    category: '商戶8小時送貨計劃 (SDIH)',
+    icon: '⚡',
+    tags: ['SDIH', 'same day', 'same day delivery', '8小時送貨', '8小时送货', '8小時', '8小时', 'same day in hub', '即日送達', '即日送货', '即日送達', '快速送貨', '快速配送', '8hour delivery', '8-hour', '今日送達', '當日送貨', '当日送货', '入倉安排', 'in-hub', '快遞服務', '商戶入倉', 'merchant 8 hour'],
+    questions: [
+      {
+        q: '什麼是商戶8小時送貨計劃（SDIH）？有什麼效益？',
+        a: `**商戶8小時送貨計劃（SDIH — Same Day In Hub）**
+
+HKTVmall 提供可配合 **8小時送貨** 的選擇，目標是：
+- 客戶於下午前確認訂單，可於**同日晚上**送達
+- 一年 364 日均可運作
+
+**試行效果（2023年尾試行）：**
+- 參與商戶的商品銷售總額（GMV）增長近 **30%**
+- 新客數量增長近 **30%**
+
+**詳細計劃簡報（Google Slides）：**
+https://docs.google.com/presentation/d/1Z6N-okBYWEojMpjHVkafxhI1k-0oIe3B_E4MjMwp1AU/present`
+      },
+      {
+        q: '參加8小時送貨計劃的商戶，在推廣及曝光率上有什麼優勢？',
+        a: `參與**商戶8小時送貨計劃**的商戶可獲得以下曝光優勢：
+
+1. **提高關鍵字搜尋排列** — 在 HKTVmall 平台搜尋時排名更前
+2. **增加「8小時送達」貨品標籤** — 產品頁面顯示專屬標籤，吸引追求快速送貨的買家
+3. **8小時送貨主題推廣活動** — 獲邀參與平台專屬主題促銷活動，增加曝光機會`
+      },
+      {
+        q: '商戶8小時送貨計劃的入倉安排是怎樣的？',
+        a: `**商戶8小時送貨計劃：商戶入倉安排**
+
+計劃分三種貨品類型，各有不同出貨安排：
+
+**1. 乾貨（室溫貨）** — 一般非冷藏貨品
+**2. 冷凍貨（0-4°C）** — 需冷藏存放的食品
+**3. 急凍貨（-18°C）** — 需急凍存放的食品
+
+各類型的具體出貨時間表及入倉要求，請參閱官方計劃簡報：
+https://docs.google.com/presentation/d/1Z6N-okBYWEojMpjHVkafxhI1k-0oIe3B_E4MjMwp1AU/present
+
+如需查詢具體入倉安排，請聯絡你的商戶關係經理（RM）。`
+      },
+      {
+        q: '如何了解更多商戶8小時送貨計劃的詳情及報名？',
+        a: `**了解商戶8小時送貨計劃的渠道：**
+
+**1. 官方計劃簡報（Google Slides）：**
+https://docs.google.com/presentation/d/1Z6N-okBYWEojMpjHVkafxhI1k-0oIe3B_E4MjMwp1AU/present
+
+**2. 計劃詳情頁面：**
+https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Fulfilment/delivery-mode/%E5%95%86%E6%88%B68%E5%B0%8F%E6%99%82%E9%80%81%E8%B2%A8%E8%A8%88%E5%8A%83
+
+**3. 網上簡介會影片：**
+請前往 HKTVmall 商戶資訊平台觀看（需先註冊/登入）
+
+**4. 聯絡商戶關係經理（RM）** — 詢問報名資格及申請程序`
+      }
+    ]
+  },
+
   // Source: https://sites.google.com/view/hktv-merc-faq/packing-guideline
   packingGuideline: {
     category: '包裝及收貨指引',
@@ -1400,6 +1462,7 @@ var FAQ_URL_MAP = {
   fulfillment:       'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Fulfilment',
   standardDelivery:  'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Fulfilment/delivery-mode/standard-delivery',
   merchantDelivery:  'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Fulfilment/delivery-mode/merchant-delivery',
+  sdih:              'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Fulfilment/delivery-mode/%E5%95%86%E6%88%B68%E5%B0%8F%E6%99%82%E9%80%81%E8%B2%A8%E8%A8%88%E5%8A%83',
   packingGuideline:  'https://sites.google.com/view/hktv-merc-faq/packing-guideline',
   promotions:        'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation',
   promotionOverview: 'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/promotion-overview',
