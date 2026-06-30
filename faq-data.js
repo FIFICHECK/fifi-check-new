@@ -937,22 +937,161 @@ https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5
   },
 
   // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/After-Sales
+  // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/After-Sales/3R-return-request
   afterSales: {
-    category: '售後服務',
+    category: '售後服務 (3R個案處理)',
     icon: '↩️',
-    tags: ['return', 'refund', 'after sales', '3R', 'replacement', '退貨', '退款', '退货', '退钱', '換貨', '售後', '顧客服務', '取消', 'cancel', 'return policy', 'refund process', 'customer service', 'return request', '退款程序', '7天退貨', 'seven days', '退錢', '換返'],
+    tags: ['return', 'refund', 'after sales', '3R', 'replacement', 'return request', 'return policy', 'customer service', '退貨', '退款', '退货', '退钱', '換貨', '換货', '售後', '售后', '顧客服務', '客服', '取消', 'cancel', '退款程序', '7天退貨', '退錢', '換返', '3R個案', '退換貨', '個案處理', 'MCS', 'food alert', '食物警示', '電器退換', '退換貨申請', 'return refund replacement', 'after-sales service'],
     questions: [
       {
-        q: 'HKTVmall的退換貨政策是什麼？',
-        a: 'HKTVmall承諾提供「七天退換貨」服務給客人。客人可在完成訂單後七天內對商品作出以下申請：\n• 退貨 (Return)\n• 退款 (Refund)\n• 換貨 (Replacement)\n以上統稱為3R個案。'
+        q: 'HKTVmall的退換貨政策是什麼？3R申請時限有多長？',
+        a: `HKTVmall 提供**七天退換貨**服務，客人可在完成訂單後 **7天內** 申請：
+- 退貨（Return）
+- 退款（Refund）
+- 換貨（Replacement）
+（統稱「3R個案」）
+
+**延長時限的特殊情況：**
+- **海外送貨訂單**：延長至完成訂單後 **21天**
+- **PDP頁面提交的售後查詢**：延長至 **14天**（由2022年9月19日起）
+- **Gold VIP / Diamond VIP 客人**：延長至 **一個月**
+
+**詳細教學：**
+https://docs.google.com/presentation/d/1bhQeQmwyB--qGTPKP-m33yyXR5M5C_b9x5-wWYT5ZA4/present?slide=id.g12b02634a43_0_697`
       },
       {
-        q: '商戶如何處理3R退換貨個案？',
-        a: '3R個案處理方法：\n• 按照3R個案處理教學操作\n• 參考Return Request個案狀態表了解各狀態含義\n• 「電子電器類產品」有特定退換貨流程\n商戶需在規定時間內處理個案，避免影響商戶評級。'
+        q: '3R個案一般處理流程是怎樣的？商戶需在多少時間內回覆？',
+        a: `**3R個案處理流程：**
+
+**第1步：收到通知**
+客人向 CS 提交申請後，HKTVmall 即時以**電郵**通知商戶。
+
+**第2步：商戶必須在 24小時內回覆**（包括星期日及公眾假期）
+位置：MMS 2.0 > Platform Support > 退換貨申請
+
+**第3步：如24小時內無回覆**
+CS 將自動受理客人的退款或補貨要求，並判斷個案是否成立。
+
+**商戶為責任方的三種情況：**
+1. 商戶**接受**客人的個案申請
+2. 商戶**24小時內沒有回覆**，由 HKTVmall CS 處理
+3. 商戶**拒絕申請並上訴**，但最終上訴**失敗**
+
+**如需接收退換貨電郵通知：**
+MMS 2.0 > 系統 > 商戶賬戶設定 > 開啟「客戶服務通知」功能`
       },
       {
-        q: '退貨商品是否一定會退回給商戶？',
-        a: '並非所有退貨商品都會安排回收退貨予商戶。部分貨品HKTVmall不會安排回收退貨，商戶需留意相關公告。\n【重要公告】食物或產品警示個案有特別退款程序，商戶需密切留意。'
+        q: '如何在MMS 2.0查看及回覆3R退換貨申請？',
+        a: `**位置：** MMS 2.0 > Platform Support > 退換貨申請
+
+**查看個案記錄：**
+- 最多支援查看**任何7天內**的個案申請
+- 選擇商店編號及時間段，即可查看：訂單編號、個案狀態、SKU資訊、申請類別、申請日期
+
+**回覆方式（二選一）：**
+
+**方法一（詳細）：**
+退換貨申請 > 點擊 SKU > 查看退換貨申請細節 > 對話記錄 > 回覆
+（可查看申請類別、原因、日期、詳細描述等）
+
+**方法二（快速）：**
+退換貨申請 > 展開案件記錄 > 直接在對話框快速回覆
+
+**回覆內容須包含：**
+1. 商戶是否接受客人的退換貨申請
+2. 如不接受，需提供相關證明/合理理由供 CS 參考`
+      },
+      {
+        q: '如何向CS申訴或提交3R相關查詢？MCS表格是什麼？',
+        a: `**MCS 表格** 是向 HKTVmall 客服部門提交查詢的官方渠道。
+
+**使用 MCS 表格的情況：**
+- 對自動接受退款或補貨要求有疑問
+- 需要提供相片或影片作為申訴證明
+- 有其他查詢或欲再次進行上訴
+
+**MCS 表格連結：**
+https://hktvmallmerhelp.zendesk.com/hc/zh-tw/requests/new?ticket_form_id=5138376529438
+
+位置（MMS 內）：商戶/客戶服務部(CS) > 查詢3R客戶退貨要求`
+      },
+      {
+        q: '哪些貨品HKTVmall不會安排回收退貨給商戶？',
+        a: `以下情況，HKTVmall **不會**安排回收客人退貨商品給商戶：
+
+1. 任何商品售價**少於 HK$100**
+2. 同一3R個案中，多件產品**總值 HK$200 或以下**
+3. 貨品出現**滲漏、包裝損毀**（如易碎類、液體類、薯片等）（電器除外）
+4. 商品已過**食用/保存限期**
+5. **急凍貨、新鮮肉類、新鮮魚類、新鮮蔬菜、水果、麵包或雞蛋**
+6. **有蟲蛀**的貨品
+
+**補充說明：**
+- 商戶可於 MMS 2.0（退換貨申請）中查看退貨由 HKTVmall 或商戶承擔損失
+- 由 HKTVmall 承擔：HKTVmall 負責貨款，按正常程序入帳給商戶
+- 由商戶承擔：商戶負責貨款，HKTVmall 不發放該訂單貨款
+
+**退貨安排準則及參考例子：**
+https://drive.google.com/file/d/1xXxigXcXEMV9a87Zi4oRJqJZAHHWCGUn/view`
+      },
+      {
+        q: '退貨運費由誰承擔？退貨如何安排回收？',
+        a: `**退貨回收安排：**
+- 一般而言，商戶**無法自行**前往交貨倉取回客人退貨
+- HKTVmall 透過第三方物流公司「**偌亞奧國際 Royale International**」安排退貨
+- 退貨運費由**商戶**負責支付
+
+**如商戶不需收取退回貨品：**
+填寫 MCS 表格退出相關安排，其後退貨將不會退至商戶在 MMS 設置的退貨倉。
+
+**查看退貨倉地址：**
+MMS > 商店管理 > 商店基本設定 > 倉庫與物流設定`
+      },
+      {
+        q: '電子電器類產品的退換貨流程有什麼特別規定？',
+        a: `**電子電器類產品退換貨流程：**
+
+**價值 HK$2,000 或以下：**
+- 一律按 HKTVmall 3R 個案流程處理
+- 商戶**不需**在產品頁面列出保養中心資料
+- 即使頁面列明保養中心，退換貨仍按 HKTVmall 退換貨流程處理
+
+**價值 HK$2,000 以上：**
+- 商戶需在產品頁面**列明「產品保養」詳情**（包括保養細則、保養中心地址及營業時間）
+- **有明顯損壞/凹痕/影片顯示未能運作** → 按 HKTVmall 3R 個案流程處理
+- **外觀沒有明顯損壞/凹痕/影片未能證實問題** → HKTVmall 建議客人自行到商戶指定保養中心檢查`
+      },
+      {
+        q: '食物警示個案的退款流程是怎樣的？商戶需要做什麼？',
+        a: `**食物警示個案退款流程：**
+
+當食物安全中心（CFS）發出食物警報或致敏物警報時：
+
+**第1步：** HKTVmall QA 團隊根據食環署食物警示將相關商品**下架**
+
+**第2步：** 發送電郵通知商戶，詢問是否有售賣相關批次，商戶需於 **24小時內回覆**
+
+**第3步（三種情況）：**
+- **未於24小時回覆** → 視作同意退款，HKTVmall 為過去**三個月**相關訂單退款
+- **確認有售賣** → 需為過去三個月相關訂單退款（貨品因食安問題不能退回商戶）
+- **確認沒有售賣** → 需提供證明文件予 QA 部，審批後可繼續售賣
+
+**重要：** 商戶應自行訂閱食物安全電子信息服務，以迅速應對最新食物警示：
+https://www.cfs.gov.hk/tc_chi/enews/subscribe.html`
+      },
+      {
+        q: '海外送貨訂單的退換貨政策如何？',
+        a: `**海外送貨訂單**的3R個案接受時間延長至完成訂單後 **21天**。
+
+各地區退換貨政策詳情：
+- **直送英國** 退換貨政策：
+  https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/overseas-delivery/uk#h.cxap3uggqt9d
+
+- **直送加拿大** 退換貨政策：
+  https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/overseas-delivery/canada#h.lj9vnv7ybta5
+
+- **直送澳洲** 退換貨政策：
+  https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/overseas-delivery/australia#h.xfsd0kf40stc`
       }
     ]
   },
@@ -1797,7 +1936,7 @@ var FAQ_URL_MAP = {
   freeGift:          'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/merchant-upload-promotion/Free-Gift',
   rmUpload:          'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/rm-upload-promotion',
   personalPrice:     'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Promotion-Creation/%E5%80%8B%E4%BA%BA%E5%B0%88%E5%B1%AC%E5%83%B9',
-  afterSales:        'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/After-Sales',
+  afterSales:        'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/After-Sales/3R-return-request',
   rrmp:              'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Customer-Interaction/rrmp',
   salesExcellence:   'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/excellence-in-sales-practice',
   qaUploadReq:       'https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/excellence-in-sales-practice/QA-upload-requirements',
