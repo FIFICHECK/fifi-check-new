@@ -3103,6 +3103,47 @@ https://academy.hktvmall.com/productsourcingstrategy
       }
     ]
   }
+,
+
+  // === 年費 Annual Fee ===
+  annualFee: {
+    category: '年費（Annual Fee）',
+    icon: '💳',
+    tags: ['年費', 'Annual Fee', '加盟費', '續費', 'Renewal', 'GMV', 'SKU數量', '廣告代幣', '廣告回贈', '商戶費用', '年度費用', '新商戶', '續約', '月均GMV'],
+    questions: [
+      {
+        q: '新商戶首年年費（Annual Fee）是多少？包含什麼？',
+        a: `新商戶首年年費：
+
+費用：HK$25,000
+
+當中包含廣告費回贈：HK$22,000
+（廣告費回贈將以廣告代幣形式存入商戶帳戶，可用於投放 HKTVmall 廣告）
+
+如有查詢，請聯絡商戶關係經理（Relationship Manager）。`
+      },
+      {
+        q: '續期年費（Renewal Annual Fee）如何計算？',
+        a: `續期年費（第二年起）根據商戶過去 6 個月的平均月度 GMV 及 SKU 數量計算：
+
+**情況一：過去 6 個月平均月 GMV 未達 HK$15,000**
+年費：HK$5,000
+
+---
+
+**情況二：過去 6 個月平均月 GMV 達到或超過 HK$15,000**
+按 SKU 數量收費：
+
+| SKU 數量 | 年費 |
+|----------|------|
+| 1 – 100 SKU | HK$18,000 |
+| 101 – 500 SKU | HK$28,000 |
+| 501+ SKU | HK$53,000 |
+
+如有任何關於年費的查詢，請聯絡你的商戶關係經理。`
+      }
+    ]
+  }
 
   }
 
