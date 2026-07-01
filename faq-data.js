@@ -2729,6 +2729,223 @@ sharehub.pr.koc@hktv.com.hk`
       }
     ]
   }
+,
+
+  // === HKTV 3PL ===
+  threePL: {
+    category: 'HKTV 3PL 倉存及訂單處理服務',
+    icon: '🏭',
+    tags: ['3PL', '倉存', '物流', '訂單處理', '儲存箱', '入倉', '包裝', '送貨', 'third party logistics', '3PL服務', '倉庫', '補貨提示', '增值服務', '盤點', '出倉', 'MMS倉庫', '3pl@hktv.com.hk'],
+    questions: [
+      {
+        q: '什麼是 HKTV 3PL 服務？有哪些優勢？',
+        a: `HKTV 3PL 是 HKTVmall 於 2023 年 7 月正式啟用的一站式倉存及訂單處理服務，提供：
+
+- 倉存服務：大型物流倉庫，引入先進自動化設備
+- 訂單處理服務：準確按 HKTVmall 要求包裝貨品
+- 快速送貨：最快 8 小時派送（未來最快 3 小時）
+
+**選用 HKTV 3PL 的優勢：**
+- 減少自家管理倉庫及物流的營運成本
+- 降低倉存、營運及派送成本
+- 彈性安排庫存數量
+- 確保符合 HKTVmall 包裝指引，減低延遲派送風險
+- 快速出貨，提供更佳的網購體驗
+- 增加產品曝光率（8小時派送專屬標籤、更高搜尋排名、額外推廣活動等）`
+      },
+      {
+        q: 'HKTV 3PL 的儲存箱有哪些規格？貨物有什麼限制？',
+        a: `**3 款儲存箱規格（儲存箱外箱尺寸均為 60 x 40 x 32 厘米，約 0.052 立方米）：**
+
+| 種類 | 內箱尺寸（長 x 闊 x 高） |
+|------|--------------------------|
+| 1 格 | 56 x 36 x 26 厘米 |
+| 2 格 | 28 x 36 x 26 厘米 |
+| 4 格 | 28 x 18 x 26 厘米 |
+
+**貨物限制：**
+- 每個儲存箱貨品重量不能超過 **17kg**
+- 單件貨物尺寸限制：長 49.5 x 闊 32.5 x 高 25 厘米
+- 每格只能放置一款貨品，且須有相同的有效日期
+
+**大貨服務（無法放入儲存箱、以原箱出售的產品）：**
+- 最大尺寸：三邊總和不超過 180 厘米，任何一邊不超過 130 厘米
+- 需要另外簽訂 1 年合約，最低消費 2 CBM`
+      },
+      {
+        q: 'HKTV 3PL 提供哪些主要服務？',
+        a: `**1. 倉存服務：**
+- 兩種倉存環境：常溫房 / 冷氣房（儲存溫度約 20–25°C）
+- 商戶可於 MMS 隨時預約入倉，選擇日期及時段，申請即時批核
+- 透過 MMS 查看即時庫存數量
+- 智能補貨提示：當產品庫存到達設定數字時，於 MMS 收到通知
+
+**2. 訂單處理服務：**
+- 根據 HKTV 要求為貨品進行包裝（減少包裝問題產生的行政費用）
+- 最後一哩配送服務：最快即日 8 小時送達，附有訂單追蹤
+
+**3. 增值服務：**
+- 盤點：申請進行盤點，核對倉庫庫存數量
+- 出倉：自由選擇日期及時段，從倉庫提取指定產品
+- 臨時存倉：靈活使用額外空間，配合短期銷售推廣`
+      },
+      {
+        q: 'HKTV 3PL 如何收費？付款方法是什麼？',
+        a: `**Standard Plan 收費：**
+詳細價目表請參閱 3PL 頁面（倉存費 + 訂單處理費）：
+https://sites.google.com/view/hktv-merc-faq/3pl
+
+訂單處理費已涵蓋包裝物料費用；易碎或敏感物品須收取額外費用。
+
+**大貨服務收費：** 另行計算（需簽 1 年合約，最低消費 2 CBM）
+
+**付款方法：**
+- 3PL 費用於每月 PCR 中以預繳形式收取
+- 首月收取儲存箱按金：訂閱儲存箱數量 × 1.5 × HK$50
+- 如 3PL 費用超過該期 PCR 之營業額，系統會發出帳單
+- 商戶須於收到帳單後 **7 日內**以銀行轉帳付款，並上傳轉帳證明至 MMS 帳務中心`
+      },
+      {
+        q: '如何開始使用 HKTV 3PL？有哪些學習資源及聯絡方式？',
+        a: `**學習資源：**
+
+「HKTV 3PL 服務」網上簡介會錄影：
+https://academy.hktvmall.com/course/3pl
+
+[中文版] HKTVmall 3PL 倉存及訂單處理服務簡報：
+https://drive.google.com/file/d/1iea88-Z5CpFhXrs3j5aZz5C0vkqhX7bt/view
+
+[ENG] HKTV 3PL Warehousing & Order Processing Services merchant deck：
+https://drive.google.com/file/d/1PDYr7Bg2ykniThPg-WaQAa2dchZT9CjN/view
+
+**聯絡 HKTV 3PL 團隊：**
+- 電郵：3pl@hktv.com.hk
+- WhatsApp：5480 4024
+- 或聯絡你的商戶關係經理`
+      }
+    ]
+  },
+
+  // === GreenLab 臨期百貨 ===
+  greenLab: {
+    category: 'GreenLab 臨期百貨計劃',
+    icon: '🌿',
+    tags: ['GreenLab', '臨期百貨', '臨近到期', 'Best Before Date', '慢流產品', '舊包裝', '批發', '可持續發展', '減少浪費', 'greenlab@hktv.com.hk', '食品', '護膚品'],
+    questions: [
+      {
+        q: '什麼是 GreenLab 臨期百貨計劃？接受哪些產品？',
+        a: `GreenLab 臨期百貨是 HKTVmall 的全新計劃，專注於銷售臨近到期或已過最佳食用/保存日期（Best Before Date）的產品，或慢流產品（銷售速度較緩慢的產品）。旨在為顧客提供經濟、實惠且高質素的生活方式選擇，並支持可持續發展和減少浪費。
+
+**招募產品類別（符合以下其中一項即可）：**
+1. 接近「最佳食用期限」的產品
+2. 舊包裝 / 即將下架 / 包裝輕微瑕疵的產品
+3. 慢流 / 二線銷售表現的產品
+
+**可接受類別：** 食品、護膚品及化妝品、護理保健等
+
+**暫不接受：** 寵物食品、母嬰食品
+
+**不接受：** 已超過「最佳食用日期」期限的產品`
+      },
+      {
+        q: '如何參加 GreenLab 臨期百貨計劃？入倉方式如何？',
+        a: `**參加方法：**
+1. 按此下載並填寫報價單（請向 GreenLab 團隊索取）
+2. 將填寫好的報價單電郵至：greenlab@hktv.com.hk
+3. 一經入選，GreenLab 團隊將以電郵形式與您聯絡
+
+**採購及入倉安排：**
+- GreenLab 以批量採購，以協商的批發價格購買
+- 商戶只須把產品**一次性**送入 **HKTV 將軍澳倉庫**
+- 無需以標準集運按每張運單送入 HKTV 屯門倉庫（與一般運作不同）
+
+**鼓勵商戶定期提供各類合適產品，多樣化選擇可提升顧客體驗並帶來更多商機。**
+
+如需了解更多，請電郵：greenlab@hktv.com.hk`
+      }
+    ]
+  },
+
+  // === HKTV Live 直播購物 ===
+  hktvLive: {
+    category: 'HKTV Live 直播購物',
+    icon: '📺',
+    tags: ['直播', 'HKTV Live', '直播購物', '直播銷售', '主持人', '商戶直播', 'live streaming', '互動', '24小時', '7天'],
+    questions: [
+      {
+        q: '什麼是 HKTV Live 直播購物？商戶如何參加？',
+        a: `HKTVLive 每日由早到晚提供多元化直播內容，滿足不同客戶的需求。
+
+**特點：**
+- 直播期間由**專業主持人**親身示範及解答問題
+- 消除客戶購買疑慮，提升下單決策速度
+- 商戶可根據自身營運策略，**每天 24 小時、每週 7 天**開展直播銷售
+- 與顧客實時互動連接
+
+**商戶如何報名：**
+請向您的**商戶關係經理（Relationship Manager）**報名參加。
+
+**HKTV Live 直播購物 Google Slides：**
+https://docs.google.com/presentation/d/1aIGxICbBEzptSqKAROFJdMPmUm_s39w3G2_91vpMhL8/present?slide=id.g371331552e2_0_210`
+      }
+    ]
+  },
+
+  // === Zoom Sales ===
+  zoomSales: {
+    category: 'Zoom Sales 線上售貨',
+    icon: '💻',
+    tags: ['Zoom Sales', '線上售貨', '真人售貨員', '線上推廣', '目標受眾', '優惠券', '線上示範', 'online sales', '直播', '推廣'],
+    questions: [
+      {
+        q: '什麼是 Zoom Sales？商戶如何參加？',
+        a: `HKTVmall Zoom Sales 直接將線下購物體驗搬到線上。
+
+**特點：**
+- **真人線上售貨員**在線解答客戶疑難
+- 即時推薦產品及分享優惠資訊
+- 可鎖定目標受眾發放優惠券
+
+**Zoom Sales 簡報：**
+https://drive.google.com/file/d/1Co5-CFPQAbzLFL3Hima1KmsFLOkA3CxF/view
+
+如有興趣參加 Zoom Sales，請聯絡你的**商戶關係經理（Relationship Manager）**了解詳情。`
+      }
+    ]
+  },
+
+  // === 商戶評級獎勵計劃 ===
+  merchantScorecard: {
+    category: '商戶評級獎勵計劃（Merchant Scorecard Scheme）',
+    icon: '🏆',
+    tags: ['商戶評級', 'Merchant Scorecard', '獎勵計劃', '評分', '得獎商戶', '曝光機會', '季度評分', '服務水平', 'scorecard', '評分準則'],
+    questions: [
+      {
+        q: '什麼是商戶評級獎勵計劃（Merchant Scorecard Scheme）？',
+        a: `為獎勵高服務水平的商戶，HKTVmall 推出**商戶評級獎勵計劃（Merchant Scorecard Scheme）**，獲獎商戶可享有額外曝光機會！
+
+**計劃特點：**
+- 每季度評分及公布得獎商戶
+- 評分項目涵蓋多個服務指標（如急凍貨品不適用，相關分數按比例調整）
+- 獲獎商戶享有額外平台曝光獎勵
+
+**歷屆得獎商戶及評分準則：**
+- 2026 上半年評分準則
+- 2025 下半年得獎商戶及評分準則
+- 2025 上半年得獎商戶及評分準則
+- 2024 各季度得獎商戶及評分準則
+（詳情請瀏覽商戶評級獎勵計劃頁面）
+
+**計劃簡介 Google Slides：**
+https://docs.google.com/presentation/d/1u8trzmrj8UL-cnlB-z1Hs9y7nWAJ8FdqUnzd3KCc5IE/present?slide=id.p1
+
+**計劃頁面（包括歷屆得獎商戶）：**
+https://sites.google.com/view/hktv-merc-faq/merchantscorecard
+
+如有疑問，請聯絡您的商戶關係經理。`
+      }
+    ]
+  }
 
   }
 
