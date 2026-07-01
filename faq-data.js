@@ -2415,6 +2415,7 @@ production.issues.mms@shoalter.com
 - 建議跨境商戶使用，以提升批量上載效率`
       }
     ],
+  },
 
   // === Meta 演算法及元數據 ===
   algorithmMeta: {
@@ -3099,8 +3100,6 @@ https://academy.hktvmall.com/productsourcingstrategy
 如有任何關於年費的查詢，請聯絡你的商戶關係經理。`
       }
     ]
-  }
-
   }
 
 };
