@@ -1584,30 +1584,6 @@ MMS 2.0 > 系統 > 商戶賬戶設定 > 開啟「客戶服務通知」功能`
     ]
   },
 
-  // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%BA%8C%E9%9A%8E%E6%AE%B5/adbooking
-  adBooking: {
-    category: '廣告投放',
-    icon: '📢',
-    tags: ['advertising', 'ad', 'ads', 'ad booking', 'campaign', 'sponsored', '廣告', '广告', '廣告投放', '广告投放', '推廣', '廣告活動', 'ad placement', 'paid promotion', 'ad credit', 'ad token', '廣告代幣', '廣告費', '投放廣告', 'sponsored listing', '競價', 'bidding'],
-    questions: [
-      {
-        q: '如何在HKTVmall投放廣告？',
-        a: '廣告投放步驟：\n1. 了解投放廣告前須知\n2. 獲得廣告代幣及增值\n3. 使用廣告投放系統\n4. 選擇廣告位置及規格\n5. 設定廣告並按時提交\nHKTVmall提供一站式廣告投放系統，商戶可自行操作。'
-      },
-      {
-        q: '如何獲得廣告代幣？',
-        a: '廣告代幣獲取及增值方法：\n• 通過HKTVmall廣告代幣計劃獲取\n• 可透過廣告投放系統進行增值\n詳細增值方式請參閱廣告投放系統說明或聯絡商戶關係經理。'
-      },
-      {
-        q: '廣告投放的四部曲是什麼？',
-        a: '預約廣告前的四部曲：\n1. 了解目標受眾\n2. 選擇合適廣告位置（查看已推出的廣告位置）\n3. 設計吸引廣告內容（符合廣告規格）\n4. 監測廣告表現數據及交易記錄\n商戶可參考成功的廣告案例作參考，並參考一站式廣告投放系統使用建議。'
-      },
-      {
-        q: '廣告的提交時限及製作時間是多少？',
-        a: '廣告預約及製作時間（由HKTVmall設計）及一般廣告提交時限，請參閱廣告投放系統中的相關說明。建議商戶提前預約以確保廣告能按時刊出。廣告表現數據及交易記錄可於廣告投放系統查看。'
-      }
-    ]
-  },
 
   // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%BA%8C%E9%9A%8E%E6%AE%B5/marketing-tips
   marketingTips: {
@@ -1630,30 +1606,6 @@ MMS 2.0 > 系統 > 商戶賬戶設定 > 開啟「客戶服務通知」功能`
     ]
   },
 
-  // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%BA%8C%E9%9A%8E%E6%AE%B5/sharehub
-  shareHub: {
-    category: 'ShareHub 網上社區',
-    icon: '🌐',
-    tags: ['sharehub', 'community', 'social commerce', 'content', 'post', '社群', '社區', '內容', '帖文', '貼文', 'community engagement', 'content sharing', 'social platform', 'merchant posts', 'sharehub marketing', '網上社區', '分享', '口碑'],
-    questions: [
-      {
-        q: '什麼是ShareHub？',
-        a: 'ShareHub是建立於HKTVmall應用程式內的網上社區，旨在讓用戶找到有興趣的內容、發掘新商品、新事物、新話題，以及與其他用戶互相交流。\n創立目的：為HKTVmall注入社交元素，推展社交電商，鼓勵HKTVmall用戶之間交流，協助他們作出消費決策。'
-      },
-      {
-        q: 'ShareHub對商戶有什麼優勢？',
-        a: 'ShareHub優勢：\n• 為商戶提供額外的產品曝光渠道\n• 透過社區內容吸引潛在客戶\n• 與顧客建立更緊密的互動關係\n• 商戶可透過ShareHub發布帖文推廣產品\n• 可參加ShareHub x 商戶聯合推廣活動'
-      },
-      {
-        q: '商戶帖文有什麼內容要求？',
-        a: 'ShareHub商戶帖文內容要求：\n• 內容必須真實、準確\n• 符合HKTVmall社區守則\n• 不能發布虛假或誤導性內容\n• 商品資訊必須與MMS上的產品一致\n詳細內容要求請參閱ShareHub商戶違規詳情說明。'
-      },
-      {
-        q: '什麼是ShareHub內容推廣策略？',
-        a: '商戶可使用ShareHub內容推廣策略，更有效地觸及目標消費群。ShareHub提供商戶聯合推廣機會，讓商戶透過ShareHub平台進行產品推廣活動。詳情請聯絡您的商戶關係經理。'
-      }
-    ]
-  },
 
   // Source: https://sites.google.com/view/hktv-merc-faq/%E5%95%86%E6%88%B6%E6%8E%A8%E5%BB%A3/%E7%8D%8E%E5%8B%B5%E8%A8%88%E5%8A%83/%E6%B8%9B%E5%A1%91%E5%85%88%E9%8B%92%E6%8E%A8%E5%BB%A3%E7%8D%8E%E5%8B%B5%E8%A8%88%E5%8A%83
   greenPackaging: {
@@ -2532,7 +2484,7 @@ Meta Description 建議：
   adBooking: {
     category: '廣告投放計劃',
     icon: '📢',
-    tags: ['廣告', '廣告投放', '廣告代幣', '年費', 'Annual Fee', '廣告計劃', 'Rate Card', '廣告規格', '廣告教學', '廣告增值', '早鳥計劃', '預訂計劃', 'ad token', 'ad booking', '廣告費用', '廣告系統'],
+    tags: ['廣告', '廣告投放', '廣告代幣', '年費', 'Annual Fee', '廣告計劃', 'Rate Card', '廣告規格', '廣告教學', '廣告增值', '早鳥計劃', '預訂計劃', 'ad token', 'ad booking', '廣告費用', '廣告系統', 'advertising', 'ad', 'ads', 'campaign', 'sponsored', '广告', '推廣', '廣告活動', 'ad placement', 'paid promotion', 'ad credit', '廣告費', '投放廣告', '競價', 'bidding'],
     questions: [
       {
         q: '商戶如何在 HKTVmall 投放廣告？廣告代幣如何獲得？',
@@ -2597,6 +2549,10 @@ https://drive.google.com/file/d/1aTSvefTgVRjEcJT1axhzJ071xo0uuduF/view
 
 請參閱最新廣告 Rate Card 了解各計劃的詳細費用及代幣換算：
 https://cloud.marketing.hktvmall.com/adplan_ratecard`
+,
+      {
+        q: '廣告投放的四部曲是什麼？',
+        a: '預約廣告前的四部曲：\n1. 了解目標受眾\n2. 選擇合適廣告位置（查看已推出的廣告位置）\n3. 設計吸引廣告內容（符合廣告規格）\n4. 監測廣告表現數據及交易記錄\n商戶可參考成功的廣告案例作參考，並參考一站式廣告投放系統使用建議。'
       }
     ]
   },
@@ -2656,7 +2612,7 @@ databank@hktv.com.hk`
   shareHub: {
     category: 'ShareHub HKTVmall 網上社區',
     icon: '🌐',
-    tags: ['ShareHub', '網上社區', '社交電商', 'KOC', '帖文', '內容行銷', 'Mall Dollar', '跟買', '回贈', '商戶違規', 'sharehub登入', '內容要求', '聯合推廣', 'koc.hktvmall.com'],
+    tags: ['ShareHub', '網上社區', '社交電商', 'KOC', '帖文', '內容行銷', 'Mall Dollar', '跟買', '回贈', '商戶違規', 'sharehub登入', '內容要求', '聯合推廣', 'koc.hktvmall.com', 'sharehub', 'community', 'social commerce', 'content', 'post', '社群', '社區', '內容', '貼文', 'community engagement', 'content sharing', 'social platform', '分享', '口碑'],
     questions: [
       {
         q: '什麼是 ShareHub？目的和優勢是什麼？',
