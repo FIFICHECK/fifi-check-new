@@ -2450,7 +2450,286 @@ production.issues.mms@shoalter.com
 - 非同步處理：提交後用 recordId 透過 Check Product Record API 追蹤狀態
 - 建議跨境商戶使用，以提升批量上載效率`
       }
+    ],
+
+  // === Meta 演算法及元數據 ===
+  algorithmMeta: {
+    category: 'Meta 演算法及元數據',
+    icon: '🔍',
+    tags: ['Meta', 'SEO', '演算法', '元數據', 'meta title', 'meta description', '搜尋引擎', 'search engine', '商店排名', '點擊率', 'CTR', 'Exchange', 'Store Front Management'],
+    questions: [
+      {
+        q: '什麼是 Meta Title 和 Meta Description？對商店有何作用？',
+        a: `Meta Title Tag 和 Meta Description Tag 是 HTML 中用來定義「網站標題」和「網站描述」的元素。
+
+重要：它們不是寫給用戶看，而是寫給搜尋引擎看，讓搜尋引擎了解你的網頁內容。
+
+如果設置正確，搜尋引擎大部分情況都會採用，並直接顯示在搜尋結果頁面（SERP）上，讓潛在客戶看到你的商店。
+
+HKTVmall 已為每間商店預設 Meta Title 及 Meta Description 模板。`
+      },
+      {
+        q: 'HKTVmall 的預設 Meta Title 和 Meta Description 模板是什麼？',
+        a: `預設 Meta Title：
+{商店名稱} 產品一覽 | HKTVmall 香港最大網購平台
+Shop {商店名稱} products online! | HKTVmall The Largest HK Shopping Platform
+
+預設 Meta Description：
+瀏覽{商店名稱} 超過{商品數目}件的{購物專區}產品, 包括{次產品類別}、{次產品類別}和{次產品類別}! ✓500,000+件商品 ✓真實客戶評論 ✓買滿$500免費送貨上門 ✓超過130個自取點
+
+以上模板由系統自動生成，商戶亦可自行修改（見自訂設置教學）。`
+      },
+      {
+        q: '如何在 Exchange 自訂 Meta Title 和 Meta Description？',
+        a: `設置位置：
+Exchange > Store Front Management > 向下滾動 > Meta title & description
+
+填寫後，自訂的 Meta Title 與 Meta Description 會取代原先的預設模板。當搜尋引擎再次訪問你的商店時，新版本就有機會被採納並呈現在搜尋結果上。
+
+Meta Title 建議格式：
+{商店名稱} 產品一覽 | HKTVmall 香港最大網購平台
+
+🔴 必須保留：「| HKTVmall 香港最大網購平台」這部分
+🟢 可自由修改：前半部分，最多 20 個字元（10 個中文字）
+
+Meta Description 建議：
+- 可完全自由創作
+- 建議包含：商店名稱、商品數目、主要產品類別（①部分）+ 服務特點及承諾（②部分）
+- 最多 160 個字元（80 個中文字）；過長的 description 會被搜尋引擎截斷`
+      },
+      {
+        q: '撰寫 Meta Title 和 Meta Description 有哪些重要要點？',
+        a: `四大要點：
+
+1. 商店名稱放最前
+把商店名稱放在 Meta Title 最前，讓搜尋者搜尋你的品牌時，商店頁面能排在較高位置。
+
+2. 簡扼要點
+出色的 Meta Title 和 Meta Description 應數秒內抓緊搜尋者眼球，刺激點擊。長期高點擊率能提升網頁在搜尋結果頁的排名。
+
+3. 持續更新
+商家應每季檢視 Meta Title 和 Meta Description，避免內容過時，讓搜尋者看到最新、最正確的資訊。
+
+4. 有根據及可靠的資訊
+確保所提及的資訊及數據有確實根據，避免誤導客人或觸犯《商品說明條例》。`
+      }
     ]
+  },
+
+  // === 投放廣告前須知 ===
+  adBooking: {
+    category: '廣告投放計劃',
+    icon: '📢',
+    tags: ['廣告', '廣告投放', '廣告代幣', '年費', 'Annual Fee', '廣告計劃', 'Rate Card', '廣告規格', '廣告教學', '廣告增值', '早鳥計劃', '預訂計劃', 'ad token', 'ad booking', '廣告費用', '廣告系統'],
+    questions: [
+      {
+        q: '商戶如何在 HKTVmall 投放廣告？廣告代幣如何獲得？',
+        a: `如何獲得廣告代幣（Ad Tokens）：
+
+1. 繳付年費（Annual Fee）
+新商戶繳付年費以獲得相對應的廣告代幣，所獲得的代幣將按比例存入商戶賬戶。
+
+2. 優先預付計劃（Advanced Payment Plan）
+商戶於指定時間內確認計劃/簽署相關合約及一筆預付廣告費用，即可享獎賞：
+- 早鳥計劃（Early Bird Plan）
+- 一般計劃（Regular Plan）
+- 預訂優惠計劃（Commitment Plan）：商戶須於 2026 年 12 月 31 日或以前簽署相關合約，確認 2027 年內須投放的廣告費用，無需一筆過預付
+
+3. 代幣充值（Top-Up Coupon）
+購買電子優惠券以換取廣告代幣
+
+如需了解最新廣告增值優惠計劃詳情，請聯絡你的商戶關係經理。`
+      },
+      {
+        q: '廣告投放有哪些資源和教學材料？廣告規格在哪裡查閱？',
+        a: `廣告計劃及資源：
+
+商戶廣告計劃 Website：
+https://cloud.marketing.hktvmall.com/EB2024_webinar
+
+廣告 Rate Card（最新廣告計劃）：
+https://cloud.marketing.hktvmall.com/adplan_ratecard
+
+2026 廣告價目表 PDF：
+https://drive.google.com/file/d/10iyYemFyvnm1GeS7Sgzot73mlCyRtZXZ/view
+
+廣告規格：
+https://cloud.marketing.hktvmall.com/Adspec_List
+
+廣告投放教學 Video（投放廣告前須知）：
+https://youtu.be/tOHI8SffroE?si=RaSTwCYw_IeAGjoq
+
+廣告投放及系統教學 Video：
+https://youtu.be/LHxHQoSaxqs?si=-6DumcMpsmtWdyM8
+
+廣告投放及系統教學 PDF：
+https://drive.google.com/file/d/1aTSvefTgVRjEcJT1axhzJ071xo0uuduF/view
+
+如有廣告投放查詢，請聯絡你的商戶關係經理。`
+      },
+      {
+        q: '廣告投放有哪些不同計劃類型？各有什麼分別？',
+        a: `廣告增值計劃類型：
+
+早鳥計劃（Early Bird Plan）：
+在指定早鳥期內預付廣告費用，享有最優惠的廣告代幣獎賞比例。
+
+一般計劃（Regular Plan）：
+在標準預訂期內預付廣告費用，享有廣告代幣獎賞。
+
+預訂優惠計劃（Commitment Plan）：
+商戶確認全年廣告投放金額並簽署合約，無需一次過預付所有費用，於 2026 年 12 月 31 日或以前簽署合約即可確認 2027 年廣告計劃。
+
+代幣充值（Top-Up Coupon）：
+隨時購買電子優惠券，靈活換取廣告代幣，按需增值。
+
+請參閱最新廣告 Rate Card 了解各計劃的詳細費用及代幣換算：
+https://cloud.marketing.hktvmall.com/adplan_ratecard`
+      }
+    ]
+  },
+
+  // === 商戶數據分析平台 ===
+  merchantDashboard: {
+    category: 'HKTVmall 商戶數據分析平台（Merchant Dashboard）',
+    icon: '📊',
+    tags: ['商戶數據', 'Merchant Dashboard', '數據分析', '業績報告', '銷售概覽', '流量分析', '市場定位', 'HKTV趨勢', '競爭分析', 'databank', '數據平台', '收費', '一對一諮詢'],
+    questions: [
+      {
+        q: '什麼是 HKTVmall 商戶數據分析平台（Merchant Dashboard）？',
+        a: `HKTVmall 商戶數據分析平台是一個數據圖像化工具，協助商戶：
+
+- 利用數據進行業績評估
+- 了解消費者的行為及購買模式
+- 善用大數據分析，配合不同市場營銷方案使企業收益最大化`
+      },
+      {
+        q: '商戶數據分析平台提供哪些數據？各功能有什麼用途？',
+        a: `評估商店業績及流量：
+- 業績報告、銷售概覽、客戶概覽、產品概覽
+- 流量概覽、站外流量
+- 了解商店在銷售、客戶、產品、流量方面的表現
+- 確定業務優勢和劣勢，制定進入市場的策略
+
+了解商店表現（競爭分析）：
+- 分析商店和競爭者的市場定位
+- 制定目標或市場活動增加銷售額並提高市場佔有率
+- 直接知道誰是你的競爭者（進階版功能）
+
+HKTV 趨勢：
+- 預測未來產品趨勢走向
+- 分析熱門產品，迎合消費者喜好
+- 根據關鍵字搜尋趨勢，制定產品名稱以提升曝光率
+
+了解市場表現：
+- 了解各產品類別的銷售及客戶表現
+- 分析消費者購物模式
+- 擴展開發新產品線的機會`
+      },
+      {
+        q: '商戶數據分析平台如何收費？如何申請及查詢？',
+        a: `收費表：
+https://cloud.marketing.hktvmall.com/MDB_Ratecard_ZH
+
+一對一數據分析諮詢服務（免費登記）：
+https://docs.google.com/forms/d/1xh2D1sQmJ1e2ChdsZIN-N_miI93rOoExO7WABdVGu4k/
+
+電郵查詢 / 申請加入：
+databank@hktv.com.hk`
+      }
+    ]
+  },
+
+  // === ShareHub ===
+  shareHub: {
+    category: 'ShareHub HKTVmall 網上社區',
+    icon: '🌐',
+    tags: ['ShareHub', '網上社區', '社交電商', 'KOC', '帖文', '內容行銷', 'Mall Dollar', '跟買', '回贈', '商戶違規', 'sharehub登入', '內容要求', '聯合推廣', 'koc.hktvmall.com'],
+    questions: [
+      {
+        q: '什麼是 ShareHub？目的和優勢是什麼？',
+        a: `ShareHub 是建立於 HKTVmall 應用程式內的網上社區，讓用戶找到感興趣的內容、發掘新商品和話題，以及與其他用戶交流。
+
+創立目的：
+- 為 HKTVmall 注入社交元素，推展社交電商
+- 鼓勵用戶間交流，協助消費決策，增加平台忠誠度
+- 為品牌/商戶提供與客戶交流的平台，建立粉絲群
+- 契合商戶/品牌與內容創作者，打造多元化內容
+
+主要優勢：
+1. 曝光率高 — HKTVmall 每月過百萬活躍用戶
+2. 精準受眾 — 家庭主要決策者、高收入群組、有明確購買意慾的用戶
+3. 一站式內容行銷 — 內容直接連結商品，比社交平台更易觸動購買意慾
+4. 官方協助引流 — HKTVmall 透過 Facebook Fan Page 及 APP 內渠道協助引流
+5. 開拓新粉絲族群 — HKTVmall 用戶群不等於 Facebook/Instagram 用戶群`
+      },
+      {
+        q: '商戶在 ShareHub 發佈帖文有哪些內容要求？什麼不能發佈？',
+        a: `基本要求：
+- 至少上載 1 張圖片
+- 字數：20 字以上
+
+可以發佈的內容：
+- 分享資訊、知識類內容（如科普、開箱）
+- 製造話題、引發討論的內容（鼓勵用戶分享用後感等）
+- 創意形式的商品介紹（如教人如何化妝等）
+
+不可發佈的內容：
+- 直接推銷商店、商品、折扣、減價優惠等
+- 淫褻、不雅、政治敏感內容
+- 透過遊戲方式向 HKTVmall 用戶索取個人資料
+- 將 ShareHub 用戶引流至第三方平台（其他網店、社交媒體連結等）
+
+違規後果：
+- 違規帖文將被刪除，不作另行通知
+- 違規 3 次或以上 → ShareHub 帳戶被停用直至另行通知
+
+詳情可參閱帖文內容要求：http://bit.ly/3EoarY8`
+      },
+      {
+        q: '什麼是 ShareHub「More！多拿！跟買回贈計劃」？',
+        a: `為鼓勵用戶分享內容，ShareHub 推出了「More！多拿！跟買回贈計劃」，所有用戶均可參與。
+
+回贈機制：
+- 帖文創作者：每件透過帖文售出商品售價的 5% Mall Dollar 回贈
+- 跟買用戶：瀏覽帖文後將商品加入購物車並結賬，亦可獲得 5% Mall Dollar 回贈
+
+商戶注意：
+認證商戶分享帖文並標註相關商品後，若其他用戶瀏覽並購買，HKTVmall 會發放 5% Mall Dollar 給用戶；商戶自身不會獲得回贈。
+
+部分分類商品不在計劃範圍內，詳情請參閱條款及細則：https://bit.ly/3qLCvRB`
+      },
+      {
+        q: '如何登入 ShareHub？商戶專用指南在哪裡？',
+        a: `ShareHub 網頁版（試用階段）：
+https://koc.hktvmall.com/landing
+
+現時的登入方法為試用階段，如有任何疑問或困難，請電郵至：
+sharehub.pr.koc@hktv.com.hk
+
+ShareHub 商戶專用指南 PDF：
+https://drive.google.com/file/d/18Wym2Yps2Nyzni_SuFtgtxCTNhYDeo-7/view
+
+商戶亦可透過 HKTVmall 應用程式內的 ShareHub 功能存取。`
+      },
+      {
+        q: 'ShareHub x 商戶聯合推廣是什麼？有哪些成功案例？',
+        a: `ShareHub 提供「商戶聯合推廣」服務，協助品牌進行產品試用活動，覆蓋大量精準受眾。
+
+案例 1 — ShareHub x L'OREAL PARiS：
+招募 2,500+ 試用者申請，50 人試用美髮油，分享用後感參與率達 62%
+
+案例 2 — ShareHub x Pampers：
+800+ 試用者申請，50 人試用，分享用後感參與率 44%，優惠碼使用次數 2,000+
+
+宣傳渠道包括：Message Banner、IG Story、Slider A、社交媒體、Floating Button
+
+如有興趣了解 ShareHub 聯合推廣詳情，請電郵至：
+sharehub.pr.koc@hktv.com.hk`
+      }
+    ]
+  }
+
   }
 
 };
