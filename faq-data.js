@@ -933,7 +933,19 @@ https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5
         q: '貴重貨品（手機/手錶/遊戲機/手提電腦）點包裝？',
         a: '【貴重貨品包裝要求】\n\n顧客對貴重貨品（手提電話、手錶、遊戲機、手提電腦等）要求尤其嚴謹，包裝標準更為嚴格。\n\n包裝建議：\n1. 選擇合適尺寸的紙箱\n2. 利用可重用的環保緩衝物料（瓦通紙、包裝紙）把貨品全方面保護\n3. 固定在包裝箱中心，確保沒有縫隙或移動空間\n4. 如裝箱內包含多件貨品（同一運單），應將每件物件獨立包裝，使用填充物料分隔\n5. 確保產品放置在裝運箱的中間位置，填滿剩餘空間\n\n包裝物料建議（從環保角度）：\n• 瓦通紙（可重用）\n• 包裝紙\n• 蜂巢紙\n\n⚠️ 避免過度包裝：\n• 例如手錶：不應用雙層氣柱袋包裝（改用適當紙箱加填充物）\n• 例如50ml化妝品：不應用過量保鮮紙/氣泡紙包裹（改用bubble公文袋）\n• 例如1L玻璃包裝飲料：不應用過量氣泡紙（改用氣柱袋或蜂巢紙加合適填充物）\n\n過度包裝不只浪費資源，也可能被收取$100過大包裝行政費用。'
       }
-    ]
+    ],
+      {
+        q: '包裝及收貨指引有哪些文件下載？',
+        a: `包裝及收貨指引文件下載：
+
+包裝及收貨指引（中文版）PDF：
+https://drive.google.com/file/u/0/d/1pZrV7xUZKjOjaQ46Fg83AX4YKG4BDBIM/view
+
+Packing & Receiving Guideline（英文版）PDF：
+https://drive.google.com/file/d/1rAPiXNQ7Yf23W7YoMqL9KOcyhVxDdWJf/view
+
+如有包裝問題或疑問，請聯絡商戶服務團隊（MCS）查詢。`
+      }
   },
 
   // Source: https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/After-Sales
@@ -1659,7 +1671,7 @@ MMS 2.0 > 系統 > 商戶賬戶設定 > 開啟「客戶服務通知」功能`
       },
       {
         q: '如何申請加入「減塑先鋒」計劃？',
-        a: '申請步驟：\n1. 準備所有內外包裝物料的相片\n2. 提供內包裝填充物料相片\n3. 提交資料供審批\n審批結果將於一星期後，由商戶關係經理通知商戶。\n有興趣成為「減塑先鋒」一份子，請立即聯絡商戶關係經理報名參加。'
+        a: '申請步驟：\n1. 準備所有內外包裝物料的相片\n2. 提供內包裝（未封箱）的相片\n3. 提供包裝完成（已封箱）的相片\n4. 提交以上資料以供審批\n\n立即網上報名：https://forms.gle/H8ASTEPDPQojDzCUA\n\n審批結果將於一星期後由商戶關係經理通知商戶。\n\n注意事項：\n• 現階段只接受一般貨品（室溫貨）的商戶參與\n• 適用於星期一至五、星期一至六或星期一至日出貨的商戶\n• 暫不適用於「全新商戶派送加盟方案」及海外派送之商戶\n• 倉庫會有專人定期檢查包裝規格；警告後仍未改善將即時取消資格\n• 每月回贈上限為港幣$3,000；以每月PCR實際發出日為準'
       },
       {
         q: '「減塑先鋒」計劃的環保物料有什麼參考標準？',
@@ -2939,10 +2951,130 @@ https://drive.google.com/file/d/1Co5-CFPQAbzLFL3Hima1KmsFLOkA3CxF/view
 **計劃簡介 Google Slides：**
 https://docs.google.com/presentation/d/1u8trzmrj8UL-cnlB-z1Hs9y7nWAJ8FdqUnzd3KCc5IE/present?slide=id.p1
 
+**2026上半年度商戶評級獎勵計劃計分項目及詳情：**
+https://cloud.marketing.hktvmall.com/merchantscorecard_26H1_tnc/
+
 **計劃頁面（包括歷屆得獎商戶）：**
 https://sites.google.com/view/hktv-merc-faq/merchantscorecard
 
 如有疑問，請聯絡您的商戶關係經理。`
+      }
+    ]
+  }
+,
+
+  // === 查詢商家 Customer Chat ===
+  customerChat: {
+    category: '查詢商家（Customer Chat）功能',
+    icon: '💬',
+    tags: ['查詢商家', 'Customer Chat', '客戶服務', '即時聊天', 'MMS', '商戶Admin', '服務時段', '開通', '客服', '在線時間', '購買決策'],
+    questions: [
+      {
+        q: '什麼是「查詢商家」（Customer Chat）功能？如何開通？',
+        a: `「查詢商家」（Customer Chat）讓客人輕鬆在商店或產品頁面中直接與商戶聯繫，進一步了解產品細節，加快客人購買決策。
+
+開通步驟（必須由商戶 Merchant Admin 完成）：
+
+第一步：新增及編輯用戶角色
+MMS > 共享設置 > 商店/用戶設定 > +加/編輯
+
+第二步：設定客戶服務專員的服務時段
+MMS 2.0 後台設定
+
+服務時段基本要求：
+星期一至星期五，每天在線至少 9 小時（包括公眾假期）
+
+第三步：按此立即開通
+（請於 MMS 後台按「立即開通」按鈕）
+
+查詢商家教學 Google Slides：
+https://docs.google.com/presentation/d/1pc34CmbxU_7WOmo05d9NNXhR8jkjjCB15jNhdoLXq0U/present?slide=id.g36f63e85c79_0_148`
+      }
+    ]
+  },
+
+  // === ChicChat 群組聊天 ===
+  chicChat: {
+    category: 'ChicChat 群組聊天功能',
+    icon: '📣',
+    tags: ['ChicChat', '群組聊天', '商戶群組', '優惠推送', '直播推廣', '產品推介', '顧客忠誠度', 'MMS App', '報名', '申請', '群組'],
+    questions: [
+      {
+        q: '什麼是 ChicChat 群組聊天功能？有什麼用途？',
+        a: `ChicChat 是 HKTVmall 的商戶專屬群組聊天功能，讓商戶於專屬群組中與顧客直接對話。
+
+主要用途：
+- 📢 即時發送最新優惠及消息
+- 💡 定期推介產品，提升商品銷售率
+- 🎉 活動及直播推廣，獲得額外曝光機會
+- 直接解決顧客售前疑問，增加顧客忠誠度
+
+注意：商戶必須下載 MMS 手機應用程式才可使用 ChicChat 功能。`
+      },
+      {
+        q: '如何報名及開通 ChicChat 群組聊天功能？',
+        a: `ChicChat 功能現時已正式開放給所有商戶使用。
+
+報名方法（二選一）：
+1. 填寫每月的 ChicChat 聊天群組邀請電郵中的報名表格
+2. 直接填寫報名表格：https://docs.google.com/forms/d/e/1FAIpQLScCbdzo9HR_kMmsIqC6iszBzCzqZK2_kEmnNXX9nFDoxB67cQ/viewform
+
+流程：
+提交報名表格 → HKTVmall 團隊審核 → 收到確認電郵 → 於 MMS App 開通 ChicChat 群組
+
+ChicChat 群組聊天功能簡報 PDF：
+https://drive.google.com/file/d/19HC569QaWkvP2_OH8T2eqydaFl2SynR4/view
+
+ChicChat 用戶指南 PDF：
+https://drive.google.com/file/d/129Exg6yRX7Dc7jFM1rYUxASw3Yj-J4Mu/view`
+      }
+    ]
+  },
+
+  // === 數碼引流合作計劃 ===
+  externalTraffic: {
+    category: '數碼引流合作計劃（External Traffic Referral Program）',
+    icon: '🔗',
+    tags: ['數碼引流', 'External Traffic', 'Referral Program', '引流', '5%佣金', '特惠佣金', '外來渠道', '超連結', '分享連結', '外部流量', '佣金優惠'],
+    questions: [
+      {
+        q: '什麼是數碼引流合作計劃（External Traffic Referral Program）？如何參與？',
+        a: `數碼引流合作計劃讓商戶透過外來渠道宣傳店舖及產品，享受特惠佣金優惠。
+
+計劃詳情：
+- 商戶只需在任何外來渠道（如社交媒體、網站等）宣傳店舖產品或優惠
+- 分享 HKTVmall 相關頁面的指定超連結
+- 符合計劃要求的產品佣金只收 5%！
+
+計劃詳情及報名：
+https://academy.hktvmall.com/externaltrafficreferralprogram
+
+如有任何疑問，請聯絡你的商戶關係經理了解詳情及報名方法。`
+      }
+    ]
+  },
+
+  // === 指定產品特惠佣金 ===
+  specialCommission: {
+    category: '指定產品特惠佣金計劃',
+    icon: '💰',
+    tags: ['特惠佣金', '佣金', '佣金計劃', 'commission', '水果', '運動旅行', '烘焙', '家電', '新年食品', '盆菜', '果籃', '低佣金', 'special commission'],
+    questions: [
+      {
+        q: '什麼是指定產品特惠佣金計劃？哪些產品類別享有特惠佣金？',
+        a: `HKTVmall 定期推出各種特惠佣金計劃，與商戶攜手創造商機，令產品價格更具競爭力。
+
+現時特惠佣金計劃（可能不定期更新，以最新佣金表為準）：
+
+- 水果類別產品：佣金低至 12%
+- 運動旅行及烘焙產品：佣金低至 15%
+- 精選家電品牌：佣金低至 5%
+- 新年節慶食品、盆菜及果籃類別：下調至 15%
+
+查閱最新商品佣金表：
+https://sites.google.com/view/hktv-merc-faq/commission-rates/special-commission-rate
+
+如商戶有出售以上類別產品，並能提供優惠價格參加特惠佣金計劃，歡迎隨時與商戶關係經理聯絡。`
       }
     ]
   }
