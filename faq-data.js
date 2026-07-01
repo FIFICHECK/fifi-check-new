@@ -3078,6 +3078,31 @@ https://sites.google.com/view/hktv-merc-faq/commission-rates/special-commission-
       }
     ]
   }
+,
+
+  // === 商戶入貨攻略 ===
+  productSourcing: {
+    category: '商戶入貨攻略（HKTVmall Keywords Search）',
+    icon: '📈',
+    tags: ['入貨攻略', 'Keywords Search', '關鍵字', '搜尋量', '補貨', '市場先機', '上架攻略', '熱門搜尋', '入貨策略', 'product sourcing', 'keyword data', '未上架產品', '搜尋數據', '趨勢'],
+    questions: [
+      {
+        q: '什麼是「商戶入貨攻略」（HKTVmall Keywords Search）？',
+        a: `「商戶入貨攻略」（HKTVmall Keywords Search）是 HKTVmall Academy 提供的數據工具，助商戶更了解顧客需求，從而制訂入貨及補貨策略。
+
+主要功能：
+- 每週更新關鍵字數據（包括未上架及已上架的產品）
+- 一步到位上架攻略
+- 協助商戶搶佔市場先機
+- 把「搜尋量爆燈」的機會，轉化成實際訂單
+
+登入 HKTVmall Academy 查看：
+https://academy.hktvmall.com/productsourcingstrategy
+
+（需登入 HKTVmall 商戶帳戶方可查看關鍵字數據及每週更新內容）`
+      }
+    ]
+  }
 
   }
 
