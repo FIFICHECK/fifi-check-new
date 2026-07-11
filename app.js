@@ -1395,7 +1395,13 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
 
         <div class="hermes-section">
           <div class="hermes-section-label">📝 答案</div>
-          <div class="hermes-section-content">${formatTextForHtml(hermesAnalysis.answer)}</div>
+          <div class="hermes-section-content" id="hermesAnswer">${formatTextForHtml(hermesAnalysis.answer)}</div>
+          <div class="language-toolbar" data-text="${escapeHtml(hermesAnalysis.answer)}">
+            <button class="lang-btn active" onclick="translateAnswer(this, 'zh-HK')">廣東話</button>
+            <button class="lang-btn" onclick="translateAnswer(this, 'ko')">한국어</button>
+            <button class="lang-btn" onclick="translateAnswer(this, 'en')">ENG</button>
+            <button class="lang-btn" onclick="translateAnswer(this, 'zh-CN')">简中</button>
+          </div>
         </div>
     `;
 
@@ -1570,11 +1576,57 @@ function escapeHtml(text) {
 // 將文字格式化為 HTML：escape HTML 並將換行符轉為 <br>
 function formatTextForHtml(text) {
   if (!text) return '';
-  // Remove language toggle text that qwen sometimes adds
-  return escapeHtml(text)
-    .replace(/\n/g, '<br>')
-    .replace(/<br>\s*[-•·]\s*(?:廣東話|한국어|ENG|English|简中|繁體中文|日本語|中文)\s*[:：]?\s*(?:\n|$)/gi, '')
-    .replace(/(?:廣東話|한국어|ENG|English|简中|繁體中文|日本語|中文)\s*[:：]?<br>/gi, '');
+  return escapeHtml(text).replace(/\n/g, '<br>');
+}
+
+// 語言翻譯功能
+var CURRENT_LANG = 'zh-HK';
+
+function translateAnswer(btn, targetLang) {
+  // Update active button
+  var toolbar = btn.parentElement;
+  var btns = toolbar.querySelectorAll('.lang-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].className = 'lang-btn';
+  }
+  btn.className = 'lang-btn active';
+
+  var text = toolbar.getAttribute('data-text');
+  if (!text) return;
+
+  var answerDiv = toolbar.previousElementSibling;
+  if (!answerDiv) return;
+
+  if (targetLang === 'zh-HK') {
+    // Original Cantonese
+    answerDiv.innerHTML = formatTextForHtml(text);
+    CURRENT_LANG = 'zh-HK';
+    return;
+  }
+
+  // Show loading
+  answerDiv.innerHTML = '<span style="opacity:0.6">⏳ 翻譯中...</span>';
+
+  // Call Google Translate API (free, no key needed)
+  var q = encodeURIComponent(text.slice(0, 1500)); // Limit length
+  var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=' + targetLang + '&dt=t&q=' + q;
+
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var translated = '';
+      for (var i = 0; i < data[0].length; i++) {
+        if (data[0][i]) {
+          translated += data[0][i][0] || '';
+        }
+      }
+      answerDiv.innerHTML = formatTextForHtml(translated);
+      CURRENT_LANG = targetLang;
+    })
+    .catch(function(err) {
+      console.log('Translation failed:', err);
+      answerDiv.innerHTML = formatTextForHtml(text);
+    });
 }
 
 function showTyping(show) {
