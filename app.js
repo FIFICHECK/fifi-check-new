@@ -229,6 +229,30 @@ function keywordSearch(query, topK) {
   return scored.filter(function(r) { return r.score > 0; }).slice(0, topK);
 }
 
+// Search a custom list using the same keyword algorithm
+function keywordSearchOnList(query, list, topK) {
+  topK = topK || 5;
+  if (!list || !list.length) return [];
+  var tokens = expandQuery(query);
+  var q = query.toLowerCase();
+
+  var scored = list.map(function(item) {
+    var faqQ = (item.q || '').toLowerCase();
+    var faqA = (item.a || '').toLowerCase();
+    var score = 0;
+    tokens.forEach(function(token) {
+      if (token.length < 1) return;
+      score += countOccurrences(faqQ, token) * 3;
+      score += countOccurrences(faqA, token);
+    });
+    if (faqQ.indexOf(q) >= 0) score += 20;
+    return { q: item.q, a: item.a, category: item.category || '📚 自訂知識庫', score: score };
+  });
+
+  scored.sort(function(a, b) { return b.score - a.score; });
+  return scored.filter(function(r) { return r.score > 0; }).slice(0, topK);
+}
+
 function trackUnansweredQuestion(question, confidence) {
   try {
     var key = 'fifi_unanswered';
@@ -252,7 +276,24 @@ function getUnansweredQuestions() {
 
 async function searchFAQEnhanced(query, topK) {
   topK = topK || 5;
-  return keywordSearch(query, topK);
+  var results = keywordSearch(query, topK);
+  // Also search custom FAQ
+  try {
+    var customFaqs = LEARNING_ENGINE.getCustomFAQ();
+    if (customFaqs && customFaqs.length > 0) {
+      var customResults = keywordSearchOnList(query, customFaqs, topK);
+      // Merge with main results, dedup by question text
+      var seen = {};
+      results.forEach(function(r) { seen[r.q] = true; });
+      customResults.forEach(function(r) {
+        if (!seen[r.q]) {
+          results.push(r);
+          seen[r.q] = true;
+        }
+      });
+    }
+  } catch(e) {}
+  return results;
 }
 
 async function getRAGContext(query, topK = 5) {
@@ -887,6 +928,9 @@ async function sendMessage() {
         ]);
         await showAssistantResponse(message, faqMatches, hermesAnalysis);
 
+        // Track question in learning engine
+        LEARNING_ENGINE.trackQuestion(message, hermesAnalysis?.confidence || 0, state.user?.username);
+
         // Track unanswered questions for self-learning
         const hasAnyFaqMatch = faqMatches && faqMatches.length > 0 && (faqMatches[0].score || 0) > 0;
         const aiConf = hermesAnalysis?.confidence || 0;
@@ -1402,6 +1446,12 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
             <button class="lang-btn" onclick="translateAnswer(this, 'en')">ENG</button>
             <button class="lang-btn" onclick="translateAnswer(this, 'zh-CN')">简中</button>
           </div>
+          <!-- Feedback Bar -->
+          <div class="feedback-bar">
+            <button class="feedback-btn feedback-btn-up" onclick="LEARNING_ENGINE.recordFeedback('up', hermesAnalysis.answer, '${escapeHtml(userQuestion.replace(/'/g, "\\'"))}'); this.classList.toggle('active');" title="有用 👍">👍</button>
+            <button class="feedback-btn feedback-btn-down" onclick="LEARNING_ENGINE.recordFeedback('down', hermesAnalysis.answer, '${escapeHtml(userQuestion.replace(/'/g, "\\'"))}'); this.classList.toggle('active');" title="無用 👎">👎</button>
+            <button class="feedback-btn btn-add-faq" onclick="LEARNING_ENGINE.addCurrentAnswerToFAQ(this)" title="加入自訂知識庫">➕ FAQ</button>
+          </div>
         </div>
     `;
 
@@ -1498,6 +1548,13 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
 
         <div class="hermes-section">
           <div class="hermes-section-content" style="background: var(--bg-warm); padding: 12px; border-radius: 6px; margin-top: 8px;">${formatTextForHtml(faqMatch.a)}</div>
+        </div>
+
+        <!-- Feedback Bar -->
+        <div class="feedback-bar" style="margin-top:8px;">
+          <button class="feedback-btn feedback-btn-up" onclick="LEARNING_ENGINE.recordFeedback('up', '${escapeHtml(faqMatch.a.replace(/'/g, "\\'"))}', '${escapeHtml(userQuestion.replace(/'/g, "\\'"))}'); this.classList.toggle('active');" title="有用 👍">👍</button>
+          <button class="feedback-btn feedback-btn-down" onclick="LEARNING_ENGINE.recordFeedback('down', '${escapeHtml(faqMatch.a.replace(/'/g, "\\'"))}', '${escapeHtml(userQuestion.replace(/'/g, "\\'"))}'); this.classList.toggle('active');" title="無用 👎">👎</button>
+          <button class="feedback-btn btn-add-faq" onclick="LEARNING_ENGINE.addCurrentAnswerToFAQ(this)" title="加入自訂知識庫">➕ FAQ</button>
         </div>
 
         ${faqMatches.length > 1 ? `
@@ -1628,6 +1685,459 @@ function translateAnswer(btn, targetLang) {
       answerDiv.innerHTML = formatTextForHtml(text);
     });
 }
+
+// ================================================
+// LEARNING ENGINE — Self-Learning System
+// ================================================
+
+var LEARNING_ENGINE = {
+  // ---- Question Tracking ----
+  getStats: function() {
+    try {
+      return JSON.parse(localStorage.getItem('fifi_question_stats') || '{}');
+    } catch(e) { return {}; }
+  },
+  saveStats: function(stats) {
+    try {
+      localStorage.setItem('fifi_question_stats', JSON.stringify(stats));
+    } catch(e) {}
+  },
+  trackQuestion: function(questionText, confidence, storeId) {
+    if (!questionText || questionText.trim().length < 3) return;
+    var stats = this.getStats();
+    var key = questionText.trim().toLowerCase();
+    if (!stats[key]) {
+      stats[key] = {
+        count: 0,
+        firstSeen: Date.now(),
+        lastSeen: Date.now(),
+        storeIds: [],
+        avgConfidence: 0,
+        feedbackUp: 0,
+        feedbackDown: 0
+      };
+    }
+    var entry = stats[key];
+    entry.count = (entry.count || 0) + 1;
+    entry.lastSeen = Date.now();
+    if (storeId && entry.storeIds.indexOf(storeId) < 0) {
+      entry.storeIds.push(storeId);
+    }
+    // Weighted average confidence
+    var oldTotal = (entry.count - 1) * (entry.avgConfidence || 0);
+    entry.avgConfidence = (oldTotal + (confidence || 0.5)) / entry.count;
+    this.saveStats(stats);
+    // Check auto-FAQ condition
+    this.checkAutoFAQ(key, entry);
+  },
+  getTopicHotspots: function() {
+    var stats = this.getStats();
+    var topicCounts = {};
+    // Map questions to SYNONYMS categories
+    for (var key in stats) {
+      var entry = stats[key];
+      var matchedTopic = null;
+      var maxOverlap = 0;
+      for (var i = 0; i < SYNONYMS.length; i++) {
+        var group = SYNONYMS[i];
+        var overlap = 0;
+        for (var j = 0; j < group.length; j++) {
+          if (key.indexOf(group[j].toLowerCase()) >= 0) {
+            overlap++;
+          }
+        }
+        if (overlap > maxOverlap) {
+          maxOverlap = overlap;
+          matchedTopic = group[0];
+        }
+      }
+      if (!matchedTopic) matchedTopic = '其他';
+      if (!topicCounts[matchedTopic]) topicCounts[matchedTopic] = 0;
+      topicCounts[matchedTopic] += entry.count;
+    }
+    // Sort by count descending
+    var sorted = [];
+    for (var t in topicCounts) {
+      sorted.push({ topic: t, count: topicCounts[t] });
+    }
+    sorted.sort(function(a, b) { return b.count - a.count; });
+    return sorted;
+  },
+
+  // ---- Feedback System ----
+  getFeedbackLog: function() {
+    try {
+      return JSON.parse(localStorage.getItem('fifi_feedback_log') || '[]');
+    } catch(e) { return []; }
+  },
+  saveFeedbackLog: function(log) {
+    try {
+      localStorage.setItem('fifi_feedback_log', JSON.stringify(log));
+    } catch(e) {}
+  },
+  recordFeedback: function(type, answerText, questionText) {
+    var log = this.getFeedbackLog();
+    log.push({
+      type: type,
+      answer: answerText ? answerText.slice(0, 200) : '',
+      question: questionText || '',
+      timestamp: Date.now()
+    });
+    if (log.length > 500) log = log.slice(-500);
+    this.saveFeedbackLog(log);
+    // Also update question stats
+    if (questionText) {
+      var stats = this.getStats();
+      var key = questionText.trim().toLowerCase();
+      if (stats[key]) {
+        if (type === 'up') stats[key].feedbackUp = (stats[key].feedbackUp || 0) + 1;
+        if (type === 'down') stats[key].feedbackDown = (stats[key].feedbackDown || 0) + 1;
+        this.saveStats(stats);
+      }
+    }
+    // Show confirmation
+    var btn = type === 'up' ? document.querySelector('.feedback-btn-up.active') : document.querySelector('.feedback-btn-down.active');
+    if (btn) {
+      var originalText = btn.innerHTML;
+      btn.innerHTML = type === 'up' ? '👍 已讚' : '👎 已踩';
+      setTimeout(function() { btn.innerHTML = originalText; }, 1500);
+    }
+  },
+
+  // ---- Custom FAQ System ----
+  getCustomFAQ: function() {
+    try {
+      return JSON.parse(localStorage.getItem('fifi_custom_faq') || '[]');
+    } catch(e) { return []; }
+  },
+  saveCustomFAQ: function(faqs) {
+    try {
+      localStorage.setItem('fifi_custom_faq', JSON.stringify(faqs));
+    } catch(e) {}
+  },
+  addCustomFAQ: function(question, answer, category) {
+    var faqs = this.getCustomFAQ();
+    // Check if exists
+    for (var i = 0; i < faqs.length; i++) {
+      if (faqs[i].q.toLowerCase() === question.toLowerCase()) {
+        showNotification('📚 該問題已在自訂知識庫中');
+        return false;
+      }
+    }
+    faqs.push({
+      q: question,
+      a: answer,
+      category: category || '📚 自訂知識庫',
+      addedBy: state.user ? state.user.username : 'unknown',
+      timestamp: Date.now()
+    });
+    this.saveCustomFAQ(faqs);
+    showNotification('✅ 已加入自訂知識庫');
+    return true;
+  },
+  // One-click add from answer
+  addCurrentAnswerToFAQ: function(btn) {
+    var panel = btn.closest('.hermes-analysis') || btn.closest('.hermes-panel-container');
+    if (!panel) return;
+    var answerDiv = panel.querySelector('.hermes-section-content');
+    if (!answerDiv) return;
+    var questionText = '';
+    // Try to find the user question from conversation
+    var messagesContainer = document.getElementById('messagesContainer');
+    if (messagesContainer) {
+      var userMsgs = messagesContainer.querySelectorAll('.message.user');
+      if (userMsgs.length > 0) {
+        var lastUserMsg = userMsgs[userMsgs.length - 1];
+        questionText = lastUserMsg.textContent || '';
+      }
+    }
+    if (!questionText) {
+      questionText = prompt('請輸入問題文字：');
+      if (!questionText) return;
+    }
+    var answerText = answerDiv.textContent || '';
+    var category = '📚 自訂知識庫';
+    this.addCustomFAQ(questionText.trim(), answerText.trim(), category);
+  },
+
+  // ---- Auto-FAQ Generation ----
+  getPendingFAQ: function() {
+    try {
+      return JSON.parse(localStorage.getItem('fifi_pending_faq') || '[]');
+    } catch(e) { return []; }
+  },
+  savePendingFAQ: function(pending) {
+    try {
+      localStorage.setItem('fifi_pending_faq', JSON.stringify(pending));
+    } catch(e) {}
+  },
+  checkAutoFAQ: function(questionKey, entry) {
+    // Auto-generate FAQ when question asked 3+ times with confidence < 0.5
+    if (entry.count >= 3 && entry.avgConfidence < 0.5) {
+      var pending = this.getPendingFAQ();
+      // Check if already exists
+      for (var i = 0; i < pending.length; i++) {
+        if (pending[i].question.toLowerCase() === questionKey) return;
+      }
+      // Find best available answer from master record
+      var bestAnswer = '';
+      var master = getMasterRecord();
+      for (var storeId in master) {
+        var records = master[storeId];
+        for (var j = 0; j < records.length; j++) {
+          if (records[j].q.toLowerCase().indexOf(questionKey) >= 0) {
+            if (records[j].a && records[j].a.length > bestAnswer.length) {
+              bestAnswer = records[j].a;
+            }
+          }
+        }
+      }
+      pending.push({
+        question: questionKey,
+        suggestedAnswer: bestAnswer || '(需要補充答案)',
+        count: entry.count,
+        firstAsked: new Date(entry.firstSeen).toISOString(),
+        status: 'pending',
+        source: 'auto'
+      });
+      if (pending.length > 50) pending = pending.slice(-50);
+      this.savePendingFAQ(pending);
+    }
+  },
+  approvePendingFAQ: function(index) {
+    var pending = this.getPendingFAQ();
+    if (index < 0 || index >= pending.length) return;
+    var item = pending[index];
+    this.addCustomFAQ(item.question, item.suggestedAnswer);
+    pending.splice(index, 1);
+    this.savePendingFAQ(pending);
+    showNotification('✅ FAQ 已核准並加入自訂知識庫');
+  },
+  rejectPendingFAQ: function(index) {
+    var pending = this.getPendingFAQ();
+    if (index < 0 || index >= pending.length) return;
+    pending.splice(index, 1);
+    this.savePendingFAQ(pending);
+    showNotification('🗑️ 已拒絕 FAQ 建議');
+  },
+
+  // ---- Learning Dashboard ----
+  showDashboard: function() {
+    var modal = document.getElementById('learningModal');
+    if (modal) {
+      this.renderDashboard();
+      modal.style.display = 'flex';
+    }
+  },
+  renderDashboard: function() {
+    var content = document.getElementById('learningContent');
+    if (!content) return;
+    var stats = this.getStats();
+    var topics = this.getTopicHotspots();
+    var pending = this.getPendingFAQ();
+    var feedbackLog = this.getFeedbackLog();
+
+    // Compute stats
+    var totalQuestions = 0;
+    var uniqueQuestions = Object.keys(stats).length;
+    var mostAsked = '';
+    var mostAskedCount = 0;
+    var totalUp = 0, totalDown = 0;
+    for (var key in stats) {
+      var e = stats[key];
+      totalQuestions += e.count || 0;
+      if ((e.count || 0) > mostAskedCount) {
+        mostAskedCount = e.count || 0;
+        mostAsked = e.count > 1 ? key : '';
+      }
+      totalUp += e.feedbackUp || 0;
+      totalDown += e.feedbackDown || 0;
+    }
+    var feedbackRatio = totalUp + totalDown > 0
+      ? Math.round(totalUp / (totalUp + totalDown) * 100)
+      : 0;
+    var unanswered = getUnansweredQuestions();
+
+    // Build HTML
+    var html = '';
+
+    // Stats cards
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;">';
+    html += '<div class="learning-stat-card"><div class="stat-number">' + totalQuestions + '</div><div class="stat-label">總問題數</div></div>';
+    html += '<div class="learning-stat-card"><div class="stat-number">' + uniqueQuestions + '</div><div class="stat-label">獨特問題</div></div>';
+    html += '<div class="learning-stat-card"><div class="stat-number">' + feedbackRatio + '%</div><div class="stat-label">好評率</div></div>';
+    html += '</div>';
+
+    // Hot topics bar chart (top 10)
+    html += '<div class="learning-section"><div class="learning-section-title">🔥 熱門話題 (Top 10)</div>';
+    var topTopics = topics.slice(0, 10);
+    var maxCount = topTopics.length > 0 ? topTopics[0].count : 1;
+    if (topTopics.length === 0) {
+      html += '<p style="color:var(--text-muted);font-size:0.8em;">尚未有足夠數據</p>';
+    } else {
+      for (var i = 0; i < topTopics.length; i++) {
+        var pct = Math.round(topTopics[i].count / maxCount * 100);
+        html += '<div class="topic-bar-row">';
+        html += '<span class="topic-label">' + escapeHtml(topTopics[i].topic) + '</span>';
+        html += '<div class="topic-bar-bg"><div class="topic-bar-fill" style="width:' + pct + '%;"></div></div>';
+        html += '<span class="topic-count">' + topTopics[i].count + '</span>';
+        html += '</div>';
+      }
+    }
+    html += '</div>';
+
+    // Pending FAQ suggestions
+    html += '<div class="learning-section"><div class="learning-section-title">📝 待審核 FAQ 建議</div>';
+    if (pending.length === 0) {
+      html += '<p style="color:var(--text-muted);font-size:0.8em;">目前無待審核建議</p>';
+    } else {
+      for (var i = 0; i < pending.length; i++) {
+        var p = pending[i];
+        html += '<div class="pending-faq-item">';
+        html += '<div class="pending-faq-q">❓ ' + escapeHtml(p.question) + '</div>';
+        if (p.suggestedAnswer && p.suggestedAnswer !== '(需要補充答案)') {
+          html += '<div class="pending-faq-a">💬 ' + escapeHtml(p.suggestedAnswer.slice(0, 150)) + (p.suggestedAnswer.length > 150 ? '...' : '') + '</div>';
+        }
+        html += '<div class="pending-faq-meta">問了 ' + p.count + ' 次</div>';
+        html += '<div class="pending-faq-actions">';
+        html += '<button class="btn btn-primary" style="padding:4px 12px;font-size:0.75em;" onclick="LEARNING_ENGINE.approvePendingFAQ(' + i + '); LEARNING_ENGINE.renderDashboard();">✅ 核准</button>';
+        html += '<button class="btn btn-secondary" style="padding:4px 12px;font-size:0.75em;" onclick="LEARNING_ENGINE.rejectPendingFAQ(' + i + '); LEARNING_ENGINE.renderDashboard();">❌ 拒絕</button>';
+        html += '</div>';
+        html += '</div>';
+      }
+    }
+    html += '</div>';
+
+    // Unanswered tracking
+    html += '<div class="learning-section"><div class="learning-section-title">❓ 未能回答的問題</div>';
+    if (unanswered.length === 0) {
+      html += '<p style="color:var(--text-muted);font-size:0.8em;">目前無記錄</p>';
+    } else {
+      html += '<div style="max-height:200px;overflow-y:auto;">';
+      for (var i = 0; i < Math.min(unanswered.length, 20); i++) {
+        var u = unanswered[i];
+        html += '<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:0.8em;">';
+        html += '<span style="color:var(--text-muted);margin-right:6px;">#' + (i+1) + '</span>';
+        html += escapeHtml(u.q ? u.q.slice(0, 60) : '');
+        html += ' <span style="color:var(--text-muted);font-size:0.85em;">(x' + (u.count || 1) + ')</span>';
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+
+    // Generate Summary button
+    html += '<div style="text-align:center;margin-top:16px;">';
+    html += '<button class="btn btn-primary" onclick="LEARNING_ENGINE.generateSummary()" style="padding:10px 20px;width:auto;font-size:0.85em;">📊 生成學習總結</button>';
+    html += '</div>';
+
+    // Summary area
+    html += '<div id="learningSummary" style="margin-top:16px;"></div>';
+
+    content.innerHTML = html;
+  },
+
+  // ---- Generate Learning Summary via LLM ----
+  generateSummary: function() {
+    var summaryDiv = document.getElementById('learningSummary');
+    if (!summaryDiv) return;
+    summaryDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);">⏳ 正在生成學習總結...</div>';
+
+    var stats = this.getStats();
+    var topics = this.getTopicHotspots();
+    var pending = this.getPendingFAQ();
+    var unanswered = getUnansweredQuestions();
+
+    // Build a compact report
+    var totalQ = 0;
+    var uniqueQ = Object.keys(stats).length;
+    var topQuestions = [];
+    for (var key in stats) {
+      totalQ += stats[key].count || 0;
+      topQuestions.push({ q: key, count: stats[key].count, conf: stats[key].avgConfidence });
+    }
+    topQuestions.sort(function(a, b) { return b.count - a.count; });
+    var top10 = topQuestions.slice(0, 10);
+
+    // Most asked question detail
+    var mostAskedDetail = top10.map(function(item, i) {
+      return (i+1) + '. 「' + item.q + '」(' + item.count + '次, 信心度 ' + Math.round(item.conf*100) + '%)';
+    }).join('\\n');
+
+    // Weak spots
+    var weakSpots = topQuestions.filter(function(item) { return item.conf < 0.4 && item.count >= 2; }).slice(0, 5);
+    var weakDetail = weakSpots.length > 0
+      ? weakSpots.map(function(item) { return '• ' + item.q + ' (' + item.count + '次, 信心度' + Math.round(item.conf*100) + '%)'; }).join('\\n')
+      : '暫無明顯弱點';
+
+    var unansweredDetail = unanswered.slice(0, 10).map(function(item, i) {
+      return (i+1) + '. ' + (item.q || '').slice(0, 60) + ' (x' + (item.count || 1) + ')';
+    }).join('\\n');
+
+    var promptReport = [
+      '===== FIFI CHECK 學習總結報告 =====',
+      '',
+      '【基本統計】',
+      '• 總問題數：' + totalQ,
+      '• 獨特問題：' + uniqueQ,
+      '• 最多問：' + (top10[0] ? top10[0].q : '無'),
+      '',
+      '【最常見問題 Top 10】',
+      mostAskedDetail || '無',
+      '',
+      '【弱點分析（信心度低且被多次提問）】',
+      weakDetail,
+      '',
+      '【未能回答的問題 Top 10】',
+      unansweredDetail || '無',
+      '',
+      '【熱門話題分佈】',
+      topics.slice(0, 5).map(function(t) { return '• ' + t.topic + ': ' + t.count + '次'; }).join('\\n'),
+      '',
+      '請根據以上數據，生成一段學習總結報告，用繁體中文/廣東話書寫。',
+      '分析模式：哪些常見問題FAQ已足夠、哪些需要補充、商戶最關心什麼。',
+      '提供改善建議（200字以內）。'
+    ].join('\\n');
+
+    // Use LLM to generate summary
+    var self = this;
+    (async function() {
+      try {
+        var response = await callLLM(promptReport);
+        // Try to parse as JSON; if fails, use raw text
+        try {
+          var parsed = JSON.parse(response);
+          summaryDiv.innerHTML = '<div class="learning-summary-report">' + formatTextForHtml(parsed.answer || parsed.summary || response) + '</div>';
+        } catch(e) {
+          summaryDiv.innerHTML = '<div class="learning-summary-report">' + formatTextForHtml(response) + '</div>';
+        }
+      } catch(err) {
+        // Fallback: generate report locally
+        var fallbackReport = '📊 學習總結報告\\n\\n';
+        fallbackReport += '📈 基本統計\\n';
+        fallbackReport += '• 總問題數：' + totalQ + '\\n';
+        fallbackReport += '• 獨特問題數：' + uniqueQ + '\\n';
+        fallbackReport += '• 最多被問：' + (top10[0] ? top10[0].q : '無') + ' (' + (top10[0] ? top10[0].count : 0) + '次)\\n\\n';
+        fallbackReport += '🔥 熱門話題 Top 5\\n';
+        topics.slice(0, 5).forEach(function(t) {
+          fallbackReport += '• ' + t.topic + ': ' + t.count + '次\\n';
+        });
+        fallbackReport += '\\n⚠️ 需改善領域\\n';
+        if (weakSpots.length > 0) {
+          weakSpots.forEach(function(item) {
+            fallbackReport += '• ' + item.q + '（信心度低：' + Math.round(item.conf*100) + '%）\\n';
+          });
+        } else {
+          fallbackReport += '• 暫無明顯需要改善的領域\\n';
+        }
+        fallbackReport += '\\n💡 建議\\n';
+        fallbackReport += '• 如發現商戶反覆問同一問題，建議補充相關FAQ\\n';
+        fallbackReport += '• 關注信心度低但高頻的問題，優先補充知識庫';
+        summaryDiv.innerHTML = '<div class="learning-summary-report">' + formatTextForHtml(fallbackReport) + '</div>';
+      }
+    })();
+  }
+};
 
 function showTyping(show) {
   if (show) {

@@ -57,6 +57,7 @@
         </div>
         <div class="chat-header-actions">
           <button class="btn-history" id="btnHistory" title="對話記錄">📜 記錄</button>
+          <button class="btn-learning" id="btnLearning" title="學習儀表板" onclick="LEARNING_ENGINE.showDashboard()">📊 學習</button>
           <button class="btn-logout" id="btnLogoutTop">登出</button>
         </div>
       </div>
@@ -138,9 +139,22 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- FAQ Data -->
+  <!-- Learning Dashboard Modal -->
+  <div class="modal" id="learningModal">
+    <div class="modal-content learning-modal-content">
+      <h3>📊 學習儀表板</h3>
+      <div class="learning-content" id="learningContent">
+        <p style="text-align:center;color:var(--text-muted);padding:40px;">載入中...</p>
+      </div>
+      <div class="modal-buttons">
+        <button class="btn btn-primary" onclick="document.getElementById('learningModal').style.display='none'">關閉</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ Data -->
   <script src="faq-data.js"></script>
   <!-- Main App -->
   <script src="app.js"></script>

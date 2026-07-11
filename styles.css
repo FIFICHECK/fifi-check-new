@@ -1019,3 +1019,235 @@ html, body {
   color: #fff;
   border-color: var(--primary);
 }
+
+/* ================================================
+   Feedback Bar
+   ================================================ */
+
+.feedback-bar {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.feedback-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 0.8em;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.feedback-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--bg-warm);
+}
+
+.feedback-btn.active {
+  border-color: var(--success);
+  color: var(--success);
+  background: rgba(143, 174, 139, 0.1);
+}
+
+.btn-add-faq {
+  margin-left: auto;
+  font-size: 0.75em;
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+
+.btn-add-faq:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ================================================
+   Learning Dashboard Modal
+   ================================================ */
+
+.learning-modal-content {
+  max-width: 580px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  width: 92%;
+}
+
+.learning-content {
+  max-height: 60vh;
+  overflow-y: auto;
+  margin: 15px 0;
+  padding: 10px 0;
+}
+
+.learning-section {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.learning-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.learning-section-title {
+  font-size: 0.9em;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  letter-spacing: 0.03em;
+}
+
+/* Stat Cards */
+.learning-stat-card {
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 12px;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 1.6em;
+  font-weight: 600;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.7em;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Topic Bar Chart */
+.topic-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.topic-label {
+  font-size: 0.78em;
+  color: var(--text-secondary);
+  min-width: 80px;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topic-bar-bg {
+  flex: 1;
+  height: 18px;
+  background: var(--bg-warm);
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.topic-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-light), var(--primary));
+  border-radius: 9px;
+  transition: width 0.5s ease;
+  min-width: 4px;
+}
+
+.topic-count {
+  font-size: 0.75em;
+  color: var(--text-muted);
+  min-width: 30px;
+  text-align: right;
+}
+
+/* Pending FAQ Items */
+.pending-faq-item {
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.pending-faq-q {
+  font-size: 0.85em;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.pending-faq-a {
+  font-size: 0.8em;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.pending-faq-meta {
+  font-size: 0.7em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.pending-faq-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Learning Summary Report */
+.learning-summary-report {
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  font-size: 0.85em;
+  line-height: 1.6;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Learning Button in Chat Header */
+.btn-learning {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.75em;
+  transition: all 0.2s;
+}
+
+.btn-learning:hover {
+  background: var(--bg-warm);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+/* Scrollbar for learning content */
+.learning-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.learning-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.learning-content::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
