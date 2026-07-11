@@ -845,8 +845,134 @@ function handleChatKeydown(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
     if (elements.chatInput.value.trim()) {
+      hideAutocomplete();
       sendMessage();
     }
+  }
+  // Arrow keys for autocomplete navigation
+  var dropdown = document.getElementById('autocompleteDropdown');
+  if (dropdown && dropdown.classList.contains('active')) {
+    var items = dropdown.querySelectorAll('.autocomplete-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      var idx = -1;
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].classList.contains('highlighted')) { idx = i; break; }
+      }
+      if (idx >= 0) items[idx].classList.remove('highlighted');
+      idx = (idx + 1) % items.length;
+      items[idx].classList.add('highlighted');
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      var idx = -1;
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].classList.contains('highlighted')) { idx = i; break; }
+      }
+      if (idx >= 0) items[idx].classList.remove('highlighted');
+      idx = (idx <= 0) ? items.length - 1 : idx - 1;
+      items[idx].classList.add('highlighted');
+    }
+  }
+}
+
+// ---- Autocomplete Debounce ----
+var autocompleteTimer = null;
+
+function handleChatInput() {
+  const hasText = elements.chatInput.value.trim().length > 0;
+  elements.btnSend.disabled = !hasText;
+  elements.btnSend.style.opacity = hasText ? '1' : '0.5';
+  
+  // Smart autocomplete
+  if (autocompleteTimer) clearTimeout(autocompleteTimer);
+  autocompleteTimer = setTimeout(function() {
+    showAutocompleteSuggestions();
+  }, 300);
+}
+
+function showAutocompleteSuggestions() {
+  var input = elements.chatInput;
+  var value = input.value.trim();
+  var dropdown = document.getElementById('autocompleteDropdown');
+  if (!dropdown) return;
+  
+  if (value.length < 2) {
+    dropdown.classList.remove('active');
+    dropdown.innerHTML = '';
+    return;
+  }
+  
+  var lower = value.toLowerCase();
+  var matches = [];
+  var seen = {};
+  
+  // Search ALL_FAQ
+  if (window.ALL_FAQ && window.ALL_FAQ.length > 0) {
+    for (var i = 0; i < window.ALL_FAQ.length; i++) {
+      var q = window.ALL_FAQ[i].q || '';
+      if (q.toLowerCase().indexOf(lower) >= 0 && !seen[q]) {
+        matches.push({ q: q, source: 'FAQ' });
+        seen[q] = true;
+        if (matches.length >= 5) break;
+      }
+    }
+  }
+  
+  // Also search custom FAQ if we have fewer than 5 matches
+  if (matches.length < 5) {
+    try {
+      var customFaqs = LEARNING_ENGINE.getCustomFAQ();
+      if (customFaqs && customFaqs.length > 0) {
+        for (var i = 0; i < customFaqs.length && matches.length < 5; i++) {
+          var q = customFaqs[i].q || '';
+          if (q.toLowerCase().indexOf(lower) >= 0 && !seen[q]) {
+            matches.push({ q: q, source: '📚 自訂' });
+            seen[q] = true;
+          }
+        }
+      }
+    } catch(e) {}
+  }
+  
+  if (matches.length === 0) {
+    dropdown.classList.remove('active');
+    dropdown.innerHTML = '';
+    return;
+  }
+  
+  var html = '';
+  for (var i = 0; i < matches.length; i++) {
+    var icon = matches[i].source === 'FAQ' ? '❓' : '📚';
+    html += '<div class="autocomplete-item" data-question="' + escapeHtml(matches[i].q) + '">';
+    html += '<span class="autocomplete-icon">' + icon + '</span>';
+    html += '<span class="autocomplete-text">' + escapeHtml(matches[i].q) + '</span>';
+    html += '<span class="autocomplete-badge">' + matches[i].source + '</span>';
+    html += '</div>';
+  }
+  dropdown.innerHTML = html;
+  dropdown.classList.add('active');
+  
+  // Add click handlers
+  var items = dropdown.querySelectorAll('.autocomplete-item');
+  for (var i = 0; i < items.length; i++) {
+    (function(item) {
+      item.addEventListener('click', function(e) {
+        var question = this.getAttribute('data-question');
+        if (question) {
+          elements.chatInput.value = question;
+          hideAutocomplete();
+          sendMessage();
+        }
+      });
+    })(items[i]);
+  }
+}
+
+function hideAutocomplete() {
+  var dropdown = document.getElementById('autocompleteDropdown');
+  if (dropdown) {
+    dropdown.classList.remove('active');
+    dropdown.innerHTML = '';
   }
 }
 
@@ -1577,6 +1703,14 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
 
   // Show sub-option chips for broad topics
   showSubOptions(userQuestion);
+
+  // Add quick action buttons to the latest hermes panel
+  if (hermesAnalysis && hermesAnalysis.answer) {
+    var lastPanel = document.querySelector('.hermes-panel-container:last-child');
+    if (lastPanel) {
+      addQuickActions(lastPanel, hermesAnalysis.answer, userQuestion);
+    }
+  }
 }
 
 // ================================================
@@ -2317,6 +2451,479 @@ var LEARNING_ENGINE = {
         summaryDiv.innerHTML = '<div class="learning-summary-report">' + formatTextForHtml(fallbackReport) + '</div>';
       }
     })();
+  },
+
+  // ---- Weak Answers Analysis (Feature 2) ----
+  getWeakAnswers: function() {
+    var feedbackLog = this.getFeedbackLog();
+    var answerStats = {};
+    // Aggregate feedback by answer text
+    for (var i = 0; i < feedbackLog.length; i++) {
+      var fb = feedbackLog[i];
+      var key = fb.answer || '';
+      if (!key) continue;
+      if (!answerStats[key]) answerStats[key] = { up: 0, down: 0, questions: [], lastFeedback: 0 };
+      if (fb.type === 'up') answerStats[key].up++;
+      if (fb.type === 'down') answerStats[key].down++;
+      if (fb.question && answerStats[key].questions.indexOf(fb.question) < 0) {
+        answerStats[key].questions.push(fb.question);
+      }
+      if (fb.timestamp > answerStats[key].lastFeedback) answerStats[key].lastFeedback = fb.timestamp;
+    }
+    // Find weak answers: down > up AND total >= 3
+    var weak = [];
+    for (var key in answerStats) {
+      var s = answerStats[key];
+      var total = s.up + s.down;
+      if (total >= 3 && s.down > s.up) {
+        weak.push({
+          answerText: key,
+          up: s.up,
+          down: s.down,
+          ratio: Math.round(s.up / total * 100),
+          questions: s.questions,
+          totalFeedback: total,
+          lastFeedback: s.lastFeedback
+        });
+      }
+    }
+    weak.sort(function(a, b) { return b.down - a.down; });
+    return weak;
+  },
+
+  getImprovementQueue: function() {
+    try {
+      return JSON.parse(localStorage.getItem('fifi_improvement_queue') || '[]');
+    } catch(e) { return []; }
+  },
+
+  saveImprovementQueue: function(queue) {
+    try {
+      localStorage.setItem('fifi_improvement_queue', JSON.stringify(queue));
+    } catch(e) {}
+  },
+
+  markForImprovement: function(answerText) {
+    var weak = this.getWeakAnswers();
+    var queue = this.getImprovementQueue();
+    for (var i = 0; i < weak.length; i++) {
+      if (weak[i].answerText === answerText) {
+        // Check if already in queue
+        var exists = false;
+        for (var j = 0; j < queue.length; j++) {
+          if (queue[j].currentAnswer === answerText) { exists = true; break; }
+        }
+        if (exists) {
+          showNotification('⚠️ 該答案已在改善隊列中');
+          return;
+        }
+        var question = weak[i].questions.length > 0 ? weak[i].questions[0] : '未知問題';
+        queue.push({
+          question: question,
+          currentAnswer: answerText,
+          suggestedImprovement: '',
+          feedbackRatio: weak[i].ratio + '% (' + weak[i].up + '/' + (weak[i].up + weak[i].down) + ')',
+          timestamp: Date.now(),
+          status: 'pending'
+        });
+        this.saveImprovementQueue(queue);
+        showNotification('✅ 已標記為需改善');
+        return;
+      }
+    }
+    showNotification('⚠️ 未找到該答案');
+  },
+
+  improveWeakAnswers: function() {
+    var queue = this.getImprovementQueue();
+    var pendingItems = [];
+    for (var i = 0; i < queue.length; i++) {
+      if (queue[i].status === 'pending' && !queue[i].suggestedImprovement) {
+        pendingItems.push(queue[i]);
+      }
+    }
+    if (pendingItems.length === 0) {
+      showNotification('✅ 沒有待改善的項目');
+      return;
+    }
+    var self = this;
+    (async function() {
+      for (var idx = 0; idx < pendingItems.length; idx++) {
+        var item = pendingItems[idx];
+        var prompt = '你是一個HKTVmall商戶支援專家。以下答案被商戶評為「不滿意」，請提供改善版本。\n\n';
+        prompt += '問題：' + item.question + '\n';
+        prompt += '當前答案：' + item.currentAnswer + '\n\n';
+        prompt += '要求：\n';
+        prompt += '1. 用繁體中文/廣東話書寫\n';
+        prompt += '2. 更清晰、更具體、更有幫助\n';
+        prompt += '3. 保持口語化但專業\n';
+        prompt += '4. 只回答改善版本的答案內容\n';
+        try {
+          var response = await callLLM(prompt);
+          // Update queue
+          var q = self.getImprovementQueue();
+          for (var j = 0; j < q.length; j++) {
+            if (q[j].currentAnswer === item.currentAnswer && q[j].status === 'pending') {
+              q[j].suggestedImprovement = response.trim();
+              q[j].timestamp = Date.now();
+              break;
+            }
+          }
+          self.saveImprovementQueue(q);
+        } catch(err) {
+          console.log('Improve weak answer failed:', err.message);
+        }
+      }
+      showNotification('✅ 完成改善建議生成');
+      // Re-render dashboard if open
+      var modal = document.getElementById('learningModal');
+      if (modal && modal.style.display === 'flex') {
+        self.renderDashboard();
+      }
+    })();
+  },
+
+  renderWeakAnswersList: function() {
+    var weak = this.getWeakAnswers();
+    var queue = this.getImprovementQueue();
+    var html = '';
+
+    // Weak answers section
+    html += '<div class="learning-section"><div class="learning-section-title">⚠️ 需改善的答案 (差評率高的答案)</div>';
+    if (weak.length === 0) {
+      html += '<p style="color:var(--text-muted);font-size:0.8em;">目前沒有需要改善的答案 — 繼續保持！👍</p>';
+    } else {
+      for (var i = 0; i < Math.min(weak.length, 10); i++) {
+        var w = weak[i];
+        html += '<div class="weak-answer-item">';
+        html += '<div class="weak-question">❓ ' + escapeHtml(w.questions[0] || '未知問題') + '</div>';
+        html += '<div class="weak-answer">💬 ' + escapeHtml(w.answerText.slice(0, 200)) + (w.answerText.length > 200 ? '...' : '') + '</div>';
+        html += '<div class="weak-meta">👍 ' + w.up + ' 👎 ' + w.down + ' | 好評率 ' + w.ratio + '% | 共 ' + w.totalFeedback + ' 次反饋</div>';
+        html += '<div class="weak-actions">';
+        html += '<button class="btn btn-primary" style="padding:4px 12px;font-size:0.75em;" onclick="LEARNING_ENGINE.markForImprovement(\'' + escapeHtml(w.answerText).replace(/'/g, "\\'") + '\'); LEARNING_ENGINE.renderDashboard();">🔧 標記改善</button>';
+        html += '</div>';
+        html += '</div>';
+      }
+    }
+    html += '</div>';
+
+    // Improvement queue section
+    html += '<div class="learning-section"><div class="learning-section-title">🔧 改善隊列</div>';
+    if (queue.length === 0) {
+      html += '<p style="color:var(--text-muted);font-size:0.8em;">目前無改善項目</p>';
+    } else {
+      for (var i = 0; i < Math.min(queue.length, 10); i++) {
+        var qItem = queue[i];
+        html += '<div class="improvement-item">';
+        html += '<div class="improvement-question">❓ ' + escapeHtml(qItem.question) + '</div>';
+        html += '<div class="improvement-current">舊：' + escapeHtml(qItem.currentAnswer.slice(0, 100)) + '</div>';
+        if (qItem.suggestedImprovement) {
+          html += '<div class="improvement-suggested">✨ 改善建議：' + escapeHtml(qItem.suggestedImprovement.slice(0, 200)) + '</div>';
+        }
+        html += '<div style="margin-top:6px;display:flex;gap:8px;align-items:center;">';
+        html += '<span class="improvement-status ' + qItem.status + '">' + qItem.status + '</span>';
+        html += '<span style="font-size:0.7em;color:var(--text-muted);">反饋率: ' + (qItem.feedbackRatio || 'N/A') + '</span>';
+        html += '</div>';
+        html += '</div>';
+      }
+    }
+    html += '</div>';
+
+    // Generate improvement button
+    html += '<div style="text-align:center;margin-bottom:16px;">';
+    html += '<button class="btn btn-primary" onclick="LEARNING_ENGINE.improveWeakAnswers()" style="padding:8px 16px;width:auto;font-size:0.85em;">🤖 自動生成改善建議</button>';
+    html += '</div>';
+
+    return html;
+  },
+
+  // ---- Enhanced Auto-Learning Report (Feature 3) ----
+  generateSummary: function() {
+    var summaryDiv = document.getElementById('learningSummary');
+    if (!summaryDiv) return;
+    summaryDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);">⏳ 正在生成增強學習總結...</div>';
+
+    var stats = this.getStats();
+    var topics = this.getTopicHotspots();
+    var pending = this.getPendingFAQ();
+    var unanswered = getUnansweredQuestions();
+    var weak = this.getWeakAnswers();
+    var feedbackLog = this.getFeedbackLog();
+
+    // Build a compact report
+    var totalQ = 0;
+    var uniqueQ = Object.keys(stats).length;
+    var topQuestions = [];
+    for (var key in stats) {
+      totalQ += stats[key].count || 0;
+      topQuestions.push({ q: key, count: stats[key].count, conf: stats[key].avgConfidence });
+    }
+    topQuestions.sort(function(a, b) { return b.count - a.count; });
+    var top10 = topQuestions.slice(0, 10);
+
+    // Date range
+    var now = new Date();
+    var dateStr = now.toLocaleDateString('zh-HK', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    // Most active day/time analysis
+    var dayCount = { '週日': 0, '週一': 0, '週二': 0, '週三': 0, '週四': 0, '週五': 0, '週六': 0 };
+    var hourCount = {};
+    for (var key in stats) {
+      var entry = stats[key];
+      if (entry.lastSeen) {
+        var d = new Date(entry.lastSeen);
+        var dayNames = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+        var day = dayNames[d.getDay()];
+        if (dayCount[day] !== undefined) dayCount[day] += entry.count || 1;
+        var h = d.getHours();
+        hourCount[h] = (hourCount[h] || 0) + (entry.count || 1);
+      }
+    }
+    var mostActiveDay = '';
+    var maxDayCount = 0;
+    for (var d in dayCount) {
+      if (dayCount[d] > maxDayCount) { maxDayCount = dayCount[d]; mostActiveDay = d; }
+    }
+    var mostActiveHour = '';
+    var maxHourCount = 0;
+    for (var h in hourCount) {
+      if (hourCount[h] > maxHourCount) { maxHourCount = hourCount[h]; mostActiveHour = h + ':00'; }
+    }
+
+    // Most asked question detail
+    var mostAskedDetail = top10.map(function(item, i) {
+      return (i+1) + '. 「' + item.q + '」(' + item.count + '次, 信心度 ' + Math.round(item.conf*100) + '%)';
+    }).join('\\n');
+
+    // Weak spots
+    var weakSpots = topQuestions.filter(function(item) { return item.conf < 0.4 && item.count >= 2; }).slice(0, 5);
+    var weakDetail = weakSpots.length > 0
+      ? weakSpots.map(function(item) { return '• ' + item.q + ' (' + item.count + '次, 信心度' + Math.round(item.conf*100) + '%)'; }).join('\\n')
+      : '暫無明顯弱點';
+
+    var unansweredDetail = unanswered.slice(0, 10).map(function(item, i) {
+      return (i+1) + '. ' + (item.q || '').slice(0, 60) + ' (x' + (item.count || 1) + ')';
+    }).join('\\n');
+
+    var weakAnswersDetail = weak.length > 0
+      ? weak.slice(0, 5).map(function(w, i) {
+          return (i+1) + '. ' + (w.questions[0] || '') + ' (好評率:' + w.ratio + '%, 差評:' + w.down + ')';
+        }).join('\\n')
+      : '暫無差評答案';
+
+    // Topic breakdown
+    var topicDetail = topics.slice(0, 10).map(function(t) {
+      return '• ' + t.topic + ': ' + t.count + '次 (' + Math.round(t.count/totalQ*100) + '%)';
+    }).join('\\n');
+
+    var promptReport = [
+      '===== FIFI CHECK 增強學習總結報告 =====',
+      '',
+      '報告日期：' + dateStr,
+      '',
+      '【基本統計】',
+      '• 總問題數：' + totalQ,
+      '• 獨特問題：' + uniqueQ,
+      '• 最多問：' + (top10[0] ? top10[0].q : '無'),
+      '• 最活躍日：' + mostActiveDay + ' (' + maxDayCount + '次)',
+      '• 最活躍時段：' + mostActiveHour + ' (' + maxHourCount + '次)',
+      '',
+      '【最常見問題 Top 10】',
+      mostAskedDetail || '無',
+      '',
+      '【弱點分析（信心度低且被多次提問）】',
+      weakDetail,
+      '',
+      '【未能回答的問題 Top 10】',
+      unansweredDetail || '無',
+      '',
+      '【差評答案分析】',
+      weakAnswersDetail,
+      '',
+      '【熱門話題分佈】',
+      topicDetail,
+      '',
+      '【改善建議】',
+      '請根據以上數據提供 3-5 個具體改善建議，包括：',
+      '1. 哪些 FAQ 需要更新或補充',
+      '2. 哪些高頻但低信心問題需要關注',
+      '3. 哪些答案需要改善',
+      '4. 整體知識庫覆蓋率評估',
+      '5. 下一步行動建議',
+      '',
+      '請用繁體中文/廣東話書寫，格式清晰美觀。'
+    ].join('\\n');
+
+    var self = this;
+    (async function() {
+      try {
+        var response = await callLLM(promptReport);
+        // Generate beautiful HTML report
+        var reportHtml = self._formatEnhancedReport(response, {
+          dateStr: dateStr,
+          totalQ: totalQ,
+          uniqueQ: uniqueQ,
+          mostAsked: top10[0] ? top10[0].q : '無',
+          mostActiveDay: mostActiveDay,
+          maxDayCount: maxDayCount,
+          mostActiveHour: mostActiveHour,
+          maxHourCount: maxHourCount,
+          top10: top10,
+          topics: topics,
+          weakSpots: weakSpots,
+          weakCount: weak.length,
+          unansweredCount: unanswered.length
+        });
+        summaryDiv.innerHTML = reportHtml;
+      } catch(err) {
+        // Fallback: generate report locally with enhanced formatting
+        var fallbackHtml = self._formatEnhancedReport(null, {
+          dateStr: dateStr,
+          totalQ: totalQ,
+          uniqueQ: uniqueQ,
+          mostAsked: top10[0] ? top10[0].q : '無',
+          mostActiveDay: mostActiveDay,
+          maxDayCount: maxDayCount,
+          mostActiveHour: mostActiveHour,
+          maxHourCount: maxHourCount,
+          top10: top10,
+          topics: topics,
+          weakSpots: weakSpots,
+          weakCount: weak.length,
+          unansweredCount: unanswered.length
+        });
+        summaryDiv.innerHTML = fallbackHtml;
+      }
+    })();
+  },
+
+  _formatEnhancedReport: function(llmResponse, data) {
+    var html = '';
+    // Header with date and copy button
+    html += '<div class="summary-report-header">';
+    html += '<div><strong>📊 增強學習總結報告</strong></div>';
+    html += '<div style="display:flex;gap:8px;align-items:center;">';
+    html += '<span class="summary-date">📅 ' + data.dateStr + '</span>';
+    html += '<button class="btn-copy-report" id="btnCopyReport" onclick="LEARNING_ENGINE._copyReport()">📋 複製報告</button>';
+    html += '</div>';
+    html += '</div>';
+
+    // Stats grid
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">';
+    html += '<div class="learning-stat-card"><div class="stat-number">' + data.totalQ + '</div><div class="stat-label">總問題數</div></div>';
+    html += '<div class="learning-stat-card"><div class="stat-number">' + data.uniqueQ + '</div><div class="stat-label">獨特問題</div></div>';
+    html += '<div class="learning-stat-card"><div class="stat-number">' + data.top10.length + '</div><div class="stat-label">Top 10 佔比</div></div>';
+    html += '</div>';
+
+    // Activity insights
+    html += '<div class="learning-section"><div class="learning-section-title">📈 活躍分析</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
+    html += '<div style="background:var(--bg-warm);padding:10px;border-radius:var(--radius);border:1px solid var(--border);">';
+    html += '<div style="font-size:0.7em;color:var(--text-muted);">最活躍日</div>';
+    html += '<div style="font-size:1.2em;font-weight:600;color:var(--primary);">' + data.mostActiveDay + '</div>';
+    html += '<div style="font-size:0.75em;color:var(--text-muted);">' + data.maxDayCount + ' 次查詢</div>';
+    html += '</div>';
+    html += '<div style="background:var(--bg-warm);padding:10px;border-radius:var(--radius);border:1px solid var(--border);">';
+    html += '<div style="font-size:0.7em;color:var(--text-muted);">最活躍時段</div>';
+    html += '<div style="font-size:1.2em;font-weight:600;color:var(--primary);">' + data.mostActiveHour + '</div>';
+    html += '<div style="font-size:0.75em;color:var(--text-muted);">' + data.maxHourCount + ' 次查詢</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+
+    // Top 10 questions
+    html += '<div class="learning-section"><div class="learning-section-title">🔥 最常見問題 Top 10</div>';
+    html += '<div style="max-height:250px;overflow-y:auto;">';
+    for (var i = 0; i < data.top10.length; i++) {
+      var item = data.top10[i];
+      html += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.8em;">';
+      html += '<span><span style="color:var(--text-muted);margin-right:6px;">#' + (i+1) + '</span>' + escapeHtml(item.q.slice(0, 50)) + '</span>';
+      html += '<span style="color:var(--text-muted);white-space:nowrap;margin-left:8px;">' + item.count + '次 | 信心 ' + Math.round(item.conf*100) + '%</span>';
+      html += '</div>';
+    }
+    html += '</div>';
+    html += '</div>';
+
+    // Category breakdown
+    html += '<div class="learning-section"><div class="learning-section-title">📂 話題分類分佈 (Top 10)</div>';
+    var maxCount = data.topics.length > 0 ? data.topics[0].count : 1;
+    for (var i = 0; i < Math.min(data.topics.length, 10); i++) {
+      var t = data.topics[i];
+      var pct = Math.round(t.count / maxCount * 100);
+      html += '<div class="topic-bar-row">';
+      html += '<span class="topic-label">' + escapeHtml(t.topic) + '</span>';
+      html += '<div class="topic-bar-bg"><div class="topic-bar-fill" style="width:' + pct + '%;"></div></div>';
+      html += '<span class="topic-count">' + t.count + '</span>';
+      html += '</div>';
+    }
+    html += '</div>';
+
+    // Weak spots
+    html += '<div class="learning-section"><div class="learning-section-title">⚠️ 弱點分析</div>';
+    if (data.weakSpots.length > 0) {
+      html += '<div style="font-size:0.8em;color:var(--danger);margin-bottom:8px;">信心度低且被多次提問的問題：</div>';
+      for (var i = 0; i < data.weakSpots.length; i++) {
+        var w = data.weakSpots[i];
+        html += '<div style="padding:4px 0;font-size:0.8em;">• ' + escapeHtml(w.q.slice(0, 60)) + ' (信心 ' + Math.round(w.conf*100) + '%)</div>';
+      }
+    } else {
+      html += '<p style="color:var(--text-muted);font-size:0.8em;">暫無明顯弱點</p>';
+    }
+    html += '<div style="margin-top:8px;font-size:0.8em;color:var(--text-muted);">差評答案：' + data.weakCount + ' 個 | 未能回答：' + data.unansweredCount + ' 個</div>';
+    html += '</div>';
+
+    // LLM insight or fallback
+    html += '<div class="learning-section"><div class="learning-section-title">💡 改善建議與洞察</div>';
+    if (llmResponse) {
+      html += '<div class="learning-summary-report">' + formatTextForHtml(llmResponse) + '</div>';
+    } else {
+      html += '<div class="learning-summary-report">';
+      html += '📈 基本情況：\n';
+      html += '• 總共收到 ' + data.totalQ + ' 個查詢，其中 ' + data.uniqueQ + ' 個為獨特問題\n';
+      html += '• 最常被問到的是「' + escapeHtml(data.mostAsked) + '」\n';
+      html += '• 最活躍於 ' + data.mostActiveDay + ' 的 ' + data.mostActiveHour + ' 時段\n';
+      html += '\n💡 改善建議：\n';
+      html += '• 關注高頻但低信心的問題，優先補充相關 FAQ\n';
+      html += '• 差評答案 (' + data.weakCount + ' 個) 需要重新審視和改善\n';
+      html += '• ' + data.unansweredCount + ' 個未能回答的問題建議補充答案\n';
+      html += '• 建議定期審視學習儀表板，持續優化知識庫';
+      html += '</div>';
+    }
+    html += '</div>';
+
+    return html;
+  },
+
+  _copyReport: function() {
+    var summaryDiv = document.getElementById('learningSummary');
+    if (!summaryDiv) return;
+    var text = summaryDiv.textContent || summaryDiv.innerText;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function() {
+        var btn = document.getElementById('btnCopyReport');
+        if (btn) {
+          btn.innerHTML = '✅ 已複製';
+          btn.classList.add('copied');
+          setTimeout(function() {
+            btn.innerHTML = '📋 複製報告';
+            btn.classList.remove('copied');
+          }, 2000);
+        }
+      }).catch(function() {});
+    } else {
+      // Fallback
+      var textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      var btn = document.getElementById('btnCopyReport');
+      if (btn) {
+        btn.innerHTML = '✅ 已複製';
+        setTimeout(function() { btn.innerHTML = '📋 複製報告'; }, 2000);
+      }
+    }
   }
 };
 
@@ -2664,8 +3271,270 @@ function showNotification(message) {
 }
 
 // ================================================
-// 對外暴露 API
+// Feature 4: One-Click Export 學習數據匯出
 // ================================================
+function exportLearningData(format) {
+  var data = {};
+
+  if (!format || format === 'all') {
+    data = {
+      exportedAt: new Date().toISOString(),
+      stats: LEARNING_ENGINE.getStats(),
+      feedbackLog: LEARNING_ENGINE.getFeedbackLog(),
+      customFAQ: LEARNING_ENGINE.getCustomFAQ(),
+      improvementQueue: LEARNING_ENGINE.getImprovementQueue(),
+      unanswered: getUnansweredQuestions(),
+      pendingFAQ: JSON.parse(localStorage.getItem('fifi_pending_faq') || '[]'),
+      conversationHistory: state.conversationHistory || []
+    };
+  } else if (format === 'feedback') {
+    data = { feedbackLog: LEARNING_ENGINE.getFeedbackLog(), exportedAt: new Date().toISOString() };
+  } else if (format === 'faq') {
+    data = { customFAQ: LEARNING_ENGINE.getCustomFAQ(), exportedAt: new Date().toISOString() };
+  } else if (format === 'stats') {
+    data = { stats: LEARNING_ENGINE.getStats(), exportedAt: new Date().toISOString() };
+  }
+
+  // Convert to CSV
+  var csv = '\uFEFF'; // BOM for UTF-8
+  csv += '匯出時間,FIFI CHECK 學習數據\n';
+  csv += '時間,' + new Date().toLocaleString('zh-HK') + '\n\n';
+
+  // Question stats
+  csv += '=== 問題統計 ===\n';
+  csv += '問題,次數,首次提問,最後提問,平均信心度,👍,👎\n';
+  var stats = LEARNING_ENGINE.getStats();
+  for (var key in stats) {
+    var e = stats[key];
+    csv += '"' + key.replace(/"/g, '""') + '",' +
+      (e.count || 1) + ',' +
+      (e.firstSeen ? new Date(e.firstSeen).toLocaleDateString('zh-HK') : '') + ',' +
+      (e.lastSeen ? new Date(e.lastSeen).toLocaleDateString('zh-HK') : '') + ',' +
+      (e.avgConfidence || 0).toFixed(2) + ',' +
+      (e.feedbackUp || 0) + ',' +
+      (e.feedbackDown || 0) + '\n';
+  }
+
+  // Feedback log (last 50)
+  csv += '\n=== 最近 Feedback ===\n';
+  csv += '類型,問題,時間\n';
+  var feedback = LEARNING_ENGINE.getFeedbackLog().slice(-50);
+  feedback.forEach(function(f) {
+    csv += (f.type === 'up' ? '👍' : '👎') + ',"' +
+      (f.question || '').replace(/"/g, '""') + '","' +
+      new Date(f.timestamp).toLocaleString('zh-HK') + '"\n';
+  });
+
+  // Custom FAQ
+  csv += '\n=== 自訂 FAQ ===\n';
+  csv += '問題,答案,分類,時間\n';
+  LEARNING_ENGINE.getCustomFAQ().forEach(function(f) {
+    csv += '"' + (f.q || '').replace(/"/g, '""') + '","' +
+      (f.a || '').replace(/"/g, '""') + '","' +
+      (f.category || '') + '","' +
+      new Date(f.timestamp).toLocaleString('zh-HK') + '"\n';
+  });
+
+  // Download
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var link = document.createElement('a');
+  var date = new Date().toISOString().slice(0, 10);
+  link.href = url;
+  link.download = 'FIFI_CHECK_學習數據_' + date + '.csv';
+  link.click();
+  URL.revokeObjectURL(url);
+  showNotification('📥 學習數據已匯出！');
+}
+
+// ================================================
+// Feature 5: AI Answer Quality Score
+// ================================================
+LEARNING_ENGINE.calcQualityScore = function(questionText, answerText, confidence) {
+  var score = {
+    total: 0,
+    details: {}
+  };
+
+  // 1. Length score (20%)
+  var len = (answerText || '').length;
+  score.details.length = len > 50 ? 20 : len > 20 ? 10 : 5;
+  if (len > 200) score.details.length = 20;
+
+  // 2. Structure score (20%) — has bullet points or newlines
+  var hasBullets = /[•\-]\s/.test(answerText);
+  var hasNewlines = /\n/.test(answerText);
+  score.details.structure = (hasBullets ? 10 : 0) + (hasNewlines ? 10 : 0);
+
+  // 3. Emoji score (10%) — has emojis
+  var hasEmoji = /[\u{1F000}-\u{1FFFF}]/u.test(answerText);
+  score.details.engagement = hasEmoji ? 10 : 5;
+
+  // 4. Confidence score (30%)
+  score.details.confidence = Math.round((confidence || 0.5) * 30);
+
+  // 5. Feedback score (20%) — from actual user feedback
+  var feedback = this.getFeedbackLog();
+  var relatedFeedback = feedback.filter(function(f) {
+    return f.answer && answerText && f.answer.slice(0, 50) === answerText.slice(0, 50);
+  });
+  var upCount = relatedFeedback.filter(function(f) { return f.type === 'up'; }).length;
+  var downCount = relatedFeedback.filter(function(f) { return f.type === 'down'; }).length;
+  var totalFeedback = upCount + downCount;
+  if (totalFeedback > 0) {
+    score.details.feedback = Math.round((upCount / totalFeedback) * 20);
+  } else {
+    score.details.feedback = 10; // neutral
+  }
+
+  score.total = score.details.length + score.details.structure +
+    score.details.engagement + score.details.confidence + score.details.feedback;
+
+  return score;
+};
+
+// ================================================
+// Feature 6: Quick Action Buttons (Copy / Pin)
+// ================================================
+function addQuickActions(container, answerText, questionText) {
+  var actionsDiv = document.createElement('div');
+  actionsDiv.className = 'quick-actions';
+  actionsDiv.style.cssText = 'display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;';
+
+  // Copy button
+  var copyBtn = document.createElement('button');
+  copyBtn.innerHTML = '📋 Copy';
+  copyBtn.className = 'quick-action-btn';
+  copyBtn.title = '複製答案';
+  copyBtn.onclick = function() {
+    navigator.clipboard.writeText(answerText).then(function() {
+      copyBtn.innerHTML = '✅ 已複製';
+      setTimeout(function() { copyBtn.innerHTML = '📋 Copy'; }, 1500);
+    });
+  };
+  actionsDiv.appendChild(copyBtn);
+
+  // Pin button
+  var pinBtn = document.createElement('button');
+  pinBtn.innerHTML = '📌 Pin';
+  pinBtn.className = 'quick-action-btn';
+  pinBtn.title = '釘選重要答案';
+  pinBtn.onclick = function() {
+    var pinned = JSON.parse(localStorage.getItem('fifi_pinned_answers') || '[]');
+    var exists = pinned.some(function(p) { return p.question === questionText; });
+    if (!exists) {
+      pinned.unshift({
+        question: questionText,
+        answer: answerText.slice(0, 300),
+        timestamp: Date.now()
+      });
+      if (pinned.length > 20) pinned = pinned.slice(0, 20);
+      localStorage.setItem('fifi_pinned_answers', JSON.stringify(pinned));
+      pinBtn.innerHTML = '✅ 已釘選';
+      setTimeout(function() { pinBtn.innerHTML = '📌 Pin'; }, 1500);
+    } else {
+      pinBtn.innerHTML = '📌 已釘選';
+    }
+  };
+  actionsDiv.appendChild(pinBtn);
+
+  // Quality score button
+  var score = LEARNING_ENGINE.calcQualityScore(questionText, answerText, 0.7);
+  var scoreBtn = document.createElement('button');
+  scoreBtn.innerHTML = '🎯 ' + score.total + '/100';
+  scoreBtn.className = 'quick-action-btn';
+  scoreBtn.title = '答案質量評分 (長度:' + score.details.length +
+    ' 結構:' + score.details.structure +
+    ' 互動:' + score.details.engagement +
+    ' 信心:' + score.details.confidence +
+    ' 反饋:' + score.details.feedback + ')';
+  scoreBtn.style.fontSize = '0.72em';
+  scoreBtn.style.opacity = '0.7';
+  actionsDiv.appendChild(scoreBtn);
+
+  // Add to learning report
+  var reportBtn = document.createElement('button');
+  reportBtn.innerHTML = '📊 加報告';
+  reportBtn.className = 'quick-action-btn';
+  reportBtn.title = '加入學習報告';
+  reportBtn.onclick = function() {
+    var reportItems = JSON.parse(localStorage.getItem('fifi_report_items') || '[]');
+    reportItems.unshift({
+      question: questionText,
+      answer: answerText.slice(0, 200),
+      timestamp: Date.now()
+    });
+    if (reportItems.length > 50) reportItems = reportItems.slice(0, 50);
+    localStorage.setItem('fifi_report_items', JSON.stringify(reportItems));
+    reportBtn.innerHTML = '✅ 已加入';
+    setTimeout(function() { reportBtn.innerHTML = '📊 加報告'; }, 1500);
+  };
+  actionsDiv.appendChild(reportBtn);
+
+  // Pin count indicator
+  var pinned = JSON.parse(localStorage.getItem('fifi_pinned_answers') || '[]');
+  if (pinned.length > 0) {
+    var pinCount = document.createElement('span');
+    pinCount.innerHTML = '📌 ' + pinned.length;
+    pinCount.style.cssText = 'font-size:0.72em;color:var(--text-muted);align-self:center;margin-left:4px;';
+    pinCount.title = pinned.length + ' 個已釘選答案';
+    actionsDiv.appendChild(pinCount);
+  }
+
+  container.appendChild(actionsDiv);
+}
+
+// ================================================
+// Feature 6b: Show Pinned Answers in Dashboard
+// ================================================
+LEARNING_ENGINE.showPinnedAnswers = function() {
+  var pinned = JSON.parse(localStorage.getItem('fifi_pinned_answers') || '[]');
+  var container = document.getElementById('learningContent');
+  if (!container) return;
+
+  if (pinned.length === 0) {
+    container.innerHTML += '<div class="learning-section"><div class="learning-section-title">📌 已釘選答案</div><p style="color:var(--text-muted);">暫無釘選答案。喺答案上按 📌 Pin 就可以釘選重要答案。</p></div>';
+    return;
+  }
+
+  var html = '<div class="learning-section"><div class="learning-section-title">📌 已釘選答案 (' + pinned.length + ')</div>';
+  pinned.slice(0, 10).forEach(function(p, i) {
+    html += '<div class="pending-faq-item">' +
+      '<div class="pending-faq-q">❓ ' + escapeHtml(p.question) + '</div>' +
+      '<div class="pending-faq-a">💬 ' + escapeHtml(p.answer) + '</div>' +
+      '<div class="pending-faq-meta">🕐 ' + new Date(p.timestamp).toLocaleString('zh-HK') + '</div>' +
+      '<div class="pending-faq-actions">' +
+      '<button class="btn btn-secondary" style="padding:2px 8px;font-size:0.72em;" onclick="LEARNING_ENGINE.removePinnedAnswer(' + i + '); LEARNING_ENGINE.showPinnedAnswers();">❌ 移除</button>' +
+      '</div></div>';
+  });
+  html += '</div>';
+  container.innerHTML += html;
+};
+
+LEARNING_ENGINE.removePinnedAnswer = function(index) {
+  var pinned = JSON.parse(localStorage.getItem('fifi_pinned_answers') || '[]');
+  pinned.splice(index, 1);
+  localStorage.setItem('fifi_pinned_answers', JSON.stringify(pinned));
+};
+
+// Patch showDashboard to include export button + pinned answers + sync button
+var originalShowDashboard = LEARNING_ENGINE.showDashboard;
+LEARNING_ENGINE.showDashboard = function() {
+  originalShowDashboard.call(this);
+  // Add export button to dashboard header
+  var header = document.querySelector('#learningModal .modal-content h3');
+  if (header && !document.getElementById('btnExportLearning')) {
+    var exportBtn = document.createElement('button');
+    exportBtn.id = 'btnExportLearning';
+    exportBtn.innerHTML = '📥 匯出數據';
+    exportBtn.className = 'btn btn-primary';
+    exportBtn.style.cssText = 'float:right;padding:4px 12px;font-size:0.75em;width:auto;';
+    exportBtn.onclick = function() { exportLearningData('all'); };
+    header.appendChild(exportBtn);
+  }
+  // Add pinned answers section
+  this.showPinnedAnswers();
+};
 
 window.FIFI = {
   state,
