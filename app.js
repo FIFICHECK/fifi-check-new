@@ -1447,9 +1447,9 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
             <button class="lang-btn" onclick="translateAnswer(this, 'zh-CN')">简中</button>
           </div>
           <!-- Feedback Bar -->
-          <div class="feedback-bar">
-            <button class="feedback-btn feedback-btn-up" onclick="LEARNING_ENGINE.recordFeedback('up', hermesAnalysis.answer, '${escapeHtml(userQuestion.replace(/'/g, "\\'"))}'); this.classList.toggle('active');" title="有用 👍">👍</button>
-            <button class="feedback-btn feedback-btn-down" onclick="LEARNING_ENGINE.recordFeedback('down', hermesAnalysis.answer, '${escapeHtml(userQuestion.replace(/'/g, "\\'"))}'); this.classList.toggle('active');" title="無用 👎">👎</button>
+          <div class="feedback-bar" data-answer="${escapeHtml(hermesAnalysis.answer)}">
+            <button class="feedback-btn feedback-btn-up" onclick="LEARNING_ENGINE.recordFeedback('up', this.parentElement.getAttribute('data-answer'), '${escapeHtml(userQuestion.replace(/'/g, "\\'"))}'); this.classList.toggle('active');" title="有用 👍">👍</button>
+            <button class="feedback-btn feedback-btn-down" onclick="LEARNING_ENGINE.recordFeedback('down', this.parentElement.getAttribute('data-answer'), '${escapeHtml(userQuestion.replace(/'/g, "\\'"))}'); this.classList.toggle('active');" title="無用 👎">👎</button>
             <button class="feedback-btn btn-add-faq" onclick="LEARNING_ENGINE.addCurrentAnswerToFAQ(this)" title="加入自訂知識庫">➕ FAQ</button>
           </div>
         </div>
@@ -1573,6 +1573,75 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
     addHermesPanel(hermesHtml);
   } else {
     addMessage('assistant', '抱歉，我暫時未有相關資料。建議聯絡您的 RM 或 FIFI 查服務團隊：3998 8139');
+  }
+
+  // Show sub-option chips for broad topics
+  showSubOptions(userQuestion);
+}
+
+// ================================================
+// 主題子選項 — 廣泛關鍵字時顯示快捷選項晶片
+// ================================================
+var TOPIC_SUB_OPTIONS = {
+  '8小時': [
+    '8小時送貨有咩好處？',
+    '8小時送貨入倉安排係點？',
+    '如何申請加入8小時送貨？'
+  ],
+  '佣金': [
+    '佣金率表有咩分類？',
+    '如何查詢佣金？',
+    '佣金結算週期係點？'
+  ],
+  '上架': [
+    '如何上架新產品？',
+    '上架需要咩資料？',
+    '上架注意事項'
+  ],
+  '退款': [
+    '如何申請退款？',
+    '退款需要幾耐？',
+    '退款政策係點？'
+  ]
+};
+
+function showSubOptions(question) {
+  if (!question) return;
+  var q = question.toLowerCase().trim();
+  var matchedOptions = null;
+  var matchedTopic = '';
+
+  // Check if question matches any broad topic keyword
+  for (var topic in TOPIC_SUB_OPTIONS) {
+    if (q.indexOf(topic.toLowerCase()) >= 0 || topic.toLowerCase().indexOf(q) >= 0) {
+      matchedOptions = TOPIC_SUB_OPTIONS[topic];
+      matchedTopic = topic;
+      break;
+    }
+  }
+
+  if (!matchedOptions || matchedOptions.length === 0) return;
+
+  var chipsHtml = '<div class="hermes-panel-container" style="margin-top:4px;">' +
+    '<div class="hermes-analysis" style="padding:12px 16px;">' +
+    '<div class="hermes-section-label" style="font-size:0.82em;margin-bottom:8px;color:var(--text-secondary);">🔍 您想了解邊方面？</div>' +
+    '<div class="sub-option-chips" style="display:flex;flex-wrap:wrap;gap:8px;">';
+
+  matchedOptions.forEach(function(opt) {
+    var escapedOpt = escapeHtml(opt).replace(/'/g, "\\'");
+    chipsHtml += '<button class="sub-option-chip" onclick="askPreset(\'' + escapedOpt + '\')" ' +
+      'style="background:var(--bg-warm);border:1px solid var(--border);border-radius:18px;padding:7px 14px;' +
+      'cursor:pointer;font-size:0.82em;color:var(--text-primary);transition:all 0.2s;">' +
+      escapeHtml(opt) + '</button>';
+  });
+
+  chipsHtml += '</div></div></div>';
+
+  var container = document.createElement('div');
+  container.innerHTML = chipsHtml;
+  if (elements.messagesContainer) {
+    elements.messagesContainer.appendChild(container);
+    elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
   }
 }
 
