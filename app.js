@@ -1570,7 +1570,11 @@ function escapeHtml(text) {
 // 將文字格式化為 HTML：escape HTML 並將換行符轉為 <br>
 function formatTextForHtml(text) {
   if (!text) return '';
-  return escapeHtml(text).replace(/\n/g, '<br>');
+  // Remove language toggle text that qwen sometimes adds
+  return escapeHtml(text)
+    .replace(/\n/g, '<br>')
+    .replace(/<br>\s*[-•·]\s*(?:廣東話|한국어|ENG|English|简中|繁體中文|日本語|中文)\s*[:：]?\s*(?:\n|$)/gi, '')
+    .replace(/(?:廣東話|한국어|ENG|English|简中|繁體中文|日本語|中文)\s*[:：]?<br>/gi, '');
 }
 
 function showTyping(show) {
