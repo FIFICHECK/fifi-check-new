@@ -182,7 +182,13 @@ function expandQuery(query) {
     for (var j = 0; j < chinese.length; j++) tokens.add(chinese[j]);
   }
 
-  // 3. Synonym expansion
+  // 2b. Korean syllables — add each Korean syllable as a token
+  var korean = q.match(/[\uac00-\ud7af]+/g) || [];
+  korean.forEach(function(word) {
+    if (word.length >= 2) tokens.add(word);
+  });
+
+  // 3. Synonym expansion (Chinese)
   var base = Array.from(tokens);
   base.forEach(function(token) {
     var group = _synonymMap[token];
@@ -196,6 +202,28 @@ function expandQuery(query) {
       });
     }
   });
+
+  // 4. Korean keyword mapping — use KEYWORD_ALIASES to map Korean → Chinese
+  if (window.KEYWORD_ALIASES && korean.length > 0) {
+    var allKorean = korean.join(' ');
+    for (var aliasKey in window.KEYWORD_ALIASES) {
+      // Check if any Korean word matches this key
+      var isKoreanKey = /[\uac00-\ud7af]/.test(aliasKey);
+      if (isKoreanKey && allKorean.indexOf(aliasKey) >= 0) {
+        // Add all Chinese/English aliases as tokens
+        var aliasValues = window.KEYWORD_ALIASES[aliasKey];
+        aliasValues.forEach(function(av) {
+          if (!/[\uac00-\ud7af]/.test(av)) { // Only add non-Korean aliases
+            tokens.add(av);
+            var avChinese = av.replace(/[^一-鿿]/g, '');
+            for (var m = 0; m < avChinese.length - 1; m++) {
+              tokens.add(avChinese.slice(m, m + 2));
+            }
+          }
+        });
+      }
+    }
+  }
 
   return Array.from(tokens);
 }
@@ -1717,6 +1745,11 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
 // 主題子選項 — 廣泛關鍵字時顯示快捷選項晶片
 // ================================================
 var TOPIC_SUB_OPTIONS = {
+  '8시간': [  // 8小時
+    '8시간 배송 혜택이 뭐예요?',
+    '8시간 배송 입고 일정',
+    '8시간 배송 신청 방법'
+  ],
   '8小時': [
     '8小時送貨有咩好處？',
     '8小時送貨入倉安排係點？',
@@ -1838,6 +1871,16 @@ var TOPIC_SUB_OPTIONS = {
   '海外': [
     '如何設定海外送貨？',
     '海外運費如何計算？'
+  ],
+  '사진': [  // 사진/이미지
+    '상품 사진 사이즈 규정이 어떻게 되나요?',
+    '사진 업로드 방법',
+    '사진 요구 사항'
+  ],
+  '이미지': [  // image
+    '이미지 사이즈 규격',
+    '이미지 업로드 가이드',
+    '이미지 요구사항'
   ],
   '圖片': [
     '產品圖片有咩要求？',

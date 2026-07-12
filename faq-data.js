@@ -523,19 +523,55 @@ const KEYWORD_ALIASES = {
   '聯絡': ['contact', 'support', '支援', '協助', 'help', 'cs', '客服', '商戶服務'],
   '支援': ['help', 'support', '協助', '聯絡', '商戶服務團隊'],
 
-  // ===== 送貨時效 =====
+  // ===== 送貨時效
   '快遞': ['物流', '送貨', '快遞公司', 'courier', 'shipment'],
   '配送': ['送貨', '物流', '派送', 'delivery'],
 
-  // ===== 包裝/出貨 =====
-  '包裝': ['packaging', '包裝材料', '包裝效率', 'pack'],
-  '出錯': ['發錯貨', '錯誤', '出錯', 'mistake', 'error', 'accuracy'],
+  // ===== 包裝/出貨
+  '包裝': ['packaging', '包裝材料', 'pack'],
+  '出錯': ['發錯貨', '錯誤', 'mistake', 'error', 'accuracy'],
+
+  // ===== 한국어 (Korean) Keywords — for Korean-speaking merchants
+  '사진': ['圖片', '產品圖片', '相片', 'image', 'photo', 'product image', '사이즈', '규격'],
+  '이미지': ['圖片', '產品圖片', 'image', 'photo', 'product image'],
+  '사이즈': ['尺寸', '大小', '규격', '크기', 'size', 'dimension'],
+  '규격': ['尺寸', '大小', '사이즈', '크기', 'size', 'specification'],
+  '규정': ['要求', '規定', '規則', '條件', 'regulation', 'requirement'],
+  '요구': ['要求', '規定', '條件', 'requirement'],
+  '크기': ['尺寸', '大小', 'size', 'dimension'],
+  '등록': ['上架', '上載', '上傳', 'upload', 'register', 'add product'],
+  '상품': ['產品', '商品', '貨品', 'product', 'item', 'goods'],
+  'SKU': ['SKU', '產品編號', '貨品編號', 'sku id', 'product code'],
+  '가격': ['價格', '價錢', '費用', 'price', 'cost'],
+  '가격표': ['佣金率', '佣金', 'commission', 'rate', '가격'],
+  '주문': ['訂單', 'order', '주문처리', 'order processing'],
+  '발송': ['發貨', '出貨', '送貨', 'ship', 'delivery', 'dispatch'],
+  '배송': ['送貨', '配送', '發貨', 'delivery', 'shipping'],
+  '환불': ['退款', '退款申請', 'refund', '환불요청'],
+  '반품': ['退貨', '退貨申請', 'return', '반품요청'],
+  '재고': ['庫存', '存貨', 'inventory', 'stock'],
+  '광고': ['廣告', 'ad', 'advertising', '광고'],
+  '할인': ['優惠', '折扣', '할인', 'discount', 'promotion'],
+  '프로모션': ['優惠', '推廣', 'promotion', '프로모션'],
+  '카테고리': ['類別', '分類', 'category', '카테고리'],
+  '브랜드': ['品牌', 'brand', '브랜드'],
+  '등록방법': ['上架', '如何上架', 'how to register', 'upload guide'],
+  '로그인': ['登入', 'login', '로그인', '後台登入'],
+  'API': ['API', 'api', '系統對接', 'integration'],
+  '수수료': ['佣金', '佣金率', '手續費', 'commission', 'fee', 'rate'],
+  '포장': ['包裝', 'packaging', '포장'],
+  '물류': ['物流', '配送', '送貨', 'logistics', 'delivery'],
+  '해외배송': ['海外送貨', '海外配送', 'international shipping'],
+  '한국어': ['한국어', 'korean', '한국', 'korea'],
+  '도움말': ['help', '説明', 'help', '도움말'],
+  '방법': ['如何', '方法', 'how to', '방법', 'guide'],
+  '문의': ['查詢', '聯絡', '支援', 'contact', 'inquiry', '문의'],
 };
 
-// 拆分關鍵詞（保留繁體中文分詞）
+// 拆分關鍵詞（保留繁體中文分詞 + 韓文）
 function tokenize(text) {
   return text.toLowerCase()
-    .replace(/[^\w\s\u4e00-\u9fff]/g, ' ')  // 保留中文和英文數字
+    .replace(/[^\w\s\u4e00-\u9fff\uac00-\ud7af]/g, ' ')  // 保留中文、英文數字、韓文
     .split(/\s+/)
     .filter(t => t.length > 0);
 }
@@ -641,3 +677,4 @@ function searchFAQ(query) {
 window.FAQ_DATA = FAQ_DATA;
 window.ALL_FAQ = ALL_FAQ;
 window.searchFAQ = searchFAQ;
+window.KEYWORD_ALIASES = KEYWORD_ALIASES;
