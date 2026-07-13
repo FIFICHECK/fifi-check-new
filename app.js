@@ -1970,6 +1970,21 @@ function showSubOptions(question) {
     }
   }
 
+  // If no direct match, check if question matches any OPTION text (for persistent chips)
+  if (!matchedOptions) {
+    for (var topic in TOPIC_SUB_OPTIONS) {
+      var opts = TOPIC_SUB_OPTIONS[topic];
+      for (var i = 0; i < opts.length; i++) {
+        if (q.indexOf(opts[i].toLowerCase().substring(0, 6)) >= 0) {
+          matchedOptions = opts;
+          matchedTopic = topic;
+          break;
+        }
+      }
+      if (matchedOptions) break;
+    }
+  }
+
   if (!matchedOptions || matchedOptions.length === 0) return;
 
   var chipsHtml = '<div class="hermes-panel-container" style="margin-top:4px;">' +
