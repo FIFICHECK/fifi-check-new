@@ -432,7 +432,7 @@ const FAQ_DATA = {
     icon: "📐",
     questions: [
       {
-        q: "廣告規格一覽 / 所有廣告類別 / Banner 圖片規格 有邊幾種廣告？",
+        q: "總覽 / 有邊幾種廣告 / 廣告一覽",
         a: `HKTVmall 提供 55 種廣告格式，分為三大類別：
 
 📌 圖像廣告 (23類)：包括橫幅廣告、全頁廣告、開頁廣告、彈出式廣告、置頂橫幅、分類橫幅、浮動廣告、關鍵字橫幅等
@@ -444,7 +444,7 @@ const FAQ_DATA = {
 詳細資料請搜尋相關廣告名稱。`
       },
       {
-        q: "橫幅廣告A / Slider A / Slider A 尺寸 / Banner A 規格",
+        q: "橫幅廣告A / Slider A / Slider A 尺寸 / Banner A 規格 / 橫幅廣告A Slider A 規格",
         a: `📐 橫幅廣告 A — Slider A
 
 裝置：網頁及手機應用程式
@@ -458,7 +458,7 @@ const FAQ_DATA = {
 字數限制：欄1=20字元 / 欄2=20字元 / 欄3=15字元 / 欄4=15字元`
       },
       {
-        q: "橫幅廣告B / Slider B / Slider B 尺寸 / Banner B 規格",
+        q: "橫幅廣告B / Slider B / Slider B 尺寸 / Banner B 規格 / 橫幅廣告B Slider B 規格",
         a: `📐 橫幅廣告 B — Slider B
 
 裝置：網頁桌面版及手機應用程式
@@ -472,7 +472,7 @@ const FAQ_DATA = {
 字數限制：欄1=20字元 / 欄2=20字元 / 欄3=15字元 / 欄4=15字元`
       },
       {
-        q: "全頁廣告 / Splash Ad / Splash Ad 尺寸 / 開屏廣告",
+        q: "全頁廣告 / Splash Ad / Splash Ad 尺寸 / 開屏廣告 / 全頁廣告 Splash Ad 規格",
         a: `📐 全頁廣告 — Splash Ad
 
 裝置：手機應用程式

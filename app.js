@@ -1821,8 +1821,8 @@ var TOPIC_SUB_OPTIONS = {
     '如何提升出貨準確度？'
   ],
   '廣告': [
-    '橫幅廣告 A Slider A 規格',
-    '橫幅廣告 B Slider B 規格',
+    '橫幅廣告A Slider A 規格',
+    '橫幅廣告B Slider B 規格',
     '全頁廣告 Splash Ad 規格',
     '開頁廣告 Open App Image 規格',
     '目標導向全頁廣告 Splash Ad Interest Base 規格',
@@ -1840,8 +1840,8 @@ var TOPIC_SUB_OPTIONS = {
     '廣告預算如何設定？'
   ],
   '廣告規格': [
-    '橫幅廣告 A Slider A 規格',
-    '橫幅廣告 B Slider B 規格',
+    '橫幅廣告A Slider A 規格',
+    '橫幅廣告B Slider B 規格',
     '全頁廣告 Splash Ad 規格',
     '開頁廣告 Open App Image 規格',
     '目標導向全頁廣告 Splash Ad Interest Base 規格',
@@ -1876,8 +1876,8 @@ var TOPIC_SUB_OPTIONS = {
   ],
   '圖片規格': [
     '廣告圖片格式通用要求',
-    '橫幅廣告 A Slider A 規格',
-    '橫幅廣告 B Slider B 規格',
+    '橫幅廣告A Slider A 規格',
+    '橫幅廣告B Slider B 規格',
     '全頁廣告 Splash Ad 規格',
     '開頁廣告 Open App Image 規格',
     '浮動標誌廣告 Floating Icon 規格',
