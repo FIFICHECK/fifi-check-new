@@ -1886,6 +1886,27 @@ var TOPIC_SUB_OPTIONS = {
     '加單貨品橫幅廣告 Add On Banner 規格',
     '產品圖片有咩要求？'
   ],
+  '價目表': [
+    '橫幅廣告A價格 / Slider A 收費',
+    '全頁廣告價格 / Splash Ad 收費',
+    '置頂橫幅廣告價格 / Top Banner 收費',
+    'Facebook / Instagram 廣告價格',
+    '廣告價目表 / 廣告價格 / 2026廣告收費'
+  ],
+  '廣告價格': [
+    '橫幅廣告A價格 / Slider A 收費',
+    '全頁廣告價格 / Splash Ad 收費',
+    '置頂橫幅廣告價格 / Top Banner 收費',
+    'Facebook / Instagram 廣告價格',
+    '廣告價目表 / 廣告價格 / 2026廣告收費'
+  ],
+  '廣告收費': [
+    '橫幅廣告A價格 / Slider A 收費',
+    '全頁廣告價格 / Splash Ad 收費',
+    '置頂橫幅廣告價格 / Top Banner 收費',
+    'Facebook / Instagram 廣告價格',
+    '廣告價目表 / 廣告價格 / 2026廣告收費'
+  ],
   '推廣': [
     '如何制定推廣計劃？',
     '如何利用社交媒體推廣？',

@@ -776,6 +776,29 @@ SKU圖片：282 × 345px`
 • 不接受交叉類別推廣`
       }
     ]
+  },
+
+  // ================================================
+  // 類別：廣告價目表 (Rate Card 2026)
+  // ================================================
+  rateCard: {
+    category: "廣告價目表 / 廣告價格",
+    icon: "💰",
+    questions: [
+      {
+        q: "廣告價目表 / 廣告價格 / 2026廣告收費",
+        a: `📋 2026 商戶廣告價目表
+HKTVmall 2026年廣告價格
+
+• 橫幅廣告A Slider A：超級市場 $57,166/星
+• 全頁廣告 Splash Ad：$42,766-w77,454/天
+• 置頂橫幅 Top Banner：超級市場 $27,510/星
+• Instagram: $5,080/me
+• Facebook: $6,342/me
+
+*預約及查詢：crm.adbooking@hktv.com.hk`
+      }
+    ]
   }
 };
 
@@ -936,6 +959,11 @@ const KEYWORD_ALIASES = {
   'Instagram廣告': ['IG廣告', 'ig post', 'ig story', 'instagram推廣', '限時動態'],
   '推播通知': ['push notification', 'app notification', '手機推播', '推播訊息', 'push'],
   'eDM': ['電郵廣告', 'email', 'edm廣告', '電子郵件廣告'],
+  
+  // ===== 廣告價目表 =====
+  '價目表': ['廣告價目表', '廣告價格', '廣告收費', 'rate card', '價錢', '收費', 'pricing', 'price'],
+  '廣告收費': ['廣告價目表', '廣告價格', 'rate card', '收費', 'pricing'],
+  '廣告價格': ['廣告價目表', '收費', 'rate card', '價錢', 'pricing'],
 };
 
 // 拆分關鍵詞（保留繁體中文分詞 + 韓文）
