@@ -472,7 +472,7 @@ const FAQ_DATA = {
 字數限制：欄1=20字元 / 欄2=20字元 / 欄3=15字元 / 欄4=15字元`
       },
       {
-        q: "全頁廣告 / Splash Ad / Splash Ad 尺寸 / 開屏廣告 / 全頁廣告 Splash Ad 規格",
+        q: "全頁廣告 / Splash Ad / Splash Ad 尺寸 / 開屏廣告 / 全頁廣告 Splash Ad 規格 / 目標導向全頁廣告 Splash Ad Interest Base 規格",
         a: `📐 全頁廣告 — Splash Ad
 
 裝置：手機應用程式
@@ -499,7 +499,7 @@ const FAQ_DATA = {
 貨品上限：3件`
       },
       {
-        q: "開頁廣告 / Open App Image / Open App 尺寸 / 進入廣告",
+        q: "開頁廣告 / Open App Image / Open App 尺寸 / 進入廣告 / 開頁廣告 Open App Image 規格",
         a: `📐 開頁廣告 — Open App Image
 
 裝置：手機應用程式
@@ -517,7 +517,7 @@ const FAQ_DATA = {
 語言：只需要中文版本`
       },
       {
-        q: "彈出式廣告 / Crazy Ad / Crazy Ad 尺寸 / 桌面彈出廣告",
+        q: "彈出式廣告 / Crazy Ad / Crazy Ad 尺寸 / 桌面彈出廣告 / 彈出式廣告 Crazy Ad 規格",
         a: `📐 彈出式廣告 — Crazy Ad (桌面版)
 
 裝置：網頁桌面版
@@ -530,7 +530,7 @@ const FAQ_DATA = {
 貨品上限：4件（全店推廣最多6件）`
       },
       {
-        q: "置頂橫幅廣告 / Top Banner / Top Banner 尺寸",
+        q: "置頂橫幅廣告 / Top Banner / Top Banner 尺寸 / 置頂橫幅廣告 Top Banner 規格",
         a: `📐 置頂橫幅廣告 — Top Banner
 
 裝置：網頁桌面版
@@ -543,7 +543,7 @@ const FAQ_DATA = {
 貨品上限：3件`
       },
       {
-        q: "分類橫幅廣告 / Category Banner / 分類橫幅尺寸",
+        q: "分類橫幅廣告 / Category Banner / 分類橫幅尺寸 / 分類橫幅廣告 Category Banner 規格",
         a: `📐 分類橫幅廣告
 
 裝置：網頁桌面版及手機應用程式
@@ -556,7 +556,7 @@ const FAQ_DATA = {
 貨品上限：3件`
       },
       {
-        q: "浮動標誌廣告 / Floating Icon / Floating Icon 尺寸",
+        q: "浮動標誌廣告 / Floating Icon / Floating Icon 尺寸 / 浮動標誌廣告 Floating Icon 規格",
         a: `📐 浮動標誌廣告 — Floating Icon
 
 裝置：手機應用程式
@@ -568,7 +568,7 @@ const FAQ_DATA = {
 字數：最多8個字元`
       },
       {
-        q: "Inspired 橫幅廣告 / Inspired Banner / 13 Landmarks 廣告",
+        q: "Inspired 橫幅廣告 / Inspired Banner / 13 Landmarks 廣告 / Inspired 橫幅廣告 Inspired Banner 規格",
         a: `📐 Inspired 橫幅廣告 — Inspired Banner
 
 裝置：網頁桌面版 / 手機應用程式
@@ -582,7 +582,7 @@ const FAQ_DATA = {
 注意：只限13Landmarks商戶預約`
       },
       {
-        q: "焦點精選 / Featured Wall / Featured Wall 尺寸",
+        q: "焦點精選 / Featured Wall / Featured Wall 尺寸 / 焦點精選 Featured Wall 規格",
         a: `📐 焦點精選 — Featured Wall
 
 裝置：手機應用程式
@@ -596,7 +596,7 @@ const FAQ_DATA = {
 要求：固定字體與界限，必須符合HKTVmall設計範本`
       },
       {
-        q: "加單貨品橫幅廣告 / Add On Banner / Add On Banner 尺寸",
+        q: "加單貨品橫幅廣告 / Add On Banner / Add On Banner 尺寸 / 加單貨品橫幅廣告 Add On Banner 規格",
         a: `📐 加單貨品橫幅廣告 — Add On Banner
 
 裝置：網頁及手機應用程式
@@ -613,7 +613,7 @@ const FAQ_DATA = {
 • 評分必須維持3.5星或以上`
       },
       {
-        q: "排行榜橫幅廣告 / Leaderboard Banner / Leaderboard 尺寸",
+        q: "排行榜橫幅廣告 / Leaderboard Banner / Leaderboard 尺寸 / 排行榜橫幅廣告 Leaderboard Banner 規格",
         a: `📐 排行榜橫幅廣告 — Leaderboard Banner
 
 裝置：手機應用程式
@@ -627,7 +627,7 @@ const FAQ_DATA = {
 注意：SKU必須屬於所選之「次一級」商品類別`
       },
       {
-        q: "贊助廣告貨品標誌 / Product Sponsorship Icon / SKU Icon",
+        q: "贊助廣告貨品標誌 / Product Sponsorship Icon / SKU Icon / 贊助廣告貨品標誌 Product Sponsorship Icon 規格",
         a: `📐 贊助廣告貨品標誌 — Product Sponsorship Icon
 
 裝置：網頁桌面版及手機應用程式
@@ -638,7 +638,7 @@ const FAQ_DATA = {
 注意：商戶可提供SKU ID或自行上載貨品圖片`
       },
       {
-        q: "專屬優惠券 / My Page Coupon / 優惠碼廣告",
+        q: "專屬優惠券 / My Page Coupon / 優惠碼廣告 / 專屬優惠券 My Page Coupon 規格",
         a: `📐 專屬優惠券 — My Page Coupon
 
 裝置：手機應用程式
@@ -652,7 +652,7 @@ const FAQ_DATA = {
 注意：需輸入BB Category Code；Common Code需設定Customer Group ID`
       },
       {
-        q: "貨品贊助清單 / Main Page Sponsor Box / Sponsor Box",
+        q: "貨品贊助清單 / Main Page Sponsor Box / Sponsor Box / 貨品贊助清單 Main Page Sponsor Box 規格",
         a: `📐 貨品贊助清單 — Main Page Sponsor Box
 
 裝置：網頁桌面版及手機應用程式
@@ -663,7 +663,7 @@ const FAQ_DATA = {
 需提交BB Category Code`
       },
       {
-        q: "貨品推廣組合 / Advance Promotion Box / Promotion Box",
+        q: "貨品推廣組合 / Advance Promotion Box / Promotion Box / 貨品推廣組合 Advance Promotion Box 規格",
         a: `📐 貨品推廣組合 — Advance Promotion Box
 
 裝置：網頁桌面版及手機應用程式
@@ -677,7 +677,7 @@ const FAQ_DATA = {
 注意：只限13Landmarks商戶預約`
       },
       {
-        q: "VIP 廣告貨品 / VIP Sponsored Product / VIP廣告",
+        q: "VIP 廣告貨品 / VIP Sponsored Product / VIP廣告 / VIP 廣告貨品 VIP Sponsored Product 規格",
         a: `📐 VIP 廣告貨品 — VIP Sponsored Product
 
 裝置：網頁桌面版及手機應用程式
@@ -692,7 +692,7 @@ const FAQ_DATA = {
 • 貨品不能同時享有大手折扣或換購優惠`
       },
       {
-        q: "購物車推薦 / Cart Recommendation / ATC Bubble",
+        q: "購物車推薦 / Cart Recommendation / ATC Bubble / 購物車推薦 Cart Recommendation 規格",
         a: `📐 購物車推薦 — Cart Recommendation
 
 裝置：手機應用程式
@@ -704,7 +704,7 @@ const FAQ_DATA = {
 每個廣告之間有10分鐘間隔`
       },
       {
-        q: "手機推播訊息 / App Notification / Push Notification",
+        q: "手機推播訊息 / App Notification / Push Notification / 手機推播訊息 App Notification 規格",
         a: `📐 手機推播訊息 — App Notification
 
 裝置：手機應用程式
@@ -716,7 +716,7 @@ const FAQ_DATA = {
 建議包含表情符號及呼籲字句`
       },
       {
-        q: "Facebook 推廣帖子 / Facebook Post / FB廣告",
+        q: "Facebook 推廣帖子 / Facebook Post / FB廣告 / Facebook 推廣帖子規格",
         a: `📐 Facebook 推廣帖子
 
 格式：JPEG / MP4
@@ -726,7 +726,7 @@ const FAQ_DATA = {
 需提供帖子內容及圖片或影片`
       },
       {
-        q: "Instagram 推廣帖子及限時動態 / IG Post & Story / IG廣告",
+        q: "Instagram 推廣帖子及限時動態 / IG Post & Story / IG廣告 / Instagram 推廣帖子及限時動態規格",
         a: `📐 Instagram 推廣帖子及限時動態
 
 格式：JPEG / MP4
@@ -738,7 +738,7 @@ const FAQ_DATA = {
 需提供帖子內容及圖片或影片`
       },
       {
-        q: "皇牌橫幅廣告 / Hero Slider / Hero Slider 尺寸 (時尚服飾)",
+        q: "皇牌橫幅廣告 / Hero Slider / Hero Slider 尺寸 (時尚服飾) / 皇牌橫幅廣告 Hero Slider 規格（時尚服飾）",
         a: `📐 皇牌橫幅廣告 — Hero Slider（護膚化妝及時尚服飾適用）
 
 格式：PNG / JPEG / GIF
@@ -746,7 +746,7 @@ const FAQ_DATA = {
 SKU圖片：288 × 288px`
       },
       {
-        q: "本週人氣店 / Weekly Best Store (時尚服飾)",
+        q: "本週人氣店 / Weekly Best Store (時尚服飾) / 本週人氣店 Weekly Best Store 規格（時尚服飾）",
         a: `📐 本週人氣店 — Weekly Best Store（護膚化妝及時尚服飾適用）
 
 格式：PNG / JPEG / GIF
@@ -754,7 +754,114 @@ SKU圖片：288 × 288px`
 SKU圖片：282 × 345px`
       },
       {
-        q: "廣告圖片格式要求 / Banner 圖片格式 / 廣告檔案格式",
+        q: "類別主頁廣告 B / Street Banner B / 類別主頁廣告 B Street Banner B 規格",
+        a: `📐 類別主頁廣告 B — Street Banner B
+
+裝置：網頁桌面版及手機應用程式
+位置：自訂類別版面
+期限：3天 / 4天 / 1星期
+曝光率：25%
+格式：JPEG
+檔案大小：< 190KB
+像素：
+• Web：210 × 55px
+• App：750 × 140px
+貨品上限：Web 1件 / App 3件
+
+注意：折扣推廣可擺放更多貨品`
+      },
+      {
+        q: "分類橫幅廣告 B / Category Banner B / 分類橫幅廣告 B Category Banner B 規格",
+        a: `📐 分類橫幅廣告 B — Category Banner B
+
+裝置：手機應用程式
+位置：商品分類頁面 / 搜尋結果頁
+期限：1星期
+曝光率：100%
+格式：JPEG
+檔案大小：< 190KB
+像素：
+• 1080 × 500px
+• 540 × 1266px
+• 729 × 786px
+貨品上限：4件（搜尋頁2件）`
+      },
+      {
+        q: "Section Banner 桌面版 / Section Banner (Desktop) / Section Banner 桌面版規格",
+        a: `📐 分類橫幅廣告 — Section Banner (Desktop)
+
+裝置：網頁桌面版
+位置：自訂類別版面
+期限：1星期
+曝光率：50%
+格式：JPEG
+檔案大小：< 190KB
+像素：1080 × 222px
+貨品上限：3件`
+      },
+      {
+        q: "浮動圖像廣告（桌面版）/ Floating Banner (Desktop) / 浮動圖像廣告 Floating Banner 規格",
+        a: `📐 浮動圖像廣告 — Floating Banner (Desktop)
+
+裝置：網頁桌面版
+期限：1星期
+曝光率：100%
+格式：JPEG
+檔案大小：< 190KB
+像素：100 × 230px
+字數：最多8個字元`
+      },
+      {
+        q: "關鍵字橫幅廣告 / Keyword Search Banner / 關鍵字橫幅廣告 Keyword Search Banner 規格",
+        a: `📐 關鍵字橫幅廣告 — Keyword Search Banner
+
+裝置：網頁桌面版及手機應用程式
+位置：搜尋頁面
+期限：1星期
+曝光率：100%
+格式：JPEG
+檔案大小：< 190KB
+像素：188 × 222px
+貨品上限：3件`
+      },
+      {
+        q: "我的清單橫幅廣告 / My List Banner / 我的清單橫幅廣告 My List Banner 規格",
+        a: `📐 我的清單橫幅廣告 — My List Banner
+
+裝置：網頁桌面版及手機應用程式
+位置：我的清單
+期限：1星期
+曝光率：50%
+格式：JPEG
+檔案大小：< 190KB
+像素：
+• Web：998 × 113px
+• App：1125 × 216px
+貨品上限：2件`
+      },
+      {
+        q: "熱門搜尋直幅廣告 / Hot Search Banner / 熱門搜尋直幅廣告 Hot Search Banner 規格",
+        a: `📐 熱門搜尋直幅廣告 — Hot Search Banner
+
+裝置：手機應用程式
+位置：自訂類別版面
+期限：1星期
+曝光率：10%
+格式：JPEG
+檔案大小：< 190KB
+像素：576 × 768px
+貨品上限：1件`
+      },
+      {
+        q: "焦點精選 / Featured Wall / Featured Wall 尺寸 / 焦點精選 Featured Wall 規格（時尚服飾）",
+        a: `📐 焦點精選 — Featured Wall（護膚化妝及時尚服飾適用）
+
+格式：PNG / JPEG / GIF
+尺寸：405 × 546px
+要求：固定字體與界限，必須符合HKTVmall設計範本`
+      },
+      {
+        q: "廣告圖片格式要求 / Banner 圖片格式 / 廣告檔案格式 / 廣告圖片格式通用要求",
         a: `📌 HKTVmall 廣告圖片格式通用要求：
 
 ✅ 圖像廣告：JPEG 為主
