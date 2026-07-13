@@ -422,6 +422,360 @@ const FAQ_DATA = {
         a: `申請加入8小時送貨計劃：\n\n1️⃣ 聯絡您的 RM（商戶關係經理）\n2️⃣ 了解計劃詳情及要求\n3️⃣ 確認商品適合8小時配送\n4️⃣ 簽署相關協議\n5️⃣ 安排入倉\n\n💡 建議先了解入倉時間表同配送要求再決定。\n\n📖 詳細資料：https://sites.google.com/view/hktv-merc-faq/%E7%AC%AC%E4%B8%80%E9%9A%8E%E6%AE%B5/Fulfilment/delivery-mode/%E5%95%86%E6%88%B68%E5%B0%8F%E6%99%82%E9%80%81%E8%B2%A8%E8%A8%88%E5%8A%83`
       }
     ]
+  },
+
+  // ================================================
+  // 類別：廣告規格 (Ad Specs)
+  // ================================================
+  adSpecs: {
+    category: "廣告規格 / Banner 圖片規格",
+    icon: "📐",
+    questions: [
+      {
+        q: "廣告規格一覽 / 所有廣告類別 / Banner 圖片規格 有邊幾種廣告？",
+        a: `HKTVmall 提供 55 種廣告格式，分為三大類別：
+
+📌 圖像廣告 (23類)：包括橫幅廣告、全頁廣告、開頁廣告、彈出式廣告、置頂橫幅、分類橫幅、浮動廣告、關鍵字橫幅等
+
+📌 其他類型廣告 (22類)：包括貨品贊助清單、推廣組合、分類廣告貨品、熱賣品牌、推薦項目、閃購廣告、VIP廣告、熱門搜尋、加單廣告、購物車推薦、推播訊息、電郵廣告、Facebook/IG廣告等
+
+📌 護膚化妝及時尚服飾指引 (10類)：包括 Hero Slider、Weekly Best Store、Featured Wall、Slider A/B、Sponsorship Icon 及文字/背景/價錢/顏色處理指引
+
+詳細資料請搜尋相關廣告名稱。`
+      },
+      {
+        q: "橫幅廣告A / Slider A / Slider A 尺寸 / Banner A 規格",
+        a: `📐 橫幅廣告 A — Slider A
+
+裝置：網頁及手機應用程式
+位置：自訂類別版面
+期限：3天 / 4天 / 1星期
+曝光率：7-10%
+格式：JPEG
+檔案大小：< 190KB
+像素：1080 × 500px
+貨品上限：4件（全店折扣推廣最多6件）
+字數限制：欄1=20字元 / 欄2=20字元 / 欄3=15字元 / 欄4=15字元`
+      },
+      {
+        q: "橫幅廣告B / Slider B / Slider B 尺寸 / Banner B 規格",
+        a: `📐 橫幅廣告 B — Slider B
+
+裝置：網頁桌面版及手機應用程式
+位置：自訂類別版面
+期限：1星期
+曝光率：20%
+格式：JPEG
+檔案大小：< 190KB
+像素：1080 × 500px
+貨品上限：4件
+字數限制：欄1=20字元 / 欄2=20字元 / 欄3=15字元 / 欄4=15字元`
+      },
+      {
+        q: "全頁廣告 / Splash Ad / Splash Ad 尺寸 / 開屏廣告",
+        a: `📐 全頁廣告 — Splash Ad
+
+裝置：手機應用程式
+位置：主頁
+期限：1天
+曝光率：25%
+格式：JPEG
+檔案大小：< 500KB
+像素：768 × 1152px
+貨品上限：3件
+注意：請勿在廣告右上方放置資訊，避免被關閉按鈕遮擋`
+      },
+      {
+        q: "目標導向全頁廣告 / Splash Ad Interest Base / 隨機派放廣告",
+        a: `📐 目標導向全頁廣告 — Splash Ad Interest Base
+
+裝置：手機應用程式
+位置：隨機派放
+期限：7天
+曝光率：25%
+格式：JPEG
+檔案大小：< 500KB
+像素：768 × 1152px
+貨品上限：3件`
+      },
+      {
+        q: "開頁廣告 / Open App Image / Open App 尺寸 / 進入廣告",
+        a: `📐 開頁廣告 — Open App Image
+
+裝置：手機應用程式
+位置：進入手機應用程式
+期限：1天
+曝光率：50%
+格式：JPEG
+檔案大小：< 190KB
+像素：
+• iOS：750 × 1334px
+• iPad：1536 × 2048px
+• Android：1080 × 1920px
+貨品上限：4件
+推廣類型：只限全店折扣優惠
+語言：只需要中文版本`
+      },
+      {
+        q: "彈出式廣告 / Crazy Ad / Crazy Ad 尺寸 / 桌面彈出廣告",
+        a: `📐 彈出式廣告 — Crazy Ad (桌面版)
+
+裝置：網頁桌面版
+位置：自訂類別版面
+期限：1天
+曝光率：50%
+格式：JPEG
+檔案大小：< 190KB
+像素：1080 × 500px
+貨品上限：4件（全店推廣最多6件）`
+      },
+      {
+        q: "置頂橫幅廣告 / Top Banner / Top Banner 尺寸",
+        a: `📐 置頂橫幅廣告 — Top Banner
+
+裝置：網頁桌面版
+位置：自訂類別版面
+期限：3天 / 4天 / 1星期
+曝光率：50%
+格式：JPEG
+檔案大小：< 190KB
+像素：1188 × 140px
+貨品上限：3件`
+      },
+      {
+        q: "分類橫幅廣告 / Category Banner / 分類橫幅尺寸",
+        a: `📐 分類橫幅廣告
+
+裝置：網頁桌面版及手機應用程式
+位置：自訂類別版面 - 「次一級」商品類別
+期限：1星期
+曝光率：100%
+格式：JPEG
+檔案大小：< 190KB
+像素：1080 × 222px
+貨品上限：3件`
+      },
+      {
+        q: "浮動標誌廣告 / Floating Icon / Floating Icon 尺寸",
+        a: `📐 浮動標誌廣告 — Floating Icon
+
+裝置：手機應用程式
+期限：1天
+曝光率：50%
+格式：PNG with shadow
+檔案大小：< 50KB
+像素：366 × 366px
+字數：最多8個字元`
+      },
+      {
+        q: "Inspired 橫幅廣告 / Inspired Banner / 13 Landmarks 廣告",
+        a: `📐 Inspired 橫幅廣告 — Inspired Banner
+
+裝置：網頁桌面版 / 手機應用程式
+位置：13 Landmarks
+期限：1星期
+曝光率：100%
+格式：JPEG
+檔案大小：< 190KB
+像素：600 × 277px
+貨品上限：3件
+注意：只限13Landmarks商戶預約`
+      },
+      {
+        q: "焦點精選 / Featured Wall / Featured Wall 尺寸",
+        a: `📐 焦點精選 — Featured Wall
+
+裝置：手機應用程式
+位置：自訂類別版面
+期限：3天 / 4天 / 1星期
+曝光率：10%
+格式：JPEG
+檔案大小：< 190KB
+像素：405 × 546px
+貨品上限：1件
+要求：固定字體與界限，必須符合HKTVmall設計範本`
+      },
+      {
+        q: "加單貨品橫幅廣告 / Add On Banner / Add On Banner 尺寸",
+        a: `📐 加單貨品橫幅廣告 — Add On Banner
+
+裝置：網頁及手機應用程式
+位置：追加購物清單版面（第一/二/三張）
+期限：1星期
+曝光率：100%
+格式：JPEG
+檔案大小：< 190KB
+像素：125 × 255px
+貨品上限：2件（全店推廣最多3件）
+要求：
+• 加單貨品價錢必須比PSP為低
+• 需提供完整SKU ID、RSP、加單價錢
+• 評分必須維持3.5星或以上`
+      },
+      {
+        q: "排行榜橫幅廣告 / Leaderboard Banner / Leaderboard 尺寸",
+        a: `📐 排行榜橫幅廣告 — Leaderboard Banner
+
+裝置：手機應用程式
+位置：對應「次一級」商品類別內的排行榜頁面
+期限：1星期
+曝光率：100%
+格式：JPEG
+檔案大小：< 190KB
+像素：1080 × 222px
+貨品上限：3件
+注意：SKU必須屬於所選之「次一級」商品類別`
+      },
+      {
+        q: "贊助廣告貨品標誌 / Product Sponsorship Icon / SKU Icon",
+        a: `📐 贊助廣告貨品標誌 — Product Sponsorship Icon
+
+裝置：網頁桌面版及手機應用程式
+位置：自訂類別版面
+期限：1個月
+曝光率：100%
+貨品上限：1件
+注意：商戶可提供SKU ID或自行上載貨品圖片`
+      },
+      {
+        q: "專屬優惠券 / My Page Coupon / 優惠碼廣告",
+        a: `📐 專屬優惠券 — My Page Coupon
+
+裝置：手機應用程式
+位置：帳戶/設定 - 優惠券
+期限：1星期
+優惠碼類型：Unique Code 或 Common Code
+需提交：標題 / 優惠詳情 / BBCode
+標題字數：最多10字元
+優惠詳情字數：最多60字元
+貨品上限：4件
+注意：需輸入BB Category Code；Common Code需設定Customer Group ID`
+      },
+      {
+        q: "貨品贊助清單 / Main Page Sponsor Box / Sponsor Box",
+        a: `📐 貨品贊助清單 — Main Page Sponsor Box
+
+裝置：網頁桌面版及手機應用程式
+位置：自訂類別版面第1位
+期限：1星期
+曝光率：100%
+要求：必須推廣至少6件貨品或以上
+需提交BB Category Code`
+      },
+      {
+        q: "貨品推廣組合 / Advance Promotion Box / Promotion Box",
+        a: `📐 貨品推廣組合 — Advance Promotion Box
+
+裝置：網頁桌面版及手機應用程式
+位置：13 Landmarks
+期限：1星期
+曝光率：100%
+格式：JPEG
+檔案大小：< 190KB
+像素：1080 × 500px
+要求：最少6件貨品，最多3張圖片（HKTVmall只提供1張設計）
+注意：只限13Landmarks商戶預約`
+      },
+      {
+        q: "VIP 廣告貨品 / VIP Sponsored Product / VIP廣告",
+        a: `📐 VIP 廣告貨品 — VIP Sponsored Product
+
+裝置：網頁桌面版及手機應用程式
+位置：VIP頁面 - 指定類別版面
+期限：3天（星期三至五）
+曝光率：100%
+貨品上限：1件
+要求：
+• VIP價格須維持三日
+• 相比過去三週平均售價低5%
+• 產品評分必須在3.5星或以上
+• 貨品不能同時享有大手折扣或換購優惠`
+      },
+      {
+        q: "購物車推薦 / Cart Recommendation / ATC Bubble",
+        a: `📐 購物車推薦 — Cart Recommendation
+
+裝置：手機應用程式
+位置：產品加入購物車後彈出
+期限：1星期
+曝光率：40-50%
+貨品上限：4件
+注意：根據客人已添加到購物車的產品顯示相同次一級類別廣告
+每個廣告之間有10分鐘間隔`
+      },
+      {
+        q: "手機推播訊息 / App Notification / Push Notification",
+        a: `📐 手機推播訊息 — App Notification
+
+裝置：手機應用程式
+期限：1天
+圖片：720 × 720px
+格式：JPEG <190KB
+只限中文訊息
+標題最多18個字元（包括表情符號）
+建議包含表情符號及呼籲字句`
+      },
+      {
+        q: "Facebook 推廣帖子 / Facebook Post / FB廣告",
+        a: `📐 Facebook 推廣帖子
+
+格式：JPEG / MP4
+圖片像素：至少1080 × 1080px
+檔案大小：圖片<500KB / 影片<2MB
+只限中文訊息
+需提供帖子內容及圖片或影片`
+      },
+      {
+        q: "Instagram 推廣帖子及限時動態 / IG Post & Story / IG廣告",
+        a: `📐 Instagram 推廣帖子及限時動態
+
+格式：JPEG / MP4
+帖子像素：1080 × 1080px
+帖子影片：1080×1350 / 1080×608 / 1080×1080px（15秒）
+限時動態圖片：1080 × 1920px
+限時動態影片：1080 × 1920px（15秒）
+只限中文訊息
+需提供帖子內容及圖片或影片`
+      },
+      {
+        q: "皇牌橫幅廣告 / Hero Slider / Hero Slider 尺寸 (時尚服飾)",
+        a: `📐 皇牌橫幅廣告 — Hero Slider（護膚化妝及時尚服飾適用）
+
+格式：PNG / JPEG / GIF
+尺寸：1179 × 1884px
+SKU圖片：288 × 288px`
+      },
+      {
+        q: "本週人氣店 / Weekly Best Store (時尚服飾)",
+        a: `📐 本週人氣店 — Weekly Best Store（護膚化妝及時尚服飾適用）
+
+格式：PNG / JPEG / GIF
+尺寸：990 × 990px
+SKU圖片：282 × 345px`
+      },
+      {
+        q: "廣告圖片格式要求 / Banner 圖片格式 / 廣告檔案格式",
+        a: `📌 HKTVmall 廣告圖片格式通用要求：
+
+✅ 圖像廣告：JPEG 為主
+✅ 浮動標誌：PNG with shadow
+✅ 時尚服飾類：PNG / JPEG / GIF 均可
+
+📏 檔案大小限制：
+• 一般橫幅廣告：< 190KB
+• 全頁廣告（Splash）：< 500KB
+• 浮動標誌：< 50KB
+
+📐 字數換算規則：
+• 每2個數字/英文字母 = 1個字元
+• 中文字 = 1個字元
+
+📋 設計注意：
+• 避免廣告訊息被遮擋（留意安全區域）
+• 全店折扣推廣可擺放更多貨品
+• 不接受交叉類別推廣`
+      }
+    ]
   }
 };
 
@@ -566,6 +920,22 @@ const KEYWORD_ALIASES = {
   '도움말': ['help', '説明', 'help', '도움말'],
   '방법': ['如何', '方法', 'how to', '방법', 'guide'],
   '문의': ['查詢', '聯絡', '支援', 'contact', 'inquiry', '문의'],
+  
+  // ===== 廣告規格 =====
+  '廣告規格': ['廣告圖片規格', 'banner規格', 'banner圖片規格', '廣告格式', '廣告尺寸', '廣告要求', '圖片規格', 'Banner尺寸', '廣告banner', 'spec', 'ad spec'],
+  'Banner': ['橫幅', 'banner', '橫幅廣告', '廣告banner', 'banner廣告'],
+  'Slider': ['Slider A', 'Slider B', '橫幅廣告A', '橫幅廣告B', 'slider', '輪播廣告'],
+  'Splash': ['全頁廣告', 'splash ad', '開屏廣告', 'splash', 'splash廣告'],
+  'Featured Wall': ['焦點精選', 'featured wall', '精選牆', '焦點廣告', 'featured'],
+  '浮動廣告': ['floating icon', '浮動標誌', 'floating banner', '浮動圖像'],
+  '贊助廣告': ['sponsorship', '贊助標誌', 'product sponsorship', 'SKU icon', '贊助icon'],
+  '加單廣告': ['add on', '加單', 'add on banner', '追加購物', 'add on list'],
+  'VIP廣告': ['VIP', 'vip product', 'VIP貨品', 'VIP廣告貨品'],
+  '購物車推薦': ['cart recommendation', 'ATC', '購物車', 'cart recommend', '加入購物車'],
+  'Facebook廣告': ['facebook post', 'FB廣告', 'FB帖子', 'facebook推廣'],
+  'Instagram廣告': ['IG廣告', 'ig post', 'ig story', 'instagram推廣', '限時動態'],
+  '推播通知': ['push notification', 'app notification', '手機推播', '推播訊息', 'push'],
+  'eDM': ['電郵廣告', 'email', 'edm廣告', '電子郵件廣告'],
 };
 
 // 拆分關鍵詞（保留繁體中文分詞 + 韓文）
