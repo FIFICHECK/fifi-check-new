@@ -444,7 +444,7 @@ const FAQ_DATA = {
 詳細資料請搜尋相關廣告名稱。`
       },
       {
-        q: "橫幅廣告A / Slider A / Slider A 尺寸 / Banner A 規格 / 橫幅廣告A Slider A 規格",
+        q: "橫幅廣告A / Slider A / Slider A 尺寸 / Banner A 規格 / 橫幅廣告A Slider A 規格 / SliderA 尺寸 / BannerA 規格 / 橫幅廣告A SliderA 規格",
         a: `📐 橫幅廣告 A — Slider A
 
 裝置：網頁及手機應用程式
@@ -458,7 +458,7 @@ const FAQ_DATA = {
 字數限制：欄1=20字元 / 欄2=20字元 / 欄3=15字元 / 欄4=15字元`
       },
       {
-        q: "橫幅廣告B / Slider B / Slider B 尺寸 / Banner B 規格 / 橫幅廣告B Slider B 規格",
+        q: "橫幅廣告B / Slider B / Slider B 尺寸 / Banner B 規格 / 橫幅廣告B Slider B 規格 / SliderB 尺寸 / BannerB 規格 / 橫幅廣告B SliderB 規格",
         a: `📐 橫幅廣告 B — Slider B
 
 裝置：網頁桌面版及手機應用程式
@@ -1270,13 +1270,30 @@ function similarity(str1, str2) {
 // 增強的關鍵字搜尋函數
 function searchFAQ(query) {
   const normalizedQuery = query.toLowerCase().trim();
-
+  
+  // Normalize spaces around single English letters and numbers followed by Chinese
+  // e.g. "廣告 A" -> "廣告A", "Slider A" -> "SliderA", so both formats match
+  const normalized = normalizedQuery
+    .replace(/ ([A-Za-z0-9]) /g, '$1')     // " A " -> "A"
+    .replace(/ ([A-Za-z0-9])$/g, '$1')       // " A" at end -> "A"  
+    .replace(/^([A-Za-z0-9]) /g, '$1')       // "A " at start -> "A"
+    // Also add spaced versions: "廣告A" -> "廣告 A" variant
+    ;
+  
+  // Also generate query without spaces for comparison
+  const noSpaceQuery = normalizedQuery.replace(/ /g, '');
+  
   // Step 1: 直接匹配（最精確）
-  const directMatches = ALL_FAQ.filter(item =>
-    item.q.toLowerCase().includes(normalizedQuery) ||
-    item.a.toLowerCase().includes(normalizedQuery) ||
-    item.category.toLowerCase().includes(normalizedQuery)
-  );
+  const directMatches = ALL_FAQ.filter(item => {
+    const q = item.q.toLowerCase();
+    const a = item.a.toLowerCase();
+    const c = item.category.toLowerCase();
+    return q.includes(normalizedQuery) ||
+      a.includes(normalizedQuery) ||
+      c.includes(normalizedQuery) ||
+      q.includes(normalized) ||
+      q.includes(noSpaceQuery);
+  });
 
   if (directMatches.length > 0) {
     return directMatches.slice(0, 5);
