@@ -1729,8 +1729,8 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
     addMessage('assistant', '抱歉，我暫時未有相關資料。建議聯絡您的 RM 或 FIFI 查服務團隊：3998 8139');
   }
 
-  // Show sub-option chips for broad topics
-  showSubOptions(userQuestion);
+  // Show sub-option chips for broad topics or based on FAQ match
+  showSubOptions(userQuestion, faqMatch);
 
   // Add quick action buttons to the latest hermes panel
   if (hermesAnalysis && hermesAnalysis.answer) {
@@ -1990,13 +1990,13 @@ var TOPIC_SUB_OPTIONS = {
   ]
 };
 
-function showSubOptions(question) {
+function showSubOptions(question, faqMatch) {
   if (!question) return;
   var q = question.toLowerCase().trim();
   var matchedOptions = null;
   var matchedTopic = '';
 
-  // Check if question matches any broad topic keyword
+  // First pass: check if question matches any broad topic keyword
   for (var topic in TOPIC_SUB_OPTIONS) {
     if (q.indexOf(topic.toLowerCase()) >= 0 || topic.toLowerCase().indexOf(q) >= 0) {
       matchedOptions = TOPIC_SUB_OPTIONS[topic];
@@ -2005,7 +2005,26 @@ function showSubOptions(question) {
     }
   }
 
-  // If no direct match, check if question matches any OPTION text (for persistent chips)
+  // Second pass: use FAQ match category to find relevant topic
+  if (!matchedOptions && faqMatch && faqMatch.category) {
+    var faqCat = faqMatch.category.toLowerCase();
+    for (var topic in TOPIC_SUB_OPTIONS) {
+      if (faqCat.indexOf(topic.toLowerCase()) >= 0 || topic.toLowerCase().indexOf(faqCat) >= 0) {
+        matchedOptions = TOPIC_SUB_OPTIONS[topic];
+        matchedTopic = topic;
+        break;
+      }
+      // Also check if any keyword in FAQ question matches a topic
+      var faqQ = (faqMatch.q || '').toLowerCase();
+      if (faqQ.indexOf(topic.toLowerCase()) >= 0) {
+        matchedOptions = TOPIC_SUB_OPTIONS[topic];
+        matchedTopic = topic;
+        break;
+      }
+    }
+  }
+
+  // Third pass: check if question matches any OPTION text (for persistent chips)
   if (!matchedOptions) {
     for (var topic in TOPIC_SUB_OPTIONS) {
       var opts = TOPIC_SUB_OPTIONS[topic];
@@ -2020,7 +2039,16 @@ function showSubOptions(question) {
     }
   }
 
-  if (!matchedOptions || matchedOptions.length === 0) return;
+  // Final fallback: show default common topic chips if nothing matched
+  if (!matchedOptions || matchedOptions.length === 0) {
+    matchedOptions = [
+      '如何上架新產品？',
+      '佣金率是多少？',
+      '如何處理退貨？',
+      '橫幅廣告 A Slider A 規格',
+      '廣告價目表'
+    ];
+  }
 
   var chipsHtml = '<div class="hermes-panel-container" style="margin-top:4px;">' +
     '<div class="hermes-analysis" style="padding:12px 16px;">' +
