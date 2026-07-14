@@ -1821,21 +1821,18 @@ var TOPIC_SUB_OPTIONS = {
     '如何提升出貨準確度？'
   ],
   '廣告': [
-    '橫幅廣告A Slider A 規格',
-    '橫幅廣告B Slider B 規格',
-    '全頁廣告 Splash Ad 規格',
-    '開頁廣告 Open App Image 規格',
-    '目標導向全頁廣告 Splash Ad Interest Base 規格',
-    '彈出式廣告 Crazy Ad 規格',
-    '置頂橫幅廣告 Top Banner 規格',
-    '分類橫幅廣告 Category Banner 規格',
-    '類別主頁廣告 B Street Banner B 規格',
-    '分類橫幅廣告 B Category Banner B 規格',
-    'Section Banner 桌面版規格',
-    '浮動標誌廣告 Floating Icon 規格',
-    '浮動圖像廣告 Floating Banner 規格',
-    'Inspired 橫幅廣告 Inspired Banner 規格',
     '如何在HKTV投放廣告？',
+    '廣告系統教學',
+    '如何提升廣告效果？',
+    '廣告預算如何設定？',
+    '廣告圖片格式通用要求',
+    '橫幅廣告A Slider A 規格',
+    '全頁廣告 Splash Ad 規格',
+    'Facebook / Instagram 廣告價格'
+  ],
+  '如何投放廣告': [
+    '如何在HKTV投放廣告？',
+    '廣告系統教學',
     '如何提升廣告效果？',
     '廣告預算如何設定？'
   ],
