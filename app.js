@@ -1562,6 +1562,12 @@ function getFAQContext(excludeCategories) {
 // 顯示回覆
 // ================================================
 
+// 只有當回覆需要商戶 @ 3998 8139（FIFI 查服務熱線）時，才顯示 👍/👎/➕FAQ feedback
+function needsServiceFeedback(text) {
+  if (!text) return false;
+  return /3998[\s\-]*8139/.test(String(text));
+}
+
 async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
   const isCommissionQ = /佣金|commission|傭金|佣金率/i.test(userQuestion);
 
@@ -1600,12 +1606,13 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
             <button class="lang-btn" onclick="translateAnswer(this, 'en')">ENG</button>
             <button class="lang-btn" onclick="translateAnswer(this, 'zh-CN')">简中</button>
           </div>
-          <!-- Feedback Bar -->
+          ${needsServiceFeedback(hermesAnalysis.answer) ? `
+          <!-- Feedback Bar（只限需要 @ 3998 8139 服務熱線嘅回覆） -->
           <div class="feedback-bar" data-answer="${escapeHtml(hermesAnalysis.answer)}">
             <button class="feedback-btn feedback-btn-up" onclick="LEARNING_ENGINE.recordFeedback('up', this.parentElement.getAttribute('data-answer'), '${escapeHtml(userQuestion.replace(/'/g, "\\'"))}'); this.classList.toggle('active');" title="有用 👍">👍</button>
             <button class="feedback-btn feedback-btn-down" onclick="LEARNING_ENGINE.recordFeedback('down', this.parentElement.getAttribute('data-answer'), '${escapeHtml(userQuestion.replace(/'/g, "\\'"))}'); this.classList.toggle('active');" title="無用 👎">👎</button>
             <button class="feedback-btn btn-add-faq" onclick="LEARNING_ENGINE.addCurrentAnswerToFAQ(this)" title="加入自訂知識庫">➕ FAQ</button>
-          </div>
+          </div>` : ''}
         </div>
     `;
 
@@ -1704,12 +1711,13 @@ async function showAssistantResponse(userQuestion, faqMatches, hermesAnalysis) {
           <div class="hermes-section-content" style="background: var(--bg-warm); padding: 12px; border-radius: 6px; margin-top: 8px;">${formatTextForHtml(faqMatch.a)}</div>
         </div>
 
-        <!-- Feedback Bar -->
+        ${needsServiceFeedback(faqMatch.a) ? `
+        <!-- Feedback Bar（只限需要 @ 3998 8139 服務熱線嘅回覆） -->
         <div class="feedback-bar" style="margin-top:8px;">
           <button class="feedback-btn feedback-btn-up" onclick="LEARNING_ENGINE.recordFeedback('up', '${escapeHtml(faqMatch.a.replace(/'/g, "\\'"))}', '${escapeHtml(userQuestion.replace(/'/g, "\\'"))}'); this.classList.toggle('active');" title="有用 👍">👍</button>
           <button class="feedback-btn feedback-btn-down" onclick="LEARNING_ENGINE.recordFeedback('down', '${escapeHtml(faqMatch.a.replace(/'/g, "\\'"))}', '${escapeHtml(userQuestion.replace(/'/g, "\\'"))}'); this.classList.toggle('active');" title="無用 👎">👎</button>
           <button class="feedback-btn btn-add-faq" onclick="LEARNING_ENGINE.addCurrentAnswerToFAQ(this)" title="加入自訂知識庫">➕ FAQ</button>
-        </div>
+        </div>` : ''}
 
         ${faqMatches.length > 1 ? `
         <div class="hermes-section" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
